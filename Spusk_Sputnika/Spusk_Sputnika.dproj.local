@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.297,C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\my_eph.dll=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.921,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\DeLibrary.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.844,=D:\Хранилища\Yandex.Disk\УИРС\My Try\Win32\Release\my_eph.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.107,C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\uEpheremides.pas=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.664,D:\Хранилища\Yandex.Disk\УИРС\My Try\Win32\Release\my_eph.dll=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.271,C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\uEpheremides_out.pas=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.669,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.445,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\eph.dll=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.520,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uTime.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.544,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\eph.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.353,C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\uEpheremides.pas=C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.651,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\my_eph.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.716,=D:\Хранилища\Yandex.Disk\УИРС\My Try\Win32\Release\myeph.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.616,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\DEManaged.dll</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.130,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uStarTime.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.836,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uAtmosphericDrag.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uForces.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.940,=C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.053,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uForces.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.063,=C:\Users\Netbook\YandexDisk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.075,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uTLE_conversation.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.261,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uEpheremides_out.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.254,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.697,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uFunctions.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.444,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uTest_Module.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.489,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uEpheremides.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.670,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.760,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.265,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uMatrix_Operations.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.512,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uControl.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.663,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uCreate.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.233,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uMatrix_Conversation.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.896,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uPrecNut.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.999,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.427,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.837,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.519,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.736,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.485,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.023,D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\uSunPressure.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.151,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.053,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.447,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.514,=D:\Хранилища\Yandex.Disk\УИРС\Spusk_Sputnika\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>
