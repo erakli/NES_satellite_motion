@@ -225,3 +225,4 @@ pip-log.txt
 *.~dsk
 *.local
 *.dsk
+__history/
