@@ -214,3 +214,14 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+#############
+## My Additions
+#############
+
+# For RAD-studio
+*.identcache
+*.~dsk
+*.local
+*.dsk
