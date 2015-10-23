@@ -56,18 +56,59 @@ implementation
 
 function FromDateToMJD(Date: TDate): double;
 var
-  temp_year, temp_month: word;
-  MJD: double;
+  temp_year, temp_month, A, B: integer;
+//  MJD: double;
+	JD: double;
+  short_period: boolean;
 begin
+
+	short_period := true; // если нас интересует промежуток между 1901 и 2099
 
   with Date do
   begin
-    temp_year := Year - 1900;
-    temp_month := Month - 3;
-    MJD := 15078 + 365.0 * temp_year + INT(temp_year / 4) +
-      INT(0.5 + 30.6 * temp_month);
+		// реализация из comalg.pdf для MJD
+//    temp_year := Year - 1900;
+//    temp_month := Month - 3;
+//    MJD := 15078 + 365.0 * temp_year + INT(temp_year / 4) +
+//      INT(0.5 + 30.6 * temp_month);
+//
+//    result := MJD + Day + Hour / 24 + Minute / 1440 + second / SecInDay;
 
-    result := MJD + Day + Hour / 24 + Minute / 1440 + second / SecInDay;
+		// реализация из AA.pdf
+		temp_year := Year;
+
+    if short_period then // выбираем короткий промежуток дат
+    begin
+
+      temp_year := temp_year - 1;
+
+      B := -13;
+      A := Trunc(temp_year / 100);
+
+      JD := 1721409.5 + Trunc(365.25 * (temp_year));
+
+    end
+    else   // иначе выбрали полный диапазон
+    begin
+
+      temp_month := Month;
+
+      if temp_month <= 2 then
+      begin
+        temp_year := temp_year - 1;
+        temp_month := temp_month + 12;
+      end;
+
+      A := Trunc(temp_year / 100);
+      B := 2 - A + Trunc(A / 4);
+
+      JD := Trunc(365.25 * (temp_year + 4716))
+       + Trunc(30.6001 * (temp_month + 1)) + Day + B - 1524.5;
+
+    end;
+
+    Result := JD - MJDCorrection + Hour / 24 + Minute / 1440 + second / SecInDay;
+
   end;
 
 end;

@@ -14,6 +14,8 @@ const
 
   SecInDay = 86400; // секунд в дне
 
+  MJDCorrection = 2400000.5; // вычитать из JD
+
   // // Для торможения атмосферы
   // Earth_eq_rad = 6378.14; // [km] Экваториальный радиус Земли
   // Earth_alpha_0 = 0.0033528131778969; // 1 / 298.257 - сжатие Земли
@@ -66,8 +68,8 @@ type
     coord, speed: TVector;
   end;
 
-  { a, s_e, i, b_Omega, s_omega, M - Кеплеровские элементы орбиты (6) }
-  TElements = array [0 .. 5] of double;
+  { a, s_e, i, b_Omega, s_omega, M0, n - Кеплеровские элементы орбиты (7) }
+  TElements = array [0 .. 6] of double;
 
   TLE_lines = array [0 .. 1] of string;
 
