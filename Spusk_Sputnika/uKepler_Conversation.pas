@@ -9,14 +9,17 @@ uses uConstants, Math;
 const
   Num_of_iter = 4;
 
-function Newton_Iter_Method(s_e, M: double): double;
-function Kepler_to_Decart(Elements: TElements; mass: double): param;
+function Iter_Method(s_e, M: double; Newton: boolean = true): double;
+function Kepler_to_Decart(Elements: TElements; mass: double): param; overload;
+function Kepler_to_Decart(Elements: TElements; mass: double; var Dubosh: boolean): param; overload;
 
 implementation
 
 // ---------------------------------------------------------------
 
-function Newton_Iter_Method(s_e, M: double): double;
+function Iter_Method(s_e, M: double; Newton: boolean = true): double;
+const
+	max_iter = 241;
 var
   iter: integer;
   E: double;
@@ -27,20 +30,38 @@ begin
 //   E := E - ((E - s_e * sin(DegToRad(E)) - M) / (1 - s_e * cos(DegToRad(E))));
 //   result := E;
 
-  cur := M + s_e * Sin(DegToRad(M));
-  E := cur;
+  cur := M + s_e * Sin(M);  // в радианах
   dif := 1;
   iter := 0;
 
-  While ((dif > 1.0E-15) AND (iter < 241)) Do
-  Begin
-    E := cur - (cur - s_e * Sin(DegToRad(cur)) - M) / (1 - s_e * Cos(DegToRad(cur)));
-    dif := Abs(cur - E);
-    cur := E;
-    iter := iter + 1;
-  End;
+  if Newton then // используем для вычисления итерационный метод Ньютона
+  begin
 
-  result := E;
+    While ((dif > 1.0E-15) AND (iter < max_iter)) Do
+    Begin
+      E := cur - (cur - s_e * Sin(cur) - M) / (1 - s_e * Cos(cur));
+      dif := Abs(cur - E);
+      cur := E;
+      iter := iter + 1;
+    End;
+
+  end
+
+  else // иначе используем метод "неподвижной точки" (Балк, Элементы динамики космического полёта, с. 114)
+
+  begin
+
+  	While ((dif > 1.0E-15) AND (iter < max_iter)) Do
+    Begin
+      E := s_e * Sin(cur) + M;
+      dif := Abs(cur - E);
+      cur := E;
+      iter := iter + 1;
+    End;
+
+  end; // if Newton
+
+  result := E;  // ответ в радианах
 
 end;
 
@@ -96,24 +117,23 @@ begin
 
   a := Elements[0];
   s_e := Elements[1];
-  i := Elements[2];
-  b_Omega := Elements[3];
-  s_omega := Elements[4];
-  M := Elements[5];
+  i := DegToRad(Elements[2]); // переводим в радианы, так как sin и cos считаются для радиан
+  b_Omega := DegToRad(Elements[3]);
+  s_omega := DegToRad(Elements[4]);
+  M := DegToRad(Elements[5]);
 
   // E - эксцентрическая аномалия
-  b_E := Newton_Iter_Method(s_e, M);
+  b_E := Iter_Method(s_e, M); // сразу считается в радианах
 
   // v - истинная аномалия
-  v.sin := (sqrt(1 - sqr(s_e)) * Sin(DegToRad(b_E))) /
-    (1 - s_e * Cos(DegToRad(b_E)));
-  v.cos := (Cos(DegToRad(b_E)) - s_e) / (1 - s_e * Cos(DegToRad(b_E)));
+  v.sin := (sqrt(1 - sqr(s_e)) * Sin(b_E)) / (1 - s_e * Cos(b_E));
+  v.cos := (Cos(b_E) - s_e) / (1 - s_e * Cos(b_E));
 
   // u - аргумент перицентра
-  u.sin := v.sin * Cos(DegToRad(s_omega)) + v.cos * Sin(DegToRad(s_omega));
-  u.cos := v.cos * Cos(DegToRad(s_omega)) + v.sin * Sin(DegToRad(s_omega));
+  u.sin := v.sin * Cos(s_omega) + v.cos * Sin(s_omega);
+  u.cos := v.cos * Cos(s_omega) + v.sin * Sin(s_omega);
 
-  r := a * (1 - s_e * Cos(DegToRad(b_E))); // [km] - радиус-вектор
+  r := a * (1 - s_e * Cos(b_E)); // [km] - радиус-вектор
   p := a * (1 - sqr(s_e)); // параметр орбиты
 
   with result do
@@ -122,21 +142,18 @@ begin
     tang_speed := sqrt(fm * mass / p) * (1 + s_e * v.sin);
 
     // coordinates
-    coord[0] := r * (u.cos * Cos(DegToRad(b_Omega)) - u.sin *
-      Sin(DegToRad(b_Omega)) * Cos(DegToRad(i)));
-    coord[1] := r * (u.cos * Sin(DegToRad(b_Omega)) + u.sin *
-      Cos(DegToRad(b_Omega)) * Cos(DegToRad(i)));
-    coord[2] := r * u.sin * Sin(DegToRad(i));
+    coord[0] := r * (u.cos * Cos(b_Omega) - u.sin * Sin(b_Omega) * Cos(i));
+    coord[1] := r * (u.cos * Sin(b_Omega) + u.sin * Cos(b_Omega) * Cos(i));
+    coord[2] := r * u.sin * Sin(i);
 
     // speed
     speed[0] := coord[0] / r * rad_speed +
-      (-1 * u.sin * Cos(DegToRad(b_Omega)) - u.cos * Sin(DegToRad(b_Omega)) *
-      Cos(DegToRad(i))) * tang_speed;
+      (-1 * u.sin * Cos(b_Omega) - u.cos * Sin(b_Omega) * Cos(i)) * tang_speed;
+
     speed[1] := coord[1] / r * rad_speed +
-      (-1 * u.sin * Sin(DegToRad(b_Omega)) + u.cos * Cos(DegToRad(b_Omega)) *
-      Cos(DegToRad(i))) * tang_speed;
-    speed[2] := coord[2] / r * rad_speed + u.cos * Sin(DegToRad(i)) *
-      tang_speed;
+      (-1 * u.sin * Sin(b_Omega) + u.cos * Cos(b_Omega) * Cos(i)) * tang_speed;
+
+    speed[2] := coord[2] / r * rad_speed + u.cos * Sin(i) * tang_speed;
 
     // // combination
     // temp_result.coord := coord;
@@ -144,6 +161,76 @@ begin
   end;
 
   // result := temp_result;
+
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+
+{
+	Реализация преобразования этих элементов из Дубошина (с. 223)
+}
+function Kepler_to_Decart(Elements: TElements; mass: double; var Dubosh: boolean): param;
+var
+  a, s_e, i, b_Omega, s_omega, M, // Кеплеровы элементы орбиты
+  b_E,
+  r,        // радиус-вектор
+  Ksi, Eta, // орбитальные координаты
+  rad_speed, tang_speed: double;
+
+
+  P, Q, PQ_check,
+  coord: TVector;
+
+	j: byte;
+begin
+
+	Dubosh := true;
+
+  a := Elements[0];
+  s_e := Elements[1];
+  i := DegToRad(Elements[2]);
+  b_Omega := DegToRad(Elements[3]);
+  s_omega := DegToRad(Elements[4]);
+  M := DegToRad(Elements[5]);
+
+  P[0] := cos(s_omega) * cos(b_Omega) - sin(s_omega) * sin(b_Omega) * cos(i);
+  P[1] := cos(s_omega) * sin(b_Omega) + sin(s_omega) * cos(b_Omega) * cos(i);
+  P[2] := sin(s_omega) * sin(i);
+
+  Q[0] := - sin(s_omega) * cos(b_Omega) - cos(s_omega) * sin(b_Omega) * cos(i);
+  Q[1] := - sin(s_omega) * sin(b_Omega) + cos(s_omega) * cos(b_Omega) * cos(i);
+  Q[2] := cos(s_omega) * sin(i);
+
+  PQ_check[0] := 0; // сумма квадратов P
+  PQ_check[1] := 0; // сумма квадратов Q
+  PQ_check[2] := 0; // сумма попарного произведения координат P и Q
+
+  for j := 0 to 2 do
+  begin
+  	PQ_check[0] := PQ_check[0] + sqr(P[j]);
+    PQ_check[1] := PQ_check[1] + sqr(Q[j]);
+    PQ_check[2] := PQ_check[2] + P[j] * Q[j];
+  end;
+
+  // контроль вычислений
+  if (PQ_check[0] <> 1) OR (PQ_check[1] <> 1) OR (Abs(PQ_check[2]) > 1.0e-15) then
+  begin
+    Dubosh := false; // мы не удовлетворяем условиям проверки P и Q
+    Result.coord := PQ_check;
+    Exit; // закончили выполнение текущей функции. Снаружи нужен обработчик
+  end;
+
+  // E - эксцентрическая аномалия
+  b_E := Iter_Method(s_e, M, false); // сразу считается в радианах. Булинь - для выбора метода (Ньютона или неподв. точек)
+
+  r := a * (1 - s_e * cos(b_E));
+  Ksi := a * (cos(b_E) - s_e);
+  Eta := a * sqrt(1 - sqr(s_e)) * sin(b_E);
+
+  for j := 0 to 2 do
+  	coord[j] := P[j] * Ksi + Q[j] * Eta;
+
+  Result.coord := coord;
 
 end;
 
