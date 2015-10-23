@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "aaplus\AA+.h"
+#include "AAElliptical.h"
 
 typedef CAAElliptical *EllipticalHandle;
 
@@ -65,7 +65,18 @@ extern "C"
 		Res.CoordinateEcliptical[1] = ResTemp.HeliocentricRectangularEcliptical.Y;
 		Res.CoordinateEcliptical[2] = ResTemp.HeliocentricRectangularEcliptical.Z;
 
+		Res.elments[0] = ResTemp.HeliocentricEclipticLongitude;
+		Res.elments[1] = ResTemp.HeliocentricEclipticLatitude;
+		Res.elments[2] = ResTemp.TrueGeocentricRA;
+		Res.elments[3] = ResTemp.TrueGeocentricDeclination;
 		Res.elments[4] = ResTemp.TrueGeocentricDistance;
+		Res.elments[5] = ResTemp.TrueGeocentricLightTime;
+		Res.elments[6] = ResTemp.AstrometricGeocentricRA;
+		Res.elments[7] = ResTemp.AstrometricGeocentricDeclination;
+		Res.elments[8] = ResTemp.AstrometricGeocentricDistance;
+		Res.elments[9] = ResTemp.AstrometricGeocentricLightTime;
+		Res.elments[10] = ResTemp.Elongation;
+		Res.elments[11] = ResTemp.PhaseAngle;
 
 		return Res;
 
