@@ -2,7 +2,7 @@ program Spusk_Sputnika;
 
 uses
   Vcl.Forms,
-  UI_unit in 'UI_unit.pas' {Main_Window} ,
+  UI_unit in 'UI_unit.pas' {Main_Window},
   uKepler_Conversation in 'uKepler_Conversation.pas',
   uConstants in 'uConstants.pas',
   uGEO_Potential in 'uGEO_Potential.pas',
@@ -20,7 +20,8 @@ uses
   uPrecNut in 'uPrecNut.pas',
   uStarTime in 'uStarTime.pas',
   uTLE_conversation in 'uTLE_conversation.pas',
-  uControl in 'uControl.pas';
+  uControl in 'uControl.pas',
+  uPrecNut_InitialParam in 'uPrecNut_InitialParam.pas';
 
 {$R *.res}
 

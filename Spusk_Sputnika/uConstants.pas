@@ -26,6 +26,8 @@ const
 
   deletimer = '	';
 
+  asecInTurn = 360 * 60 * 60;
+
 type
 
   TMatrix = array [0 .. m_size, 0 .. m_size] of double;

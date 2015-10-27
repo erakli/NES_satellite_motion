@@ -4,154 +4,123 @@ interface
 
 { Алгоритмы вычисления матрицы прецессии и матрицы нутации
 
-  Примечание: во всех формулах требуется момент времени t в шкале
-  барицентрического динамического времени
-
-  Переменная tc вычисляется лишний раз. Надо будет потом исправить этот
-  момент }
+  }
 
 uses
-  uConstants, uMatrix_Operations, uEpheremides;
+  uConstants, uMatrix_Operations, uFunctions,
+   uPrecNut_InitialParam; // здесь
 
-const
-  rs = 4.848136811095E-6; { В этой постоянной хранится число для перевода
-    дуговых секунд в радианную меру }
+type
 
-function ClcPrecAngels(t: double): TVector; // Вычисление параметров прецессии
-function ClcPrecMatr(t: double): TMatrix; // Вычисление матрицы прецессии
+	TCIP_Tranform_Matrix = class  // Матрица Q(t)
+  private
 
-function GetEpsMean(t: double): double; // Вычисление угла наклона эклиптики
+  	X, Y, { Координаты CIP в GCRS }
 
-function ClcNutMatr(t: double): TMatrix; // Вычисление матрицы нутации
+    s     { s being a quantity, named "CIO locator", which provides the position
+    				of the CIO on the equator of the CIP corresponding to the kinematical
+            defnition of the NRO in the GCRS when the CIP is moving with respect
+            to the GCRS, between the reference epoch and the date t due to
+            precession and nutation }
+     : double;
 
-function EarthRotMatr(S: double): TMatrix; // Матрица вращения Земли
+
+  	{* * * The fundamental arguments of nutation theory * * *}
+
+    {*	The arguments of lunisolar nutation (0..4)
+    	+ the arguments for the planetary nutation (5..13) *}
+
+  	Fa: array[0..FA_SIZE] of double; // t is measured in Julian centuries of TDB
+
+    { Инициализация данных }
+    procedure FaInit(t: double);
+
+    { Вычисление X и Y }
+    function getX(t: double): double;
+    function getY(t: double): double;
+
+  public
+
+  	function getQ_Matrix(t: double): TMatrix;
+
+  	constructor Create;
+    destructor Destroy; override;
+
+  end;
+
 
 implementation
 
-{ Вычисление параметров прецессии
 
-  Параметрами прецессии называются три угловые переменные: ζa(t), θa(t),
-  za(t). Аргументом t для вычисления параметров прецессии является барицентри-
-  ческое динамическое время TDB, выраженное в модифицированных юлианских
-  днях (MJD).
+{ TCIP_Tranform_Matrix }
 
-  С помощью параметров прецессии вычисляют матрицу прецессии для преоб-
-  разования от системы координат, соответствующей стандартной эпохе J2000.0, в
-  систему подвижного экватора и мгновенной эклиптики, соответствующую задан-
-  ной эпохе.
-
-  Единица измерений параметров прецессии – радиан. }
-function ClcPrecAngels(t: double): TVector;
-var
-  tc: double; { Вспомогательная переменная tc содержит время в юлианских
-    столетиях, прошедшее от стандартной эпохи J2000.0, начало
-    которой соответствует 1.5 января 2000 года }
+constructor TCIP_Tranform_Matrix.Create;
 begin
-
-  tc := (t - 51544.5) / 36525;
-
-  result[0] := rs * (2306.2181 + (0.30188 + 0.017998 * tc) * tc) * tc; // ζa(t)
-  result[1] := rs * (2004.3109 - (0.42665 + 0.041833 * tc) * tc) * tc; // θa(t)
-  result[2] := rs * (2306.2181 + (1.09468 + 0.018203 * tc) * tc) * tc; // za(t)
 
 end;
 
-{ Вычисление матрицы прецессии
-
-  Матрица прецессии необходима для преобразования от системы координат,
-  соответствующей стандартной эпохе J2000.0, в систему среднего подвижного
-  экватора и мгновенной эклиптики, соответствующую заданной эпохе. }
-function ClcPrecMatr(t: double): TMatrix;
-var
-  r_values: TVector; // Значения параметров прецессии
-  R: array [0 .. 2] of TMatrix; // Три матрицы поворота
-  Matrx: TMatrix;
+destructor TCIP_Tranform_Matrix.Destroy;
 begin
 
-  r_values := ClcPrecAngels(t);
+	{ уточнить про очистку динамического массива (в интернете указано, что
+  	"you don't need to free the memory at all, since this is done automatically
+     when the identifier goes out of scope") }
+  inherited;
+end;
 
-  { Здесь вычисляются три матрицы поворота }
+procedure TCIP_Tranform_Matrix.FaInit(t: double);   // t is measured in Julian centuries
+var
+	l, l_, F, D, Om: double;
+begin
 
-  R[0] := RotMatr(-r_values[0]).z; // Rz(−ζa(t))
-  R[1] := RotMatr(r_values[1]).y; // Ry(θa(t))
-  R[2] := RotMatr(-r_values[2]).z; // Rz(−za(t))
+	// придумать оптимизацию, написать описания
 
-  { Далее матрица прецессии получается последовательным перемножением этих
-    трёх матриц поворота }
-  Matrx := MultMatr(R[1], R[0]); // Вычисление части конечного выражения
+	l :=  asec2rad(134.96340251 * 3600 + 1717915923.2178 * t + 31.8792 * pow2(t)
+  			+ 0.051635 * pow3(t) - 0.0002447 * pow4(t));
 
-  result := MultMatr(R[2], Matrx); // Результатом будет матрица
+  l_ := asec2rad(357.52910918 * 3600 + 129596581.0481 * t - 0.5532 * pow2(t)
+  			+ 0.000136 * pow3(t) - 0.00001149 * pow4(t));
+
+  F := asec2rad(93.27209062 * 3600 + 1739527262.8478 * t - 12.7512 * pow2(t)
+  		 - 0.001037 * pow3(t) + 0.00000417 * pow4(t));
+
+  D := asec2rad(297.85019547 * 3600 + 1602961601.209 * t - 6.3706 * pow2(t)
+			 + 0.006593 * pow3(t) - 0.00003169 * pow4(t));
+
+  Om := asec2rad(125.04455501 * 3600 - 6962890.5431 * t + 7.4722 * pow2(t)
+			  + 0.007702 * pow3(t) - 0.00005939 * pow4(t));
+
+  Fa[0] := l;
+  Fa[1] := l_;
+  Fa[2] := F;
+  Fa[3] := D;
+  Fa[4] := Om;
+
+  // в радианах
+  Fa[5] := 4.402608842 + 2608.7903141574 * t;
+  Fa[6] := 3.176146697 + 1021.3285546211 * t;
+  Fa[7] := 1.753470314 + 628.3075849991 * t;
+  Fa[8] := 6.203480913 + 334.0612426700 * t;
+  Fa[9] := 0.599546497 + 52.9690962641 * t;
+	Fa[10] := 0.874016757 + 21.3299104960 * t;
+	Fa[11] := 5.481293872 + 7.4781598567 * t;
+	Fa[12] := 5.311886287 + 3.8133035638 * t;
+	Fa[13] := 0.02438175 * t + 0.00000538691 * pow2(t);
 
 end;
 
-{ Вычисление угла наклона эклиптики
-
-  Числовое значение угла наклона мгновенной эклиптики к среднему подвижно-
-  му экватору ε(t) , заданное на момент барицентрического динамического времени
-  t , необходимо для вычисления матрицы нутации. }
-function GetEpsMean(t: double): double;
-var
-  tc: double; { Вспомогательная переменная tc содержит время в юлианских
-    столетиях, прошедшее от стандартной эпохи J2000.0, начало
-    которой соответствует 1.5 января 2000 года }
+function TCIP_Tranform_Matrix.getQ_Matrix(t: double): TMatrix;
 begin
-
-  tc := (t - 51544.5) / 36525;
-
-  result := rs * (84381.448 - (46.815 + (0.0059 - 0.001813 * tc) * tc) * tc);
 
 end;
 
-{ Вычисление матрицы нутации
-
-  Матрица нутации необходима для преобразования от системы координат, соот-
-  ветствующей среднему подвижному экватору, в систему координат, соответству-
-  ющей истинному экватору.
-
-  Δψ — нутация в долготе,
-  Δε — нутация в наклоне.
-
-  Параметры нутации не вычисляются, а достаются из распознанного файла
-  эферемид (DE405) с помощью функции Epheremides.GetEpheremides }
-function ClcNutMatr(t: double): TMatrix;
-var
-  r_values: coordinates; // Параметров нутации
-  R: array [0 .. 2] of TMatrix; // Три матрицы поворота
-  Matrx: TMatrix;
-  Eps // Переменная для хранения значения угла наклона эклиптики ε(t)
-    : double;
+function TCIP_Tranform_Matrix.getX(t: double): double;
 begin
-
-  r_values := Epheremides.GetEpheremides(t, true); { true означает, что
-    получаем параметры нутации }
-
-  Eps := GetEpsMean(t); { угол наклона мгновенной эклиптики к среднему
-    подвижному экватору ε(t) }
-
-  { Здесь вычисляются три матрицы поворота }
-  with r_values do // x = Δψ (нутация в долготе), y = Δε (нутация в наклоне)
-  begin
-    R[0] := RotMatr(-Eps - y).x; // Rx(−ε − Δε)
-    R[1] := RotMatr(-x).z; // Rz(−Δψ)
-    R[2] := RotMatr(Eps).x; // Rx(ε)
-  end;
-
-  { Далее матрица нутации получается последовательным перемножением этих
-    трёх матриц поворота }
-  Matrx := MultMatr(R[1], R[2]); // Вычисление части конечного выражения
-
-  result := MultMatr(R[0], Matrx); // Результатом будет матрица
 
 end;
 
-{ Матрица вращения Земли
-
-  Матрица вращения Земли R является матрицей поворота вокруг оси OZ на
-  угол, равный значению истинного звёздного времени S }
-function EarthRotMatr(S: double): TMatrix;
+function TCIP_Tranform_Matrix.getY(t: double): double;
 begin
-
-  result := RotMatr(S).z;
 
 end;
 
