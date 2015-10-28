@@ -5,10 +5,10 @@ unit uMatrix_Operations;
 interface
 
 uses
-  uConstants;
+  uTypes;
 
 function MultMatrVec(matrx: TMatrix; vec: TVector): TVector;
-function RotMatr(t: double): TMassive;
+function RotMatr(t: MType): TMassive;
 function MultMatr(m, q: TMatrix): TMatrix;
 function TranspMatr(m: TMatrix): TMatrix;
 
@@ -33,7 +33,7 @@ begin
 end;
 
 { Вращение матрицы вокруг осей }
-function RotMatr(t: double): TMassive;
+function RotMatr(t: MType): TMassive;
 begin
 
   with result do

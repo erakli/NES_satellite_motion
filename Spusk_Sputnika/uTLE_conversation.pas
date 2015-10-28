@@ -5,7 +5,7 @@ interface
 { unfornor - интересные формулы }
 
 uses
-  uConstants, uTime, SysUtils, Math;
+  uConstants, uTypes, uTime, SysUtils, Math;
 
 function ReadTLE(TLE: TLE_lines): output;
 
@@ -13,7 +13,7 @@ implementation
 
 function ReadTLE(TLE: TLE_lines): output;
 var
-  epoch, MNMOTION, n: double;
+  epoch, MNMOTION, n: MType;
   year: integer;
 
   temp_str: string;

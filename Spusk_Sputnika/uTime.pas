@@ -16,7 +16,7 @@ interface
   2 марта 1900 года по 27 февраля 2100 года. }
 
 uses
-  System.SysUtils, uConstants, Classes, Dialogs;
+  System.SysUtils, uConstants, uTypes, Classes, Dialogs;
 
 const
   TAI_TT = 32.184; // Константа добавляемая к Атомному времени для перевода в
@@ -27,21 +27,21 @@ const
 type
   TDate = record
     Year, Month, Day, Hour, Minute: word;
-    second: double;
+    second: MType;
   end;
 
-function FromDateToMJD(Date: TDate): double;
-function FromMJDToDate(MJD: double): TDate;
+function FromDateToMJD(Date: TDate): MType;
+function FromMJDToDate(MJD: MType): TDate;
 
-function GetDeltaTAI(Date: TDate): double;
+function GetDeltaTAI(Date: TDate): MType;
 // Поправка к шкале всемирного времени
-function GetDeltaUT(MJD: double): TVector;
+function GetDeltaUT(MJD: MType): TVector;
 // Получение поправки ΔUT = UT1 − UTC и координат полюса
 
-function UT1_time(MJD: double): double; // Вычисление Всемирного времени
-function TT_time(MJD: double): double; // Вычисление земного времени
+function UT1_time(MJD: MType): MType; // Вычисление Всемирного времени
+function TT_time(MJD: MType): MType; // Вычисление земного времени
 
-function TDB_time(MJD: double): double;
+function TDB_time(MJD: MType): MType;
 { Вычисление барицентрического динамического времени }
 
 var
@@ -54,11 +54,11 @@ implementation
 
 // ---------------------------------------------------------------
 
-function FromDateToMJD(Date: TDate): double;
+function FromDateToMJD(Date: TDate): MType;
 var
   temp_year, temp_month, A, B: integer;
-//  MJD: double;
-	JD: double;
+//  MJD: MType;
+	JD: MType;
   short_period: boolean;
 begin
 
@@ -113,9 +113,9 @@ begin
 
 end;
 
-function FromMJDToDate(MJD: double): TDate;
+function FromMJDToDate(MJD: MType): TDate;
 var
-  sp, rd: double;
+  sp, rd: MType;
   nd, nz, na, nb, ma, Year, Month, Day, Hour, Minute: longword;
 begin
 
@@ -167,7 +167,7 @@ end;
 
   Поправка получается из разницы Атомного и Всемирного времени
   (DeltaTT = TAI - UTC) в сек }
-function GetDeltaTAI(Date: TDate): double;
+function GetDeltaTAI(Date: TDate): MType;
 var
   i: integer;
   SearchStr, text: string;
@@ -210,7 +210,7 @@ end;
 
 { Получение поправки к UTC для получения UT1 и координат полюса на момент
   времени UT1 }
-function GetDeltaUT(MJD: double): TVector;
+function GetDeltaUT(MJD: MType): TVector;
 // 0 - DUT1, 1-2 - xp, yp (коорд. полюса)
 var
   i: integer;
@@ -276,9 +276,9 @@ end;
 // *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
 { Вычисление Всемирного времени }
-function UT1_time(MJD: double): double;
+function UT1_time(MJD: MType): MType;
 var
-  DeltaUT: double;
+  DeltaUT: MType;
   // Поправка ΔUT = UT1 − UTC, приближение UTC к UT1 (Всемирному времни)
 begin
 
@@ -296,9 +296,9 @@ end;
 
   На поверхности Земли и в околоземном пространстве пользуются равномерной
   шкалой земного времени TT. }
-function TT_time(MJD: double): double;
+function TT_time(MJD: MType): MType;
 var
-  DeltaTAI: double;
+  DeltaTAI: MType;
   Date: TDate;
 begin
 
@@ -317,12 +317,12 @@ end;
   ческого динамического времени TDB.
   В этой шкале вычисляются положения Луны, Солнца и параметры прецессии
   и нутации. }
-function TDB_time(MJD: double): double;
+function TDB_time(MJD: MType): MType;
 var
   d, g, // Вспомогательные переменные
   TT { Момент в шкале земного времени TT, выраженный в модифицированных юли-
     анских днях. }
-    : double;
+    : MType;
 begin
 
   TT := TT_time(MJD);

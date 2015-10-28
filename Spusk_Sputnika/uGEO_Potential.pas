@@ -7,7 +7,7 @@ interface
 
 uses
   uConstants, uFunctions, uMatrix_Conversation, uMatrix_Operations,
-  System.SysUtils, Math;
+  System.SysUtils, uTypes, Math;
 
 const
   n = 12; // Количество гармоник ?
@@ -19,15 +19,15 @@ const
 type
 
   TFullForm = record
-    main, diff: double;
+    main, diff: MType;
   end;
 
   TParts = record
-    x, y, z: double;
+    x, y, z: MType;
   end;
 
   TFullForm_Q = record
-    main: double;
+    main: MType;
     diff: TParts;
   end;
 
@@ -37,7 +37,7 @@ type
     Q (ниже) }
   matrx_f = array [1 .. n, 0 .. n] of TFullForm; // Матрица для слагаемых F
 
-  harmonics = array [2 .. n, 0 .. n] of double;
+  harmonics = array [2 .. n, 0 .. n] of MType;
 
   { TO-DO:
     * Переработать чтение и формирование гармоник - Done
@@ -71,13 +71,13 @@ type
       в ряд по сферическим функциям }
     C, S: harmonics;
 
-    radius: double; // модуль радиус-вектора от (x, y, z)
+    radius: MType; // модуль радиус-вектора от (x, y, z)
 
-    procedure InitStep(t: double; coord: coordinates);
+    procedure InitStep(t: MType; coord: coordinates);
     procedure MainStep;
   public
 
-    function RightPart(t: double; coord, veloc: coordinates): coordinates;
+    function RightPart(t: MType; coord, veloc: coordinates): coordinates;
 
     constructor Create;
     destructor Destroy; override;
@@ -130,12 +130,12 @@ begin
 end;
 
 { Начальный шаг алгоритма }
-procedure TGEO_Potential.InitStep(t: double; coord: coordinates);
+procedure TGEO_Potential.InitStep(t: MType; coord: coordinates);
 var
   Rс // Вектор положения объекта в небесной СК
     : TVector;
 
-  temp_r: double;
+  temp_r: MType;
 
   i, j: byte;
   min: array [0 .. 1] of byte; // Флаг на минимально известный элемент массива
@@ -292,7 +292,7 @@ end; // ---------------------------- Конец начального шага
 procedure TGEO_Potential.MainStep;
 var
   i, k: byte;
-  xr, yr, zr: double;
+  xr, yr, zr: MType;
 begin
 
   xr := Rt[0] / radius;
@@ -354,7 +354,7 @@ begin
 
 end; // ---------------------------- Конец Основной части
 
-function TGEO_Potential.RightPart(t: double; coord, veloc: coordinates)
+function TGEO_Potential.RightPart(t: MType; coord, veloc: coordinates)
   : coordinates;
 var
   Mtc: TMatrix; // Матрица перехода из земной в небесную

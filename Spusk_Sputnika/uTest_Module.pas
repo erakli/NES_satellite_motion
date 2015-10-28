@@ -16,7 +16,7 @@ unit uTest_Module;
 interface
 
 uses
-  uConstants, uEpheremides, Dialogs, System.SysUtils, uAtmosphericDrag,
+  uConstants, uTypes, uEpheremides, Dialogs, System.SysUtils, uAtmosphericDrag,
   uKepler_Conversation, uFunctions, uTLE_conversation;
 
 type
@@ -24,16 +24,16 @@ type
 	EllipticalHandle = THandle;
 
   tObjectElem = record
-  	a, e, i, w, omega, JDEquinox, T: double;
+  	a, e, i, w, omega, JDEquinox, T: MType;
   end;
 
   tObjectDetails = record
   	CoordinateEquatorial, CoordinateEcliptical: TVector;
-    elments: array[0..11] of double;
+    elments: array[0..11] of MType;
   end;
 
 const
-	ElemInit: array[0..6] of double =
+	ElemInit: array[0..6] of MType =
   	(2.2091404, 0.8502196, 11.94524, 334.75006, 186.23352, 2448192.5 + 0.54502, 2451544.5); // для примера из AA
 {
 	a := ElemInit[0];
@@ -48,11 +48,11 @@ const
 
 var
   i: byte;
-  a: double;
-  r: array [0 .. 5] of double;
+  a: MType;
+  r: array [0 .. 5] of MType;
   not_load: shortint;
 
-  JD, MJD, Sb_coeff, dist1, dist2, interval: double;
+  JD, MJD, Sb_coeff, dist1, dist2, interval: MType;
   coord, v: TVector;
 
   TLE: TLE_lines;
@@ -68,7 +68,7 @@ var
   Elliptical: EllipticalHandle;
 
 // функция из dll
-function EllipticalCalculate(handle: EllipticalHandle; JD: double;
+function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
 	elements: tObjectElem; bHighPrecision: boolean = false): tObjectDetails; stdcall;
 // ------------------------------------------- /для dll
 

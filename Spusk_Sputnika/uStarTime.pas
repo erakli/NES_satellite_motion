@@ -23,11 +23,11 @@ interface
   ΔUT измеряется в секундах. }
 
 uses
-  uPrecNut, uConstants, uTime, uEpheremides;
+  uPrecNut, uConstants, uTypes, uTime, uEpheremides;
 
-function ToGetGMSTime(UT1_mjd: double; Midnight: boolean = true): double;
+function ToGetGMSTime(UT1_mjd: MType; Midnight: boolean = true): MType;
 // Гринвичское среднее звёздное время
-function ToGetGASTime(UT1_mjd: double): double; { Гринвичское истинное
+function ToGetGASTime(UT1_mjd: MType): MType; { Гринвичское истинное
   звёздное время }
 
 implementation
@@ -41,13 +41,13 @@ implementation
 
   Гринвичское среднее звёздное время Sm является функцией всемирного вре-
   мени UT1. }
-function ToGetGMSTime(UT1_mjd: double; Midnight: boolean = true): double;
+function ToGetGMSTime(UT1_mjd: MType; Midnight: boolean = true): MType;
 var
   // UT1, // содержит текущее значение всемирного времени в MJD
   Tu, { время, отсчитываемое в юлианских столетиях по 36525 суток в системе
     всемирного времени UT1 от эпохи 2000, январь 1, 12h UT1 (MJD51544.5) }
   s0, // GMST в 0h UT1
-  r: double;
+  r: MType;
 begin
 
   // UT1 := UT1_time(UTCmjd);
@@ -77,12 +77,12 @@ end;
   Гринвичское истинное звёездное время S есть угол от истинной точки весен-
   него равноденствия до гринвичского меридиана, отсчитываемый вдоль истинного
   экватора. }
-function ToGetGASTime(UT1_mjd: double): double;
+function ToGetGASTime(UT1_mjd: MType): MType;
 var
   s0, // Гринвичское среднее звёездное время
   eps, // Угол наклона мгновенной эклиптики к среднему подвижному экватору ε(t)
   long_nut // Параметр нутации Δψ(t) - нутация в долготе
-    : double;
+    : MType;
 begin
 
   s0 := ToGetGMSTime(UT1_mjd);

@@ -8,7 +8,7 @@ interface
 
 uses
   uSputnik, uKepler_conversation, uTLE_conversation, uConstants, uTime, Math,
-  uIntegrator, uAtmosphericDrag, uSunPressure, uGEO_Potential, uPrecNut,
+  uIntegrator, uAtmosphericDrag, uSunPressure, uGEO_Potential, uPrecNut, uTypes,
   uMatrix_conversation, uMatrix_operations;
 
 const
@@ -26,10 +26,10 @@ type
   TControl = class
   private
     start_time, end_time, // время начала и конца алгоритма
-    cur_time, Ever_step: double;
+    cur_time, Ever_step: MType;
   public
-    procedure Prepare(t0, t_end: TDate; step: double; TLE: TLE_lines;
-      mass, s, Sb_coeff: double; lines: boolean = true);
+    procedure Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
+      mass, s, Sb_coeff: MType; lines: boolean = true);
     procedure Modeling;
   end;
 
@@ -40,10 +40,10 @@ implementation
 
 { TControl }
 
-procedure TControl.Prepare(t0, t_end: TDate; step: double; TLE: TLE_lines;
-  mass, s, Sb_coeff: double; lines: boolean = true);
+procedure TControl.Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
+  mass, s, Sb_coeff: MType; lines: boolean = true);
 var
-  TDB: double;
+  TDB: MType;
   Elements: TElements;
   Mpc // Матрицы перехода: от истинной экваториальной к небесной
     : TMatrix;
@@ -90,7 +90,7 @@ end;
 
 procedure TControl.Modeling;
 var
-  TDB: double;
+  TDB: MType;
   _coord, _speed: coordinates;
   temp_force, Force: TResult;
   f: textfile;

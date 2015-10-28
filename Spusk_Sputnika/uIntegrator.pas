@@ -3,22 +3,22 @@ unit uIntegrator;
 interface
 
 uses
-  uConstants, Math;
+  uConstants, uTypes, Math;
 
 const
   num = 7;
 
 type
 
-  TFunc = function(t: double; x, dif_x: coordinates): coordinates of object;
+  TFunc = function(t: MType; x, dif_x: coordinates): coordinates of object;
 
   TResult = record
     x, dif_x: coordinates;
   end;
 
-  TCoefVect = array [0 .. num - 1] of double;
+  TCoefVect = array [0 .. num - 1] of MType;
   TCoordVect = array [0 .. num - 1] of coordinates;
-  TVect = array [0 .. num] of double;
+  TVect = array [0 .. num] of MType;
   TXVect = array [0 .. num] of coordinates;
 
   {
@@ -38,7 +38,7 @@ type
     h: TVect; { Коэффициенты уточнений }
     F: TXVect; { Вектор значений функций в подшагах }
     t: TVect; { t[i] := h[i] * step - подшаги }
-    c: array [0 .. num, 0 .. num - 1] of double;
+    c: array [0 .. num, 0 .. num - 1] of MType;
     { Коэффициенты для вычисления A }
 
     coefA: TCoordVect;
@@ -48,16 +48,16 @@ type
     coefVeloc: TCoefVect; // и скорости
 
     memoAlpha: boolean;
-    // step : double; // Шаг интегрирования T
+    // step : MType; // Шаг интегрирования T
   public
-    function ClcCoord(t: double): coordinates;
-    function ClcVeloc(t: double): coordinates;
+    function ClcCoord(t: MType): coordinates;
+    function ClcVeloc(t: MType): coordinates;
 
-    procedure ClcC(step: double);
+    procedure ClcC(step: MType);
     procedure ClcA(n: byte);
     procedure ClcAlpha(i: byte);
 
-    function Integrate(time: double; x0, dif_x0: coordinates; step: double;
+    function Integrate(time: MType; x0, dif_x0: coordinates; step: MType;
       Func: TFunc): TResult;
 
     constructor Create;
@@ -122,7 +122,7 @@ end;
   + 1/12 * A[2] * t^4 + 1/20 * A[3] * t^5 + 1/30 * A[4] * t^6 +
   + 1/42 * A[5] * t^7 + 1/56 * A[6] * t^8 + 1/72 * A[7] * t^9 }
 
-function TEverhart.ClcCoord(t: double): coordinates;
+function TEverhart.ClcCoord(t: MType): coordinates;
 var
   i: byte;
   temp_sum: coordinates;
@@ -153,7 +153,7 @@ end;
   + 1/4 * A[3] * t^4 + 1/5 * A[4] * t^5 + 1/6 * A[5] * t^6 +
   + 1/7 * A[6] * t^7 + 1/8 * A[7] * t^8 }
 
-function TEverhart.ClcVeloc(t: double): coordinates;
+function TEverhart.ClcVeloc(t: MType): coordinates;
 var
   i: byte;
   temp_sum: coordinates;
@@ -178,7 +178,7 @@ end;
 { Вычисление всех необходимы коэффициентов. Разбиение шага T (подшаги)
   вычисляется вместе с коэффициентом c[i, j] }
 
-procedure TEverhart.ClcC(step: double);
+procedure TEverhart.ClcC(step: MType);
 var
   i, j: byte;
 begin
@@ -250,8 +250,8 @@ end;
 
 { Сама функция интегратора }
 
-function TEverhart.Integrate(time: double; x0, dif_x0: coordinates;
-  step: double; Func: TFunc): TResult;
+function TEverhart.Integrate(time: MType; x0, dif_x0: coordinates;
+  step: MType; Func: TFunc): TResult;
 var
   i: byte;
 begin

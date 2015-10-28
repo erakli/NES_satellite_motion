@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uConstants, uTime, uSputnik,
-  uControl, Vcl.StdCtrls, Vcl.Mask;
+  uControl, uTypes, Vcl.StdCtrls, Vcl.Mask;
 
 type
   TForm1 = class(TForm)
@@ -43,7 +43,7 @@ type
     { Private declarations }
     t_start_, t_end_: TDate;
     TLE_: TLE_lines;
-    mass_, space_, step_, Sb_coeff_: double;
+    mass_, space_, step_, Sb_coeff_: MType;
 
     procedure Proceed;
     procedure Run;

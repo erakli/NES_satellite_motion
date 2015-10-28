@@ -4,12 +4,12 @@ interface
 
 { Алгоритмы для преобразования Кеплеровских элементов }
 
-uses uConstants, Math;
+uses uTypes, uConstants, Math;
 
 const
   Num_of_iter = 4;
 
-function Iter_Method(s_e, M: double; Newton: boolean = true): double;
+function Iter_Method(s_e, M: MType; Newton: boolean = true): double;
 function Kepler_to_Decart(Elements: TElements; mass: double): param; overload;
 function Kepler_to_Decart(Elements: TElements; mass: double; var Dubosh: boolean): param; overload;
 

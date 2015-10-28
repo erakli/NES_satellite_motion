@@ -5,13 +5,14 @@
 interface
 
 uses
-  uMatrix_Operations, uConstants, uPrecNut, uStarTime, uTime, uEpheremides;
+  uMatrix_Operations, uConstants, uTypes, uPrecNut, uStarTime, uTime,
+  uEpheremides;
 
-function FromFixToTrueM(t: double): TMatrix;
-function FromTrueToFixM(t: double): TMatrix;
+function FromFixToTrueM(t: MType): TMatrix;
+function FromTrueToFixM(t: MType): TMatrix;
 
-function FromFixToTerraM(t: double): TMatrix;
-function FromTerraToFixM(t: double): TMatrix;
+function FromFixToTerraM(t: MType): TMatrix;
+function FromTerraToFixM(t: MType): TMatrix;
 
 implementation
 
@@ -20,7 +21,7 @@ implementation
   Матрица перехода между небесной системой координат и истинной эквато-
   риальной системой является произведением матрицы нутации N(t) на матрицу
   прецессии P(t). }
-function FromFixToTrueM(t: double): TMatrix;
+function FromFixToTrueM(t: MType): TMatrix;
 // var
 // P, N: TMatrix; // Матрицы прецессии и нутации
 begin
@@ -41,7 +42,7 @@ end;
   Матрица перехода от истинной экваториальной системы координат к небесной
   системе координат является транспонированной по отношению к матрице перехо-
   да от небесной системы координат к истинной экваториальной. }
-function FromTrueToFixM(t: double): TMatrix;
+function FromTrueToFixM(t: MType): TMatrix;
 var
   Mcp: TMatrix; // от небесной к истинной экваториальной
 begin
@@ -55,7 +56,7 @@ end;
 
   Матрицы перехода от небесной к земной системе координат вычисляется как
   произведение матрицы вращения Земли, матрицы нутации, матрицы прецессии }
-function FromFixToTerraM(t: double): TMatrix;
+function FromFixToTerraM(t: MType): TMatrix;
 var
   R: array [1 .. 3] of TMatrix;
   { Вспомогательные матрицы:
@@ -66,9 +67,9 @@ var
     стрелки на эмпирическое значение координаты полюса Земли xp }
 
   temp_M: TMatrix;
-  S: double; // Гринвичское истинное звёздное время
+  S: MType; // Гринвичское истинное звёздное время
   UT1 { , // Всемирное время (для координат полюса)
-    TDB } : double; // Барицентрическое динамическое время в MJD
+    TDB } : MType; // Барицентрическое динамическое время в MJD
 begin
 
   UT1 := UT1_time(t);
@@ -96,7 +97,7 @@ end;
   Матрица преобразования между земной и небесной системами координат необходима
   при вычислении компонентов ускорения, обусловленного гравитационным полем
   Земли }
-function FromTerraToFixM(t: double): TMatrix;
+function FromTerraToFixM(t: MType): TMatrix;
 var
   Mpc: TMatrix;
 begin

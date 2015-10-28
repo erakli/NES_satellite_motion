@@ -8,7 +8,7 @@ unit uSunPressure;
 interface
 
 uses
-  uConstants, uFunctions, Math, uEpheremides, uTime, uSputnik;
+  uConstants, uTypes, uFunctions, Math, uEpheremides, uTime, uSputnik;
 
 type
 
@@ -28,7 +28,7 @@ type
 
     cos_psi // для рассчётов тени
     // : coordinates;
-      : double;
+      : MType;
 
     beta, { [град] такое значение усгла пси (в рассчётах тени)
       при котором диффузное отражение практически
@@ -39,7 +39,7 @@ type
     fi, // угол, на котором пересекается орбита и граница тени
     psi { Это угол, скорее всего аномалия, на который спутник
       отстоит линии, соединяющей Солнце и Землю }
-      : double;
+      : MType;
 
     k: array [0 .. 2] of real; { Коэффициенты:
       * k - отражательные свойства ИСЗ,
@@ -48,16 +48,16 @@ type
       давления от света отражённого от Земли,
       0.2 <= k' <= 0.3, 0.37 <= k" <= 0.57 }
 
-    procedure SunPressureInit(t: double; coord: coordinates);
+    procedure SunPressureInit(t: MType; coord: coordinates);
 
     { Функция для учёта нахождения ИСЗ в тени }
-    function Shadow(psi: double; isSunLight: boolean): byte;
+    function Shadow(psi: MType; isSunLight: boolean): byte;
 
     { Составляющие силы, создающей давление на ИСЗ }
     function SunP: coordinates; // Свет от Солнца
     function EarthP: coordinates; // Отражённый свет от Земли
   public
-    function RightPart(t: double; coord, veloc: coordinates): coordinates;
+    function RightPart(t: MType; coord, veloc: coordinates): coordinates;
 
     constructor Create;
     destructor Destroy; override;
@@ -87,11 +87,11 @@ begin
   inherited;
 end;
 
-procedure TSunPressure.SunPressureInit(t: double; coord: coordinates);
+procedure TSunPressure.SunPressureInit(t: MType; coord: coordinates);
 var
   temp_vect: coordinates;
-  scal_inc: double; // Для вычисления скалярного произведения
-  TDB: double; // Барицентрическое динамическое время в MJD
+  scal_inc: MType; // Для вычисления скалярного произведения
+  TDB: MType; // Барицентрическое динамическое время в MJD
 begin
 
   { Надо сделать задание коэффициентов k[1] и k[2] (Выше) }
@@ -146,7 +146,7 @@ begin
 
 end;
 
-function TSunPressure.Shadow(psi: double; isSunLight: boolean): byte;
+function TSunPressure.Shadow(psi: MType; isSunLight: boolean): byte;
 begin
 
   result := 0;
@@ -164,7 +164,7 @@ end;
 
 function TSunPressure.SunP: coordinates;
 var
-  temp_part: double;
+  temp_part: MType;
 begin
 
   temp_part := k[0] * Sun.q * Sputnik._space * Shadow(psi, true) *
@@ -181,7 +181,7 @@ end;
 
 function TSunPressure.EarthP: coordinates;
 var
-  temp_part: double;
+  temp_part: MType;
 begin
 
   temp_part := Sun.q * Sputnik._space * (Earth.big_a / Sun_ISZ) *
@@ -197,7 +197,7 @@ begin
 
 end;
 
-function TSunPressure.RightPart(t: double; coord, veloc: coordinates)
+function TSunPressure.RightPart(t: MType; coord, veloc: coordinates)
   : coordinates;
 var
   temp: array [0 .. 1] of coordinates;

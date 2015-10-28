@@ -13,7 +13,7 @@ unit uAtmosphericDrag;
 interface
 
 uses
-  uConstants, uTime, Math, System.SysUtils, Dialogs, uSputnik,
+  uConstants, uTime, Math, System.SysUtils, Dialogs, uSputnik, uTypes,
   uFunctions, uStarTime;
 
 const
@@ -27,15 +27,15 @@ type
 
   // vectors = (a, b, c, n, fi_1, d, e, l);
 
-  TCoefVect = array [0 .. num] of double;
+  TCoefVect = array [0 .. num] of MType;
 
   TAtmosphericDrag = class
   private
     { Основные индексы вычисления плотности атмосферы: }
-    F10_7: double; { [10^-22 * Вт * м^-2 * Гц^-1]
+    F10_7: MType; { [10^-22 * Вт * м^-2 * Гц^-1]
       среднесуточный индекс солнечной активности }
 
-    F81: double; { средневзвешенный индекс. Результат осреднения F10_7
+    F81: MType; { средневзвешенный индекс. Результат осреднения F10_7
       за 81 сутки (три оборота вокруг Солнца) }
 
     F0: word; { фиксированный уровень солнечной активности.
@@ -44,7 +44,7 @@ type
     Kp: byte; { [баллы] квазилогарифмический планетарный среднесуточный индекс
       геомагнитной возмущенности }
 
-    time: double; // [сек] всемирное время
+    time: MType; // [сек] всемирное время
     days: word; // число суток от начала года
 
     { множители, учитывающие:
@@ -58,7 +58,7 @@ type
     { коэффициенты модели, используемые для расчета плотности атмосферы при
       различных значениях фиксированного уровня солнечной активности F0: }
     // При ro_0 (densityNight)
-    den_a: array [0 .. num + 2] of double;
+    den_a: array [0 .. num + 2] of MType;
 
     // При К0
     l: TCoefVect;
@@ -69,55 +69,55 @@ type
     // Sun : TSun;     // Параметры Солнца - необходимо их задать
 
     { звездное время в гринвичскую полночь: }
-    S_time: double; // [рад]
+    S_time: MType; // [рад]
 
     { коэффициент модели, равный углу запаздывания максимума плотности
       по отношению к максимуму освещенности: }
-    fi_1: double; // [рад]
-    n: array [0 .. num - 2] of double;
+    fi_1: MType; // [рад]
+    n: array [0 .. num - 2] of MType;
 
     // При К2
     d: TCoefVect;
-    A: array [0 .. num * 2] of double; // Коэффициенты множителя A(d) при К2
+    A: array [0 .. num * 2] of MType; // Коэффициенты множителя A(d) при К2
 
     // При К3
     b: TCoefVect;
 
     // При К4
-    e: array [0 .. num * 2] of double;
+    e: array [0 .. num * 2] of MType;
 
     // Коэффициенты при вычислении плотности на высоте <120 km
     h_i, // [km] Нижняя граница слоя
     a0, // [кг/м^3]
     k1, // [1/км]
     k2 // [1/км^2]
-      : double;
+      : MType;
 
     memo_ro: byte; { Номер слоя, в котором мы до этого находились. При
       несоответствии нынешнего слоя memo_ro, сменяем
       коэффициенты }
 
-    // function module(coord : coordinates) : double; // Модуль трёх компонент
-    function height(coord: coordinates): double; // [km]
-    function series(h: double; x: array of double; n: byte;
-      plus: boolean): double;
+    // function module(coord : coordinates) : MType; // Модуль трёх компонент
+    function height(coord: coordinates): MType; // [km]
+    function series(h: MType; x: array of MType; n: byte;
+      plus: boolean): MType;
 
-    function densityNight(h: double): double;
-    function density(t: double; coord: coordinates): double;
+    function densityNight(h: MType): MType;
+    function density(t: MType; coord: coordinates): MType;
     // [кг/м^3] - Вычисление плотности
 
-    function setK(h: double; Index: byte; Value: coordinates): double;
-    function setA(d: word): double;
+    function setK(h: MType; Index: byte; Value: coordinates): MType;
+    function setA(d: word): MType;
 
-    procedure getCoeffForK(F0: word; h: double; vec: string);
-    procedure getF0_Kp(t: double);
+    procedure getCoeffForK(F0: word; h: MType; vec: string);
+    procedure getF0_Kp(t: MType);
 
-    function ReadValue(text: string; flag: byte): double;
+    function ReadValue(text: string; flag: byte): MType;
 
-    function SetTime(Value: double): double;
-    function SetDays(Value: double): word;
+    function SetTime(Value: MType): MType;
+    function SetDays(Value: MType): word;
   public
-    function RightPart(MJD: double; coord, v: coordinates): coordinates;
+    function RightPart(MJD: MType; coord, v: coordinates): coordinates;
 
     constructor Create;
     destructor Destroy; override;
@@ -160,7 +160,7 @@ begin
 end;
 
 
-// function TAtmosphericDrag.module(coord : coordinates) : double;
+// function TAtmosphericDrag.module(coord : coordinates) : MType;
 // begin
 //
 // with coord do
@@ -169,9 +169,9 @@ end;
 // end;
 
 { Вычисление высоты над земным элепсоидом. Стоит уточнить }
-function TAtmosphericDrag.height(coord: coordinates): double;
+function TAtmosphericDrag.height(coord: coordinates): MType;
 var
-  dist: double;
+  dist: MType;
 begin
 
   dist := module(coord);
@@ -181,7 +181,7 @@ begin
 end;
 
 // Извлечение необходимых данных из строки по флагу
-function TAtmosphericDrag.ReadValue(text: string; flag: byte): double;
+function TAtmosphericDrag.ReadValue(text: string; flag: byte): MType;
 var
   i, position: byte;
   proc_text: string;
@@ -199,7 +199,7 @@ begin
 end;
 
 // Получение количества секунд с начала дня по всемирному времени
-function TAtmosphericDrag.SetTime(Value: double): double;
+function TAtmosphericDrag.SetTime(Value: MType): MType;
 var
   Date: TDate;
 begin
@@ -219,7 +219,7 @@ begin
 end;
 
 // Получение количества суток с начала года
-function TAtmosphericDrag.SetDays(Value: double): word;
+function TAtmosphericDrag.SetDays(Value: MType): word;
 var
   Date: TDate;
   vis: byte; // Флаг на то, високосный ли год
@@ -242,7 +242,7 @@ end;
 
 { Получение параметров F10_7, F81 и Kp из файла (на данный момент
   - solarinex.txt) }
-procedure TAtmosphericDrag.getF0_Kp(t: double);
+procedure TAtmosphericDrag.getF0_Kp(t: MType);
 var
   f: TextFile;
   temp_text, Date: string;
@@ -320,7 +320,7 @@ begin
 end;
 
 { Заполняем массивы коэффициентов для вычисления массива К }
-procedure TAtmosphericDrag.getCoeffForK(F0: word; h: double; vec: string);
+procedure TAtmosphericDrag.getCoeffForK(F0: word; h: MType; vec: string);
 var
   f: TextFile;
   temp_text: string;
@@ -455,10 +455,10 @@ begin
 end;
 
 { Функция для подсчёта "рядов" с возрастающей степенью }
-function TAtmosphericDrag.series(h: double; x: array of double; n: byte;
-  plus: boolean): double;
+function TAtmosphericDrag.series(h: MType; x: array of MType; n: byte;
+  plus: boolean): MType;
 var
-  sum: double;
+  sum: MType;
   i: byte;
 begin
 
@@ -475,10 +475,10 @@ begin
 end;
 
 { Заполняем коэффициенты К }
-function TAtmosphericDrag.setK(h: double; Index: byte;
-  Value: coordinates): double;
+function TAtmosphericDrag.setK(h: MType; Index: byte;
+  Value: coordinates): MType;
 var
-  cos_fi, r, beta: double;
+  cos_fi, r, beta: MType;
   { разность между долготой, для которой рассчитывают плотность
     атмосферы, и долготой с максимальным значением плотности
     в ее суточном распределении, рад }
@@ -515,10 +515,10 @@ begin
 
 end;
 
-function TAtmosphericDrag.setA(d: word): double;
+function TAtmosphericDrag.setA(d: word): MType;
 var
   i: byte;
-  sum: double;
+  sum: MType;
 begin
 
   sum := 0;
@@ -529,19 +529,19 @@ begin
 
 end;
 
-function TAtmosphericDrag.densityNight(h: double): double;
+function TAtmosphericDrag.densityNight(h: MType): MType;
 begin
 
   result := Earth.density_120 * exp(series(h, den_a, num + 2, false));
 
 end;
 
-function TAtmosphericDrag.density(t: double; coord: coordinates): double;
+function TAtmosphericDrag.density(t: MType; coord: coordinates): MType;
 const
   vec = 'abcnfdel'; // Строка с первыми буквами массивов коэффициентов
 var
   i: byte;
-  h, main_part: double;
+  h, main_part: MType;
 begin
 
   h := height(coord); // Вычисляем высоту
@@ -637,10 +637,10 @@ begin
 
 end;
 
-function TAtmosphericDrag.RightPart(MJD: double; coord, v: coordinates)
+function TAtmosphericDrag.RightPart(MJD: MType; coord, v: coordinates)
   : coordinates;
 var
-  speed, ro, UT1: double;
+  speed, ro, UT1: MType;
   // Fe: TVector; // Матрица ускорения в небесной СК
 begin
 

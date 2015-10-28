@@ -2,9 +2,12 @@ unit uPrecNut_InitialParam;
 
 interface
 
+uses
+  uTypes;
+
 const
-	FA_SIZE = 13;   // размер массива фудаментальных аргументов (Fa)
-	MULT_ELEM_SIZE = 17;  // размер строки массива множителей нутации
+	FA_SIZE = 14;   // размер массива фудаментальных аргументов (Fa) - 1
+	MULT_ELEM_SIZE = FA_SIZE + 4;  // размер строки массива множителей нутации
   j_PERIODS = 4;   // количество блоков для вычисления Х и Y
 
   { массивы индексов aX, aY }
@@ -25,7 +28,7 @@ const
         8..13 - множители планетарной части (Planetary part) }
 
   {* Expression for the X coordinate of the CIP in the GCRS, tab5.2a.txt *}
-	aX0: array[0..ind_aX[0], 0..MULT_ELEM_SIZE] of double = (
+	aX0: array[0..ind_aX[0] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1,	-6844318.44,	1328.67,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (2,	-523908.04,	-544.75,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -1337,7 +1340,7 @@ const
   );
 
 
-  aX1: array[0..ind_aX[1], 0..MULT_ELEM_SIZE] of double = (
+  aX1: array[0..ind_aX[1] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
     (1307,	-3309.73,	205833.11,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (1308,	198.97,	12814.01,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -1596,7 +1599,7 @@ const
   );
 
 
-  aX2: array[0..ind_aX[2], 0..MULT_ELEM_SIZE] of double = (
+  aX2: array[0..ind_aX[2] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1560,	2037.98,	81.46,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (1561,	155.74,	-2.75,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -1638,7 +1641,7 @@ const
   );
 
 
-  aX3: array[0..ind_aX[3], 0..MULT_ELEM_SIZE] of double = (
+  aX3: array[0..ind_aX[3] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1596,	1.73,	-20.39,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (1597,	0,	-1.27,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -1648,7 +1651,7 @@ const
   );
 
 
-  aX4: array[0..ind_aX[4], 0..MULT_ELEM_SIZE] of double = (
+  aX4: array[0..ind_aX[4] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1600,	-0.1,	-0.02,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0)
 
@@ -1657,7 +1660,7 @@ const
 
 ////////////////////////////////////////////////////////////////////////////////
   {* Expression for the Y coordinate of the CIP in the GCRS, tab5.2b.txt *}
-  aY0: array[0..ind_aY[0], 0..MULT_ELEM_SIZE] of double = (
+  aY0: array[0..ind_aY[0] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1,	1538.18,	9205236.26,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (2,	-458.66,	573033.42,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -2625,7 +2628,7 @@ const
   );
 
 
-  aY1: array[0..ind_aY[1], 0..MULT_ELEM_SIZE] of double = (
+  aY1: array[0..ind_aY[1] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(963,	153041.79,	853.32,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (964,	11714.49,	-290.91,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -2908,7 +2911,7 @@ const
   );
 
 
-  aY2: array[0..ind_aY[2], 0..MULT_ELEM_SIZE] of double = (
+  aY2: array[0..ind_aY[2] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
     (1240,	120.56,	-2301.27,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (1241,	-1.03,	-143.27,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -2944,7 +2947,7 @@ const
   );
 
 
-  aY3: array[0..ind_aY[3], 0..MULT_ELEM_SIZE] of double = (
+  aY3: array[0..ind_aY[3] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1270,	-15.22,	-1.61,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0),
     (1271,	-1.16,	-0.01,	0,	0,	2,	-2,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0),
@@ -2955,7 +2958,7 @@ const
   );
 
 
-  aY4: array[0..ind_aY[4], 0..MULT_ELEM_SIZE] of double = (
+  aY4: array[0..ind_aY[4] - 1, 0..MULT_ELEM_SIZE - 1] of MType = (
 
   	(1275,	-0.02,	0.11,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0)
 

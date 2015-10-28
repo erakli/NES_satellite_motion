@@ -4,24 +4,24 @@ unit uFunctions;
 
 interface
 
-uses uConstants;
+uses uTypes;
 
-function module(coord: coordinates): double; overload;
-function module(coord: TVector): double; overload;
+function module(coord: coordinates): MType; overload;
+function module(coord: TVector): MType; overload;
 
 { Функции преобразования к радианам из минут дуги }
-function deg2rad(arg: double): double;
-function amin2rad(arg: double): double;
-function asec2rad(arg: double): double;
+function deg2rad(arg: MType): MType;
+function amin2rad(arg: MType): MType;
+function asec2rad(arg: MType): MType;
 
-function pow2(arg: double): double;
-function pow3(arg: double): double;
-function pow4(arg: double): double;
-function pow5(arg: double): double;
+function pow2(arg: MType): MType;
+function pow3(arg: MType): MType;
+function pow4(arg: MType): MType;
+function pow5(arg: MType): MType;
 
 implementation
 
-function module(coord: coordinates): double;
+function module(coord: coordinates): MType;
 begin
 
   with coord do
@@ -29,10 +29,10 @@ begin
 
 end;
 
-function module(coord: TVector): double;
+function module(coord: TVector): MType;
 var
 	i: byte;
-  output: double;
+  output: MType;
 begin
 
 	output := 0;
@@ -44,38 +44,38 @@ begin
 end;
 
 { Функции преобразования к радианам из минут дуги }
-function deg2rad(arg: double): double;
+function deg2rad(arg: MType): MType;
 begin
 	result := arg * Pi / 180;
 end;
 
-function amin2rad(arg: double): double;
+function amin2rad(arg: MType): MType;
 begin
 	result := arg * Pi / (180 * 60);
 end;
 
-function asec2rad(arg: double): double;
+function asec2rad(arg: MType): MType;
 begin
 	result := arg * Pi / (180 * 60 * 60);
 end;
 
 
-function pow2(arg: double): double;
+function pow2(arg: MType): MType;
 begin
 	result := arg * arg;
 end;
 
-function pow3(arg: double): double;
+function pow3(arg: MType): MType;
 begin
 	result := arg * arg * arg;
 end;
 
-function pow4(arg: double): double;
+function pow4(arg: MType): MType;
 begin
 	result := arg * arg * arg * arg;
 end;
 
-function pow5(arg: double): double;
+function pow5(arg: MType): MType;
 begin
 	result := arg * arg * arg * arg * arg;
 end;

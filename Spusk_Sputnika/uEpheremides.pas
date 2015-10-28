@@ -12,7 +12,7 @@ interface
   Так же важное замечание: координаты и параметры нутации получены на полночь }
 
 uses
-  uConstants, Classes, Dialogs, SysUtils;
+  uTypes, uConstants, Classes, Dialogs, SysUtils;
 
 const
 
@@ -33,7 +33,7 @@ type
       эферемид и параметрами нутации }
 
   public
-    function GetEpheremides(MJD: double; Nutations: boolean = false)
+    function GetEpheremides(MJD: MType; Nutations: boolean = false)
       : coordinates;
 
     constructor Create;
@@ -72,7 +72,7 @@ end;
 
 { Получение геоцентрических координат для данной даты в астрономических единиц
   (на выходе - в метрах) и параметры нутации }
-function TEpheremides.GetEpheremides(MJD: double; Nutations: boolean = false)
+function TEpheremides.GetEpheremides(MJD: MType; Nutations: boolean = false)
   : coordinates;
 var
   days: integer;

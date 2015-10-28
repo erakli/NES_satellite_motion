@@ -3,7 +3,7 @@ unit uSputnik;
 interface
 
 uses
-  System.Classes, uConstants;
+  System.Classes, uTypes, uConstants;
 
 type
   TSputnik = class(TObject)
@@ -12,7 +12,7 @@ type
     state: param;
     mass, Sb_coeff, // баллистический коэффициент
     _space { s - площадь эффективного/поперечного сечения }
-      : double;
+      : MType;
 
     constructor Create;
     destructor Destroy; override;

@@ -21,7 +21,8 @@ uses
   uStarTime in 'uStarTime.pas',
   uTLE_conversation in 'uTLE_conversation.pas',
   uControl in 'uControl.pas',
-  uPrecNut_InitialParam in 'uPrecNut_InitialParam.pas';
+  uPrecNut_InitialParam in 'uPrecNut_InitialParam.pas',
+  uTypes in 'uTypes.pas';
 
 {$R *.res}
 
