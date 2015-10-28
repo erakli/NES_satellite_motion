@@ -1,5 +1,11 @@
 ﻿unit uPrecNut;
 
+{
+	TO-DO:
+  	* Доработать поворот вокруг осей в модуле uMatrix_Operations
+    * Вычислять степени t изначально и подставлять это значение в места вызова
+}
+
 interface
 
 { Алгоритмы вычисления матрицы прецессии и матрицы нутации
@@ -43,6 +49,8 @@ type
     { Вычисление X и Y }
     function getX(t: MType): MType;
     function getY(t: MType): MType;
+
+    function get_s(t: MType): MType;
 
   public
 
@@ -120,6 +128,9 @@ begin
 
 end;
 
+
+{ Вычисление координаты X CIO }
+
 function TCIP_Tranform_Matrix.getX(t: MType): MType;
 var
   arg,   // Аргумент синуса и косинуса в не-полиномиальной части
@@ -132,11 +143,11 @@ begin
 
   { Можно оптимизировать введя J }
 
-  // в арксекундах
-  pol := -0.016617 + 2004.191898 * t - 0.4297829 * pow2(t) - 0.19861834 * pow3(t)
-         + 0.000007578 * pow4(t) + 0.0000059285 * pow5(t);
+  // в МИКРОарксекундах
+  pol := -16617 + 2004191898 * t - 429782.9 * pow2(t) - 198618.34 * pow3(t)
+         + 7.578 * pow4(t) + 5.9285 * pow5(t);
 
-  { Идём по множителям в обратном порядке (j = 4..0) }
+  { Идём по периодам в обратном порядке (j = 4..0) }
   non_pol := 0; // результат вычисления - МИКРОарксекунды (надо переводить к арксекундам)
 
 
@@ -145,7 +156,7 @@ begin
   for f_ind := 0 to FA_SIZE - 1 do
     arg := arg + Fa[f_ind] * aX4[0, f_ind + 4];
 
-  non_pol := (aX4[0, 1] * sin(arg) + aX4[0, 2] * cos(arg)) * pow5(t);
+  non_pol := (aX4[0, 1] * sin(arg) + aX4[0, 2] * cos(arg)) * pow4(t);
 
 
   // ----- j = 3
@@ -157,7 +168,7 @@ begin
     for f_ind := 0 to FA_SIZE - 1 do
       arg := arg + Fa[f_ind] * aX3[0, f_ind + 4];
 
-    sum := (aX3[0, 1] * sin(arg) + aX3[0, 2] * cos(arg)) * pow4(t);
+    sum := (aX3[0, 1] * sin(arg) + aX3[0, 2] * cos(arg)) * pow3(t);
     non_pol := non_pol + sum;
 
   end;
@@ -172,7 +183,7 @@ begin
     for f_ind := 0 to FA_SIZE - 1 do
       arg := arg + Fa[f_ind] * aX2[0, f_ind + 4];
 
-    sum := (aX2[0, 1] * sin(arg) + aX2[0, 2] * cos(arg)) * pow3(t);
+    sum := (aX2[0, 1] * sin(arg) + aX2[0, 2] * cos(arg)) * pow2(t);
     non_pol := non_pol + sum;
 
   end;
@@ -187,7 +198,7 @@ begin
     for f_ind := 0 to FA_SIZE - 1 do
       arg := arg + Fa[f_ind] * aX1[0, f_ind + 4];
 
-    sum := (aX1[0, 1] * sin(arg) + aX1[0, 2] * cos(arg)) * pow2(t);
+    sum := (aX1[0, 1] * sin(arg) + aX1[0, 2] * cos(arg)) * t;
     non_pol := non_pol + sum;
 
   end;
@@ -202,56 +213,60 @@ begin
     for f_ind := 0 to FA_SIZE - 1 do
       arg := arg + Fa[f_ind] * aX0[0, f_ind + 4];
 
-    sum := (aX0[0, 1] * sin(arg) + aX0[0, 2] * cos(arg)) * t;
+    sum := aX0[0, 1] * sin(arg) + aX0[0, 2] * cos(arg);
     non_pol := non_pol + sum;
 
   end;
 
 
   // Собираем результат
-  result := asec2rad(pol + non_pol * MICRO); { так как non_pol вычисляется в
+  result := asec2rad((pol + non_pol) * MICRO); { так как non_pol вычисляется в
     МИКРОарксекундах - надо привести к арксекундам домножив на 1.0e-6 }
 
 end;
 
+
+
+{ Вычисление координаты Y CIO }
+
 function TCIP_Tranform_Matrix.getY(t: MType): MType;
 var
   arg,   // Аргумент синуса и косинуса в не-полиномиальной части
-  pol, non_pol, // Polinomial and non-polinamial parts of X
+  pol, non_pol, // Polinomial and non-polinamial parts of Y
   sum
   : MType;
 
   i, f_ind: integer;
 begin
 
-  { Можно оптимизировать введя J }
+  { Можно оптимизировать введя j }
 
-  // в арксекундах
-  pol := -0.006951 - 0.025896 * t - 22.4072747 * pow2(t) + 0.00190059 * pow3(t)
-         + 0.001112526 * pow4(t) + 0.0000001358 * pow5(t);
+  // в МИКРОарксекундах
+  pol := -6951 - 25896 * t - 22407274.7 * pow2(t) + 1900.59 * pow3(t)
+         + 1112.526 * pow4(t) + 0.1358 * pow5(t);
 
-  { Идём по множителям в обратном порядке (j = 4..0) }
+  { Идём по периодам в обратном порядке (j = 4..0) }
   non_pol := 0; // результат вычисления - МИКРОарксекунды (надо переводить к арксекундам)
 
 
   // ----- j = 4
   arg := 0;
   for f_ind := 0 to FA_SIZE - 1 do
-    arg := arg + Fa[f_ind] * aX4[0, f_ind + 4];
+    arg := arg + Fa[f_ind] * aY4[0, f_ind + 4];
 
-  non_pol := (aX4[0, 1] * sin(arg) + aX4[0, 2] * cos(arg)) * pow5(t);
+  non_pol := (aY4[0, 1] * cos(arg) + aY4[0, 2] * sin(arg)) * pow4(t);
 
 
   // ----- j = 3
 
-  for i := ind_aX[3] - 1 downto 0 do
+  for i := ind_aY[3] - 1 downto 0 do
   begin
 
     arg := 0;
     for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX3[0, f_ind + 4];
+      arg := arg + Fa[f_ind] * aY3[0, f_ind + 4];
 
-    sum := (aX3[0, 1] * sin(arg) + aX3[0, 2] * cos(arg)) * pow4(t);
+    sum := (aY3[0, 1] * cos(arg) + aY3[0, 2] * sin(arg)) * pow3(t);
     non_pol := non_pol + sum;
 
   end;
@@ -259,14 +274,14 @@ begin
 
   // ----- j = 2
 
-  for i := ind_aX[2] - 1 downto 0 do
+  for i := ind_aY[2] - 1 downto 0 do
   begin
 
     arg := 0;
     for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX2[0, f_ind + 4];
+      arg := arg + Fa[f_ind] * aY2[0, f_ind + 4];
 
-    sum := (aX2[0, 1] * sin(arg) + aX2[0, 2] * cos(arg)) * pow3(t);
+    sum := (aY2[0, 1] * cos(arg) + aY2[0, 2] * sin(arg)) * pow2(t);
     non_pol := non_pol + sum;
 
   end;
@@ -274,14 +289,14 @@ begin
 
   // ----- j = 1
 
-  for i := ind_aX[1] - 1 downto 0 do
+  for i := ind_aY[1] - 1 downto 0 do
   begin
 
     arg := 0;
     for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX1[0, f_ind + 4];
+      arg := arg + Fa[f_ind] * aY1[0, f_ind + 4];
 
-    sum := (aX1[0, 1] * sin(arg) + aX1[0, 2] * cos(arg)) * pow2(t);
+    sum := (aY1[0, 1] * cos(arg) + aY1[0, 2] * sin(arg)) * t;
     non_pol := non_pol + sum;
 
   end;
@@ -289,22 +304,120 @@ begin
 
   // ----- j = 0
 
-  for i := ind_aX[0] - 1 downto 0 do
+  for i := ind_aY[0] - 1 downto 0 do
   begin
 
     arg := 0;
     for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX0[0, f_ind + 4];
+      arg := arg + Fa[f_ind] * aY0[0, f_ind + 4];
 
-    sum := (aX0[0, 1] * sin(arg) + aX0[0, 2] * cos(arg)) * t;
+    sum := aY0[0, 1] * cos(arg) + aY0[0, 2] * sin(arg);
     non_pol := non_pol + sum;
 
   end;
 
 
   // Собираем результат
-  result := asec2rad(pol + non_pol * MICRO); { так как non_pol вычисляется в
+  result := asec2rad((pol + non_pol) * MICRO); { так как non_pol вычисляется в
     МИКРОарксекундах - надо привести к арксекундам домножив на 1.0e-6 }
+end;
+
+
+
+{ На основе полученных X и Y вычисляется s }
+
+function TCIP_Tranform_Matrix.get_s(t: MType): MType;
+var
+  arg,   // Аргумент синуса и косинуса в не-полиномиальной части
+  pol, non_pol, // Polinomial and non-polinamial parts of s
+  sum
+  : MType;
+
+  i, f_ind: integer;
+begin
+
+  { Можно оптимизировать введя j }
+
+  // в МИКРОарксекундах
+  pol := 94.0 + 3808.65 * t - 122.68 * pow2(t) - 72574.11 * pow3(t)
+  			 + 27.98 * pow4(t) + 15.62 * pow5(t);
+
+  { Идём по периодам в обратном порядке (j = 4..0) }
+  non_pol := 0; // результат вычисления - МИКРОарксекунды (надо переводить к арксекундам)
+
+
+  // ----- j = 4
+  arg := 0;
+  for f_ind := 0 to FA_SIZE - 1 do
+    arg := arg + Fa[f_ind] * as_4[0, f_ind + 4];
+
+  non_pol := (as_4[0, 1] * sin(arg) + as_4[0, 2] * cos(arg)) * pow4(t);
+
+
+  // ----- j = 3
+
+  for i := ind_as_[3] - 1 downto 0 do
+  begin
+
+    arg := 0;
+    for f_ind := 0 to FA_SIZE - 1 do
+      arg := arg + Fa[f_ind] * as_3[0, f_ind + 4];
+
+    sum := (as_3[0, 1] * sin(arg) + as_3[0, 2] * cos(arg)) * pow3(t);
+    non_pol := non_pol + sum;
+
+  end;
+
+
+  // ----- j = 2
+
+  for i := ind_as_[2] - 1 downto 0 do
+  begin
+
+    arg := 0;
+    for f_ind := 0 to FA_SIZE - 1 do
+      arg := arg + Fa[f_ind] * as_2[0, f_ind + 4];
+
+    sum := (as_2[0, 1] * sin(arg) + as_2[0, 2] * cos(arg)) * pow2(t);
+    non_pol := non_pol + sum;
+
+  end;
+
+
+  // ----- j = 1
+
+  for i := ind_as_[1] - 1 downto 0 do
+  begin
+
+    arg := 0;
+    for f_ind := 0 to FA_SIZE - 1 do
+      arg := arg + Fa[f_ind] * as_1[0, f_ind + 4];
+
+    sum := (as_1[0, 1] * sin(arg) + as_1[0, 2] * cos(arg)) * t;
+    non_pol := non_pol + sum;
+
+  end;
+
+
+  // ----- j = 0
+
+  for i := ind_as_[0] - 1 downto 0 do
+  begin
+
+    arg := 0;
+    for f_ind := 0 to FA_SIZE - 1 do
+      arg := arg + Fa[f_ind] * as_0[0, f_ind + 4];
+
+    sum := as_0[0, 1] * sin(arg) + as_0[0, 2] * cos(arg);
+    non_pol := non_pol + sum;
+
+  end;
+
+
+  // Собираем результат
+  result := asec2rad((pol + non_pol) * MICRO); { так как non_pol вычисляется в
+    МИКРОарксекундах - надо привести к арксекундам домножив на 1.0e-6 }
+
 end;
 
 end.
