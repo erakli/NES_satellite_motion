@@ -27,7 +27,6 @@ type
   private
 
   	X, Y, { Координаты CIP в GCRS }
-    x2, y2, // квадраты координат полюса
 
     s     { s being a quantity, named "CIO locator", which provides the position
     				of the CIO on the equator of the CIP corresponding to the kinematical
@@ -52,8 +51,6 @@ type
     function getY(t: MType): MType;
 
     function get_s(t: MType): MType;
-
-    function get_a: MType;
 
   public
 
@@ -83,40 +80,6 @@ begin
      when the identifier goes out of scope") }
   inherited;
 end;
-
-
-{ Формирование преобразующей матрицы }
-
-function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
-var
-  Q, R3: TMatrix;
-  a: MType;
-begin
-
-  FaInit(t);
-  X := getX(t);
-  Y := getY(t);
-
-  x2 := sqr(X);
-  y2 := sqr(Y);
-
-  s := get_s(t);
-
-  a := get_a;
-
-  Q[0, 0] := 1 - a * x2;    Q[0, 1] := -a * X * Y;    Q[0, 2] := X;
-
-  Q[1, 0] := -a * X * Y;    Q[1, 1] := 1 - a * y2;    Q[1, 2] := Y;
-
-  Q[2, 0] := -X;            Q[2, 1] := -Y;            Q[2, 2] := 1 - a * (x2 + y2);
-
-  R3 :=
-  result := ;
-
-end;
-
-
-{ Начальная инициализация параметров для заданного времени }
 
 procedure TCIP_Tranform_Matrix.FaInit(t: MType);   // t is measured in Julian centuries
 var
@@ -160,20 +123,8 @@ begin
 
 end;
 
-
-{
-  Коэффициент, используемый, при вычислении матрицы Q
-
-  Важно: должен считаться после X и Y (считается на их основе) }
-
-function TCIP_Tranform_Matrix.get_a: MType;
-var
-  d: MType; // в теории, расстояние до полюса
+function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
 begin
-
-  d := arctan( sqrt( (x2 + y2)/(1 - x2 - y2) ) );
-
-  result := 1 / ( 1 + cos(d) );
 
 end;
 
