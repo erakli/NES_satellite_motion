@@ -79,8 +79,8 @@ begin
   { Перевод полученного времени в барицентрическое. Получение
     матриц прецессии и нутации вычисляется в нём }
 
-  R[1] := RotMatr(-GetDeltaUT(UT1)[2]).x; // Аргументом yp вокруг OX
-  R[2] := RotMatr(-GetDeltaUT(UT1)[1]).y; // Аргументом xp вокруг OY
+  R[1] := RotMatr(1, -GetDeltaUT(UT1)[2]); // Аргументом yp вокруг OX
+  R[2] := RotMatr(2, -GetDeltaUT(UT1)[1]); // Аргументом xp вокруг OY
 
   temp_M := MultMatr(R[2], R[1]);
   temp_M := MultMatr(temp_M, EarthRotMatr(S));

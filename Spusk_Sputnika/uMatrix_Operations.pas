@@ -8,7 +8,7 @@ uses
   uTypes;
 
 function MultMatrVec(matrx: TMatrix; vec: TVector): TVector;
-function RotMatr(t: MType): TMassive;
+function RotMatr(axis: byte; t: MType): TMatrix;
 function MultMatr(m, q: TMatrix): TMatrix;
 function TranspMatr(m: TMatrix): TMatrix;
 
@@ -33,44 +33,59 @@ begin
 end;
 
 { Вращение матрицы вокруг осей }
-function RotMatr(t: MType): TMassive;
+function RotMatr(axis: byte; t: MType): TMatrix;
+var
+	cos_t, sin_t: MType;
+  R: TMatrix;
 begin
 
-	{ Разбить на отдельные функции, чтобы не считать лишнего,
-  	посчитать sin и cos изначально, и потом подставлять значения
-    в матрицу.
-
-    Также, опционально, изменить формат обращения: сразу перемножать
+	{ Также, опционально, изменить формат обращения: сразу перемножать
     исходную матрицу и матрицу поворота }
 
-  with result do
-  begin
+  cos_t := cos(t);
+  sin_t := sin(t);
 
-    // Матрица поворота на ОХ
+  case axis of
+  	1:
+    	begin
+      	// Матрица поворота на ОХ
 
-    x[0, 0] := 1;		x[0, 1] := 0;					x[0, 2] := 0;
+        R[0, 0] := 1;		R[0, 1] := 0;					R[0, 2] := 0;
 
-    x[1, 0] := 0;		x[1, 1] := cos(t);		x[1, 2] := sin(t);
+        R[1, 0] := 0;		R[1, 1] := cos_t;			R[1, 2] := sin_t;
 
-    x[2, 0] := 0;		x[2, 1] := -sin(t);		x[2, 2] := cos(t);
+        R[2, 0] := 0;		R[2, 1] := -sin_t;		R[2, 2] := cos_t;  
+      end; 
 
-    // Матрица поворота на ОY
+    2:
+    	begin
+      	 // Матрица поворота на ОY
 
-    y[0, 0] := cos(t);		y[0, 1] := 0;		y[0, 2] := -sin(t);
+         R[0, 0] := cos_t;		R[0, 1] := 0;		R[0, 2] := -sin_t;
 
-    y[1, 0] := 0;					y[1, 1] := 1;		y[1, 2] := 0;
+         R[1, 0] := 0;				R[1, 1] := 1;		R[1, 2] := 0;
 
-    y[2, 0] := sin(t);		y[2, 1] := 0;		y[2, 2] := cos(t);
+         R[2, 0] := sin_t;		R[2, 1] := 0;		R[2, 2] := cos_t;  
+      end;
 
-    // Матрица поворота на ОZ
+    3:
+    	begin
+      	// Матрица поворота на ОZ
 
-    z[0, 0] := cos(t);		z[0, 1] := sin(t);		z[0, 2] := 0;
+        R[0, 0] := cos_t;			R[0, 1] := sin_t;		R[0, 2] := 0;
 
-    z[1, 0] := -sin(t);		z[1, 1] := cos(t);		z[1, 2] := 0;
+        R[1, 0] := -sin_t;		R[1, 1] := cos_t;		R[1, 2] := 0;
 
-    z[2, 0] := 0;					z[2, 1] := 0;					z[2, 2] := 1;
+        R[2, 0] := 0;					R[2, 1] := 0;				R[2, 2] := 1;  
+      end
 
+    else
+      begin
+      	{ здесь нужен throw exeption }
+      end;
   end;
+
+  result := R;
 
 end;
 

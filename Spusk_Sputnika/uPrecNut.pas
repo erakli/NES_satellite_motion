@@ -19,7 +19,7 @@ interface
 
 uses
   uConstants, uMatrix_Operations, uFunctions, uTypes,
-   uPrecNut_InitialParam; // здесь
+   uPrecNut_InitialParam; // здесь хранятся массивы множителей для ARGUMENT
 
 type
 
@@ -81,6 +81,8 @@ begin
   inherited;
 end;
 
+
+
 procedure TCIP_Tranform_Matrix.FaInit(t: MType);   // t is measured in Julian centuries
 var
 	l, l_, F, D, Om: MType;
@@ -123,10 +125,21 @@ begin
 
 end;
 
+
+
+{ Считаем матрицу Q(t) }
+
 function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
+var
+	TT_centuries: MType;
 begin
 
+	TT_centuries = (t - J2000_Day) / 36525;
+
+  // Продолжить
+
 end;
+
 
 
 { Вычисление координаты X CIO }
