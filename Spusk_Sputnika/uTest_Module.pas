@@ -17,7 +17,8 @@ interface
 
 uses
   uConstants, uTypes, uEpheremides, Dialogs, System.SysUtils, uAtmosphericDrag,
-  uKepler_Conversation, uFunctions, uTLE_conversation;
+  uKepler_Conversation, uFunctions, uTLE_conversation, uMatrix_Conversation,
+  uMatrix_Operations, uTime;
 
 type
 // ------------------------------------------- для dll
@@ -60,6 +61,8 @@ var
 
   Kepler_Elements: TElements;
   Dubosh: boolean;
+
+  Transform: TMatrix;
 
 // ------------------------------------------- для dll
   Elements: tObjectElem;
@@ -112,6 +115,8 @@ Details := EllipticalCalculate(Elliptical, JD, Elements);
 Kepler_Elements := TLE_output.Elements;
 coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord; // метод из Дубошина
 v := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
+
+coord := MultMatrVec(ITRS2GCRS(TT_time(MJD) + MJDCorrection), coord);
 
 dist1 := module(v) - 6378.1366;
 dist2 := module(coord) - 6378.1366;

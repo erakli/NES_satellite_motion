@@ -6,7 +6,7 @@ interface
 
 uses
   uMatrix_Operations, uConstants, uTypes, uPrecNut, uStarTime, uTime,
-  uEpheremides;
+  uEpheremides, uFunctions;
 
 function FromFixToTrueM(t: MType): TMatrix;
 function FromTrueToFixM(t: MType): TMatrix;
@@ -14,6 +14,7 @@ function FromTrueToFixM(t: MType): TMatrix;
 function FromFixToTerraM(t: MType): TMatrix;
 function FromTerraToFixM(t: MType): TMatrix;
 
+// -----------------------------------------------------------------------------
 function ITRS2GCRS(t: MType): TMatrix;
 function W(t, xp, yp: MType): TMatrix;
 function R(t: MType): TMatrix;
@@ -24,7 +25,7 @@ implementation
 { Перевод между Земной (ITRS) в Небесную инерциальную (GCRS) СК на основе
   IERS Conversation(2010) с помощью CIO
 
-  Считаем, что на вход подаётся время в ТТ (или UTC), для чего надо реализовать
+  Считаем, что на вход подаётся время в ТТ, для чего надо реализовать
   перевод TT_UTC}
 function ITRS2GCRS(t: MType): TMatrix;
 var
@@ -35,15 +36,16 @@ var
   transform: TMatrix;
 begin
 
-  Q.Create;
+  Q := TCIP_Tranform_Matrix.Create;
   delta_got := false;
 
   TT_centuries := (t - J2000_Day) / 36525;
-  xpyp_vec := GetDeltaUT(t);  // здесь нужно UTC на вход
+  xpyp_vec := GetDeltaUT(TT2UTC(t));  // здесь нужно UTC на вход
 
-  UT1 := UT1_time(t); // и здесь
+  UT1 := UT1_time(TT2UTC(t)); // и здесь
 
-  transform := MultMatr(R(TT_Centuries), W(TT_centuries, xpyp_vec[1], xpyp_vec[2]));
+  transform := MultMatr(R(UT1), W(TT_centuries, xpyp_vec[1], xpyp_vec[2]));
+  result := MultMatr(Q.getQ_Matrix(TT_centuries), transform); // здесь тоже centuries?
 end;
 
 
@@ -54,10 +56,10 @@ var
   res_matrix: TMatrix;
 begin
 
-  _s := -0.000047 * MICRO * t;  // MICRO - вроде бы мюарксекунды (проверить)
+  _s := asec2rad(-0.000047) * t;  // нужно ли переводить в радианы?
 
-  res_matrix := MultMatr(RotMatr(- _s, 3), RotMatr(xp, 2));
-  result := MultMatr(res_matrix, RotMatr(yp, 1));
+  res_matrix := MultMatr(RotMatr(3, - _s), RotMatr(2, xp));
+  result := MultMatr(res_matrix, RotMatr(1, yp));
 
 end;
 
@@ -154,7 +156,7 @@ begin
   R[2] := RotMatr(2, -GetDeltaUT(UT1)[1]); // Аргументом xp вокруг OY
 
   temp_M := MultMatr(R[2], R[1]);
-  temp_M := MultMatr(temp_M, EarthRotMatr(S));
+ // temp_M := MultMatr(temp_M, EarthRotMatr(S));
 
   // R[3] := MultMatr(ClcNutMatr(TDB), ClcPrecMatr(TDB));
   R[3] := MultMatr(_N, _P);
