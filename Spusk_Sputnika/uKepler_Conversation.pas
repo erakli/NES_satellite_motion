@@ -9,21 +9,21 @@ uses uTypes, uConstants, Math;
 const
   Num_of_iter = 4;
 
-function Iter_Method(s_e, M: MType; Newton: boolean = true): double;
-function Kepler_to_Decart(Elements: TElements; mass: double): param; overload;
-function Kepler_to_Decart(Elements: TElements; mass: double; var Dubosh: boolean): param; overload;
+function Iter_Method(s_e, M: MType; Newton: boolean = true): MType;
+function Kepler_to_Decart(Elements: TElements; mass: MType): param; overload;
+function Kepler_to_Decart(Elements: TElements; mass: MType; var Dubosh: boolean): param; overload;
 
 implementation
 
 // ---------------------------------------------------------------
 
-function Iter_Method(s_e, M: double; Newton: boolean = true): double;
+function Iter_Method(s_e, M: MType; Newton: boolean = true): MType;
 const
 	max_iter = 241;
 var
   iter: integer;
-  E: double;
-  cur, dif: double;
+  E: MType;
+  cur, dif: MType;
 begin
 //   E := M;
 //   for iter := 1 to Num_of_iter do
@@ -103,14 +103,14 @@ end;
 
   Примечание: s_ - означает "small" - далее идущая буква прописная, b_ - "big" -
   заглавная }
-function Kepler_to_Decart(Elements: TElements; mass: double): param;
+function Kepler_to_Decart(Elements: TElements; mass: MType): param;
 type
   vec = record
-    Sin, Cos: double;
+    Sin, Cos: MType;
   end;
 var
   a, s_e, i, b_Omega, s_omega, M, // Кеплеровы элементы орбиты
-  b_E, r, p, rad_speed, tang_speed: double;
+  b_E, r, p, rad_speed, tang_speed: MType;
   v, u: vec;
   // temp_result: param;
 begin
@@ -169,19 +169,29 @@ end;
 {
 	Реализация преобразования этих элементов из Дубошина (с. 223)
 }
-function Kepler_to_Decart(Elements: TElements; mass: double; var Dubosh: boolean): param;
+function Kepler_to_Decart(Elements: TElements; mass: MType; var Dubosh: boolean): param;
+type
+  vec = record
+    sin, cos: MType;
+  end;
 var
   a, s_e, i, b_Omega, s_omega, M, // Кеплеровы элементы орбиты
   b_E,
   r,        // радиус-вектор
   Ksi, Eta, // орбитальные координаты
-  rad_speed, tang_speed: double;
+  _p
+  	: MType;
 
 
   P, Q, PQ_check,
   coord: TVector;
 
 	j: byte;
+
+  rad_speed, tang_speed,
+  _v, _u: MType;
+  v, u: vec;
+  speed: TVector;
 begin
 
 	Dubosh := true;
@@ -231,6 +241,37 @@ begin
   	coord[j] := P[j] * Ksi + Q[j] * Eta;
 
   Result.coord := coord;
+
+
+  { Вычисление скорости для эллиптического движения }
+  _v := 2 * arctan( sqrt( (1 + s_e)/(1 - s_e) ) * Tan( b_E / 2 ) );
+  _u := _v + s_omega;
+
+  // v - истинная аномалия
+  v.sin := sin(_v);
+  v.cos := cos(_v);
+
+  // u - аргумент перицентра
+  u.sin := sin(_u);
+  u.cos := cos(_v);
+
+//  r := a * ( 1 - sqr(s_e) ) / ( 1 + s_e * v.cos ); // [km] - радиус-вектор
+  _p := a * (1 - sqr(s_e)); // параметр орбиты
+
+  rad_speed := sqrt(fm * mass / _p) * s_e * v.sin;          // радиальная скорость
+  tang_speed := sqrt(fm * mass / _p) * (1 + s_e * v.sin); 	 // трансверальная скорость
+
+
+  // speed
+  speed[0] := coord[0] / r * rad_speed +
+    ( -u.sin * Cos(b_Omega) - u.cos * Sin(b_Omega) * Cos(i) ) * tang_speed;
+
+  speed[1] := coord[1] / r * rad_speed +
+    ( -u.sin * Sin(b_Omega) + u.cos * Cos(b_Omega) * Cos(i) ) * tang_speed;
+
+  speed[2] := coord[2] / r * rad_speed + u.cos * Sin(i) * tang_speed;
+
+  Result.speed := speed;
 
 end;
 

@@ -40,13 +40,16 @@ implementation
 
 { TControl }
 
-procedure TControl.Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
-  mass, s, Sb_coeff: MType; lines: boolean = true);
+procedure TControl.Prepare(t0, t_end: TDate;
+												 	 step: MType;
+                           TLE: TLE_lines;
+                           mass, s, Sb_coeff: MType;
+                           lines: boolean = true);
 var
   TDB: MType;
   Elements: TElements;
-  Mpc // Матрицы перехода: от истинной экваториальной к небесной
-    : TMatrix;
+//  Mpc // Матрицы перехода: от истинной экваториальной к небесной
+//    : TMatrix;
   temp_param: param;
 begin
 
@@ -61,12 +64,12 @@ begin
   if lines then
   begin
     Elements := ReadTLE(TLE).Elements;
-    Elements[0] := Elements[0] * Power(mass, Third);
+    //Elements[0] := Elements[0] * Power(mass, Third); // странная конструкция
   end;
 
   TDB := TT_time(cur_time);
-  _P := ClcPrecMatr(cur_time);
-  _N := ClcNutMatr(cur_time);
+//  _P := ClcPrecMatr(cur_time);
+//  _N := ClcNutMatr(cur_time);
 
 //  Mpc := FromTrueToFixM(start_time); // Вычислили матрицу перехода к небесной СК
 //  Mpc := FromTerraToFixM(start_time);  // пробуем из земной
@@ -137,8 +140,8 @@ begin
     begin
       Force := Integrate(cur_time, _coord, _speed, Ever_step,
         GEO_potential.RightPart);
-      temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
-        AtmosphericDrag.RightPart);
+//      temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
+//        AtmosphericDrag.RightPart);
 
       Force.x := CoordSum(Force.x, temp_force.x);
       Force.dif_x := CoordSum(Force.dif_x, temp_force.dif_x);
@@ -171,9 +174,9 @@ begin
 
     TDB := TT_time(cur_time);
     // считаем в конце цикла, так как в первый раз посчитали в Prepare
-    _P := ClcPrecMatr(TDB);
-    // Высчитали матрицы нутации и прецессии. На каждый шаг
-    _N := ClcNutMatr(TDB);
+//    _P := ClcPrecMatr(TDB);
+//    // Высчитали матрицы нутации и прецессии. На каждый шаг
+//    _N := ClcNutMatr(TDB);
 
   end;
 

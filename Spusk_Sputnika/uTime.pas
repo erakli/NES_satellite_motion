@@ -40,6 +40,7 @@ function GetDeltaUT(MJD: MType): TVector;
 
 function UT1_time(MJD: MType): MType; // Вычисление Всемирного времени
 function TT_time(MJD: MType): MType; // Вычисление земного времени
+function TT2UTC(MJD: MType): MType;
 
 function TDB_time(MJD: MType): MType;
 { Вычисление барицентрического динамического времени }
@@ -47,13 +48,13 @@ function TDB_time(MJD: MType): MType;
 var
   FS: TFormatSettings;
 
+  TAI_list, EOP // Сюда будет загружаться файл с ΔUT (finals2000A.txt)
+    : TStringList;
+
   _xp, _yp,  // глобальные переменные для мгновенного положения полюса
     _deltaUT: MType;  // .. для поправки ΔUT = UT1 − UTC
 
   delta_got: boolean; // были ли координаты и поправка получены?
-
-  TAI_list, EOP // Сюда будет загружаться файл с ΔUT (finals2000A.txt)
-    : TStringList;
 
 implementation
 
@@ -216,7 +217,9 @@ end;
 { Получение поправки к UTC для получения UT1 и координат полюса на момент
   времени UT1
 
-  На вход - время UTC }
+  На вход - время UTC
+
+  Проверить, кто обращается к этой функции}
 function GetDeltaUT(MJD: MType): TVector;
 // 0 - DUT1, 1-2 - xp, yp (коорд. полюса)
 var
@@ -233,7 +236,7 @@ begin
     // Date := FromMJDToDate(MJD);
     delta := '';
 
-    SearchDate := ' ' + inttostr(trunc(MJD)) + '.00 ';
+    SearchDate := ' ' + inttostr(trunc(MJD - MJDCorrection)) + '.00 ';
 
     // with Date do // Формирование искомой строки по дате
     // begin
@@ -328,6 +331,20 @@ begin
   result := MJD + DeltaTAI / SecInDay; // 86400 - сек в дне
 
 end;
+
+function TT2UTC(MJD: MType): MType;
+var
+  DeltaTAI: MType;
+  Date: TDate;
+begin
+
+  Date := FromMJDToDate(MJD);
+  DeltaTAI := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
+
+  result := MJD - DeltaTAI / SecInDay; // 86400 - сек в дне
+
+end;
+
 
 { Вычисление барицентрического динамического времени
 

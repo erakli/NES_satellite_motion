@@ -117,7 +117,7 @@ type
     function SetTime(Value: MType): MType;
     function SetDays(Value: MType): word;
   public
-    function RightPart(MJD: MType; coord, v: coordinates): coordinates;
+    function RightPart(MJD: MType; coord, v: coordinates; Sb_coeff: MType): coordinates;
 
     constructor Create;
     destructor Destroy; override;
@@ -637,7 +637,7 @@ begin
 
 end;
 
-function TAtmosphericDrag.RightPart(MJD: MType; coord, v: coordinates)
+function TAtmosphericDrag.RightPart(MJD: MType; coord, v: coordinates; Sb_coeff: MType)
   : coordinates;
 var
   speed, ro, UT1: MType;
@@ -655,9 +655,9 @@ begin
   ro := density(UT1, coord); // Запускаем алгоритм подсчёта плотности
 
   { ! Уточнить вычисление результирующего ускорения }
-  result.x := -Sputnik.Sb_coeff * ro * speed * v.x;
-  result.y := -Sputnik.Sb_coeff * ro * speed * v.y;
-  result.z := -Sputnik.Sb_coeff * ro * speed * v.z;
+  result.x := -Sb_coeff * ro * speed * v.x;
+  result.y := -Sb_coeff * ro * speed * v.y;
+  result.z := -Sb_coeff * ro * speed * v.z;
 
 end;
 
