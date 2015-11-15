@@ -19,7 +19,7 @@ interface
 
 uses
   uConstants, uMatrix_Operations, uFunctions, uTypes,
-   uPrecNut_InitialParam; // здесь хранятся массивы множителей для ARGUMENT
+   uPrecNut_InitialParam; // здесь  хранятся массивы множителей для ARGUMENT
 
 type
 
@@ -27,6 +27,7 @@ type
   private
 
   	X, Y, { Координаты CIP в GCRS }
+    x2, y2, // квадраты координат полюса
 
     s     { s being a quantity, named "CIO locator", which provides the position
     				of the CIO on the equator of the CIP corresponding to the kinematical
@@ -51,6 +52,8 @@ type
     function getY(t: MType): MType;
 
     function get_s(t: MType): MType;
+
+    function get_a: MType;
 
   public
 
@@ -82,6 +85,39 @@ begin
 end;
 
 
+{ Формирование преобразующей матрицы }
+
+function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
+var
+  Q, R3: TMatrix;
+  TT_centuries, a: MType;
+begin
+
+  TT_centuries = (t - J2000_Day) / 36525;
+
+  FaInit(TT_centuries);
+  X := getX(TT_centuries);
+  Y := getY(TT_centuries);
+  s := get_s(TT_centuries);
+
+  x2 := sqr(X);
+  y2 := sqr(Y);
+
+  a := get_a;
+
+  Q[0, 0] := 1 - a * x2;    Q[0, 1] := -a * X * Y;    Q[0, 2] := X;
+
+  Q[1, 0] := -a * X * Y;    Q[1, 1] := 1 - a * y2;    Q[1, 2] := Y;
+
+  Q[2, 0] := -X;            Q[2, 1] := -Y;            Q[2, 2] := 1 - a * (x2 + y2);
+
+  R3 := RotMatr(3, s);
+  result := MultMatr(Q, R3);
+
+end;
+
+
+{ Начальная инициализация параметров для заданного времени }
 
 procedure TCIP_Tranform_Matrix.FaInit(t: MType);   // t is measured in Julian centuries
 var
@@ -126,20 +162,21 @@ begin
 end;
 
 
+{
+  Коэффициент, используемый, при вычислении матрицы Q
 
-{ Считаем матрицу Q(t) }
+  Важно: должен считаться после X и Y (считается на их основе) }
 
-function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
+function TCIP_Tranform_Matrix.get_a: MType;
 var
-	TT_centuries: MType;
+  d: MType; // в теории, расстояние до полюса
 begin
 
-	TT_centuries = (t - J2000_Day) / 36525;
+  d := arctan( sqrt( (x2 + y2)/(1 - x2 - y2) ) );
 
-  // Продолжить
+  result := 1 / ( 1 + cos(d) );
 
 end;
-
 
 
 { Вычисление координаты X CIO }
