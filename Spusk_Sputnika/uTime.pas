@@ -47,6 +47,11 @@ function TDB_time(MJD: MType): MType;
 var
   FS: TFormatSettings;
 
+  _xp, _yp,  // глобальные переменные для мгновенного положения полюса
+    _deltaUT: MType;  // .. для поправки ΔUT = UT1 − UTC
+
+  delta_got: boolean; // были ли координаты и поправка получены?
+
   TAI_list, EOP // Сюда будет загружаться файл с ΔUT (finals2000A.txt)
     : TStringList;
 
@@ -209,7 +214,9 @@ begin
 end;
 
 { Получение поправки к UTC для получения UT1 и координат полюса на момент
-  времени UT1 }
+  времени UT1
+
+  На вход - время UTC }
 function GetDeltaUT(MJD: MType): TVector;
 // 0 - DUT1, 1-2 - xp, yp (коорд. полюса)
 var
@@ -220,56 +227,69 @@ var
     : string;
 begin
 
-  // Date := FromMJDToDate(MJD);
-  delta := '';
+  if NOT delta_got then
+  begin
 
-  SearchDate := ' ' + inttostr(trunc(MJD)) + '.00 ';
+    // Date := FromMJDToDate(MJD);
+    delta := '';
 
-  // with Date do // Формирование искомой строки по дате
-  // begin
-  //
-  // if MJD <= 51543 then
-  // Year := Year - 1900
-  // else
-  // Year := Year - 2000;
-  //
-  // SearchDate := IntToStr(Year);
-  //
-  // if Month < 10 then
-  // SearchDate := SearchDate + ' ';
-  //
-  // SearchDate := SearchDate + IntToStr(Month);
-  //
-  // if Day < 10 then
-  // SearchDate := SearchDate + ' ';
-  //
-  // SearchDate := SearchDate + IntToStr(Day);
-  //
-  // end;
+    SearchDate := ' ' + inttostr(trunc(MJD)) + '.00 ';
 
-  for i := 0 to EOP.Count - 1 do // Поиск строчки с нужной датой
-    if pos(SearchDate, EOP[i]) > 0 then
+    // with Date do // Формирование искомой строки по дате
+    // begin
+    //
+    // if MJD <= 51543 then
+    // Year := Year - 1900
+    // else
+    // Year := Year - 2000;
+    //
+    // SearchDate := IntToStr(Year);
+    //
+    // if Month < 10 then
+    // SearchDate := SearchDate + ' ';
+    //
+    // SearchDate := SearchDate + IntToStr(Month);
+    //
+    // if Day < 10 then
+    // SearchDate := SearchDate + ' ';
+    //
+    // SearchDate := SearchDate + IntToStr(Day);
+    //
+    // end;
+
+    for i := 0 to EOP.Count - 1 do // Поиск строчки с нужной датой
+      if pos(SearchDate, EOP[i]) > 0 then
+      begin
+        delta := Copy(EOP[i], 59, 10);
+        xp := Copy(EOP[i], 19, 9);
+        yp := Copy(EOP[i], 38, 9);
+        break;
+      end;
+
+    if (i = EOP.Count - 1) or (delta = '') then
     begin
-      delta := Copy(EOP[i], 59, 10);
-      xp := Copy(EOP[i], 19, 9);
-      yp := Copy(EOP[i], 38, 9);
-      break;
+      ShowMessage('Ошибка поиска поправки DeltaT для даты ' + inttostr(Date.Year)
+        + '/' + inttostr(Date.Month) + '/' + inttostr(Date.Day));
+      for i := Low(TVector) to High(TVector) do
+        result[i] := -1;
+      exit;
+    end
+    else
+    begin
+
+      _deltaUT := StrToFloat(delta);
+      _xp := StrToFloat(xp);
+      _yp := StrToFloat(yp);
+
+      delta_got := true;
+
     end;
 
-  if (i = EOP.Count - 1) or (delta = '') then
-  begin
-    ShowMessage('Ошибка поиска поправки DeltaT для даты ' + inttostr(Date.Year)
-      + '/' + inttostr(Date.Month) + '/' + inttostr(Date.Day));
-    for i := Low(TVector) to High(TVector) do
-      result[i] := -1;
-    exit;
-  end
-  else
-  begin
-    result[0] := StrToFloat(delta);
-    result[1] := StrToFloat(xp);
-    result[2] := StrToFloat(yp);
-  end;
+  end; // end of   if NOT delta_got
+
+  result[0] := _deltaUT;
+  result[1] := _xp;
+  result[2] := _yp;
 
 end;
 
@@ -343,6 +363,10 @@ end;
 initialization
 
 // ---------------------------------------------------------------
+
+_xp := 0; _yp := 0; _deltaUT := 0;
+
+delta_got := false;
 
 with FS do
 begin

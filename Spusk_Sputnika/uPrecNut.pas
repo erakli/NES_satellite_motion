@@ -90,15 +90,13 @@ end;
 function TCIP_Tranform_Matrix.getQ_Matrix(t: MType): TMatrix;
 var
   Q, R3: TMatrix;
-  TT_centuries, a: MType;
+  a: MType;
 begin
 
-  TT_centuries = (t - J2000_Day) / 36525;
-
-  FaInit(TT_centuries);
-  X := getX(TT_centuries);
-  Y := getY(TT_centuries);
-  s := get_s(TT_centuries);
+  FaInit(t);
+  X := getX(t);
+  Y := getY(t);
+  s := get_s(t);
 
   x2 := sqr(X);
   y2 := sqr(Y);

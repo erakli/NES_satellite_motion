@@ -14,7 +14,78 @@ function FromTrueToFixM(t: MType): TMatrix;
 function FromFixToTerraM(t: MType): TMatrix;
 function FromTerraToFixM(t: MType): TMatrix;
 
+function ITRS2GCRS(t: MType): TMatrix;
+function W(t, xp, yp: MType): TMatrix;
+function R(t: MType): TMatrix;
+function ERA(JD_ut1: MType): MType;
+
 implementation
+
+{ Перевод между Земной (ITRS) в Небесную инерциальную (GCRS) СК на основе
+  IERS Conversation(2010) с помощью CIO
+
+  Считаем, что на вход подаётся время в ТТ (или UTC), для чего надо реализовать
+  перевод TT_UTC}
+function ITRS2GCRS(t: MType): TMatrix;
+var
+  TT_centuries, UT1: MType;
+  xpyp_vec: TVector;
+  Q: TCIP_Tranform_Matrix;
+
+  transform: TMatrix;
+begin
+
+  Q.Create;
+  delta_got := false;
+
+  TT_centuries := (t - J2000_Day) / 36525;
+  xpyp_vec := GetDeltaUT(t);  // здесь нужно UTC на вход
+
+  UT1 := UT1_time(t); // и здесь
+
+  transform := MultMatr(R(TT_Centuries), W(TT_centuries, xpyp_vec[1], xpyp_vec[2]));
+end;
+
+
+{ Transformation matrix for polar motion }
+function W(t, xp, yp: MType): TMatrix;
+var
+  _s: MType;
+  res_matrix: TMatrix;
+begin
+
+  _s := -0.000047 * MICRO * t;  // MICRO - вроде бы мюарксекунды (проверить)
+
+  res_matrix := MultMatr(RotMatr(- _s, 3), RotMatr(xp, 2));
+  result := MultMatr(res_matrix, RotMatr(yp, 1));
+
+end;
+
+
+{ CIO based transformation matrix for Earth rotation
+
+  Время на входе в UT1 }
+function R(t: MType): TMatrix;
+begin
+
+  result := RotMatr(3, -ERA(t));
+
+end;
+
+
+{ Earth Rotation Angle }
+function ERA(JD_ut1: MType): MType;
+var
+  Tu: MType; // = JD_ut1 - 2451545.0
+begin
+
+  Tu := JD_ut1 - 2451545.0;
+  result := 2 * pi * (0.7790572732640 + 1.00273781191135448 * Tu);
+
+end;
+
+
+{------------------------------------------------------------------------------}
 
 { От небесной к истинной экваториальной системе координат
 
