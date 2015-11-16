@@ -26,9 +26,9 @@ begin
 
   result := NullVec;
 
-  for i := Low(vec) to High(vec) do
-    for j := Low(matrx[i]) to High(matrx[i]) do
-      result[i] := result[i] + vec[i] * matrx[i, j];
+  for i := Low(matrx[i]) to High(matrx[i]) do
+    for j := Low(vec) to High(vec) do
+      result[i] := result[i] + vec[j] * matrx[i, j];
 
 end;
 
@@ -92,14 +92,15 @@ end;
 { Умножение матрицы на матрицу }
 function MultMatr(m, q: TMatrix): TMatrix;
 var
-  i, j: byte;
+  i, j, k: byte;
 begin
 
   result := NullMatr;
 
   for i := Low(result) to High(result) do
     for j := Low(result) to High(result) do
-      result[i, j] := result[i, j] + m[i, j] * q[i, j];
+    	for k := Low(result) to High(result) do
+      	result[i, j] := result[i, j] + m[i, k] * q[k, j];
 
 end;
 

@@ -10,7 +10,7 @@ const
 
 type
 
-  MType = extended;
+  MType = double;
 
   TMatrix = array [0 .. m_size, 0 .. m_size] of MType;
   TVector = array [0 .. m_size] of MType;

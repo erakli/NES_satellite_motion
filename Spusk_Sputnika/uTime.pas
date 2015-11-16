@@ -88,8 +88,8 @@ begin
 
       temp_year := temp_year - 1;
 
-      B := -13;
-      A := Trunc(temp_year / 100);
+//      B := -13;
+//      A := Trunc(temp_year / 100);
 
       JD := 1721409.5 + Trunc(365.25 * (temp_year));
 
@@ -279,7 +279,7 @@ begin
     // Date := FromMJDToDate(MJD);
     delta := '';
 
-    SearchDate := ' ' + IntToStr(Trunc(JD)) + '.00 ';
+    SearchDate := ' ' + IntToStr(Trunc(JD - MJDCorrection)) + '.00 ';
 
     // with Date do // Формирование искомой строки по дате
     // begin

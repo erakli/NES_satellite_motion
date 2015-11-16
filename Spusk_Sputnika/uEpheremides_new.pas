@@ -2,10 +2,18 @@ unit uEpheremides_new;
 
 interface
 
-uses Math, SysUtils, uTypes;
+{ Модуль для получения эфемерид
+
+	Planetary positions are stored in units of kilometers (TDB-compatible). }
+
+uses Math, SysUtils, uTypes, Classes;
+
+const
+
+  eph_file = 'ascp1900.421';
 
 type
-  Ttales = array [0 .. 2] of string;
+  TStrVector = array [0 .. 2] of string;
 
   TFacility = class
     private
@@ -14,10 +22,11 @@ type
       N: Word;
       LUB: integer; // Строка крайнего задействованного блока
       k, koefs, LUS: Byte;
-      // LUS - Last Used SubInterval, параметр, в котором хранится позиция(в массиве ВВ) левой границы последнего считанного подинтервала
+      { LUS - Last Used SubInterval, параметр, в котором хранится позиция (в
+      	массиве ВВ) левой границы последнего считанного подинтервала }
 
     public
-      constructor Create(ax, ay, az: MType; aN: Word; ak, akoefs: Byte);
+      constructor Create(aX, aY, aZ: MType; aN: Word; ak, akoefs: Byte);
       function Get(JD: MType): TVector;
   end;
 
@@ -26,7 +35,7 @@ function ChebPol(x: MType; j: integer): MType;
 // возвращает номер 1-ой строки блока
 function BinSearch(need: MType): integer;
 
-// заполняет черный ящик(ВВ)
+// заполняет черный ящик (ВВ)
 procedure FillBB(Facility: TFacility; pos: integer; date: MType);
 
 // ищет подынтервал, в который входит need
@@ -35,21 +44,45 @@ function SearchSubinterval(Facility: TFacility; need: MType): TVector;
 function StepSearch(Facility: TFacility; need: MType): integer;
 
 // разбивает строку на три отдельных слова
-function Separation(str: string): Ttales;
-procedure creation;
+function Separation(str: string): TStrVector;
+
+// получение эфемерид для определённого объекта
+procedure Creation(FacilityNum: byte);
+{
+	 1	Mercury
+   2	Venus
+   3	Earth-Moon barycenter
+   4	Mars
+   5	Jupiter
+   6	Saturn
+   7	Uranus
+   8	Neptune
+   9	Pluto
+   10	Moon (geocentric)
+   11	Sun
+}
 
 var
-  Mercury, Venus, Eart_Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
+	// можно оптимизировать, введя динамический массив, расширяемый при добавлении
+  // нового объекта
+  Mercury, Venus, Earth_Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
     Moon, Sun: TFacility;
 
-implementation
+  // Глобальная переменная для хранения всего файла DE.
+  // Внимание: может оказаться ресурсоёмким
+  DEfile_list: TStringList;
+
+
+implementation // --------------------------------------------------------------
+
+{ TFacility }
 
 constructor TFacility.Create;
 begin
   LUS := 153; // Если LUS = 153 => вызов функции Get еще не проводился
-  XYZ[0] := ax;
-  XYZ[1] := ay;
-  XYZ[2] := az;
+  XYZ[0] := aX;
+  XYZ[1] := aY;
+  XYZ[2] := aZ;
   N := aN; // Этот параметр - индетефикатор объекта
   k := ak;
   koefs := akoefs;
@@ -62,24 +95,33 @@ var
 begin
   if LUS = 153 then
     Search := BinSearch(JD)
-  else if (JD >= BB[0]) and (JD < BB[k]) then // Входит ли в тот же интервал?
-    if (JD >= BB[LUS]) and (JD < BB[LUS + 1]) then
-    // Да, Входит ли в тот же подынтервал? Первое выражение в квадратных скобках позволяет получить позицию, на которой в ВВ хранится первая граница полуинтервала, второе - соответственно
-    begin // Да
-      Result := XYZ;
-      exit;
-    end
-    else
-    begin
-      Result := SearchSubinterval(self, JD);
-      exit;
-    end
   else
-    Search := StepSearch(self, JD);
+  	if (JD >= BB[0]) and (JD < BB[k]) then // Входит ли в тот же интервал?
+
+      if (JD >= BB[LUS]) and (JD < BB[LUS + 1]) then
+      { Да, Входит ли в тот же подынтервал? Первое выражение в квадратных
+      	скобках позволяет получить позицию, на которой в ВВ хранится первая
+        граница полуинтервала, второе - соответственно }
+      begin // Да
+        Result := XYZ;
+        exit;
+      end
+      else
+      begin
+        Result := SearchSubinterval(self, JD);
+        exit;
+      end
+
+    else
+      Search := StepSearch(self, JD);
+
   FillBB(self, Search, JD);
   LUB := Search;
   Result := SearchSubinterval(self, JD);
 end;
+
+
+{ ------------- Вспомогательные функции ------------- }
 
 function ChebPol(x: MType; j: integer): MType;
 begin
@@ -93,19 +135,25 @@ begin
   end
 end;
 
+// возвращает номер 1-ой строки блока
 function BinSearch(need: MType): integer;
 var
   LB, RB, MIB: Word;
   LMIB, RMIB: MType;
+
+  block: TStrVector;
 begin
   LB := 1;
   RB := 1018;
   Result := -1;
+
   repeat
     MIB := round((RB - LB) / 2) + LB;
-    LMIB := StrToFloat(Separation(form2.SVL.Strings[(MIB - 1) * 341 + 1])[0]);
-    // НАЗВАНИЕ ФОРМЫ
-    RMIB := StrToFloat(Separation(form2.SVL.Strings[(MIB - 1) * 341 + 1])[1]);
+
+    block := Separation(DEfile_list[(MIB - 1) * 341 + 1]);
+    LMIB := StrToFloat(block[0]);
+    RMIB := StrToFloat(block[1]);
+
     if (need > LMIB) and (need < RMIB) then
       Result := (MIB - 1) * 341
     else if (need > LMIB) then
@@ -114,61 +162,54 @@ begin
       RB := MIB - 1;
     if RB < LB then
       Result := (LB - 1) * 341;
+
   until Result > -1;
 end;
 
+// заполняет черный ящик (ВВ)
 procedure FillBB(Facility: TFacility; pos: integer; date: MType);
 var
   f: boolean;
   i, cor, p: Byte;
   Nu, a, b: integer;
-  stt: Ttales;
+  stt: TStrVector;
+
+  temp_value: MType;
 begin
-  stt := Separation(form2.SVL.Strings[pos + 1]);
-  case Facility.k of
-    1:
-      begin
-        Facility.BB[0] := StrToFloat(stt[0]);
-        Facility.BB[1] := StrToFloat(stt[1]);
-      end;
-    2:
-      begin
-        Facility.BB[0] := StrToFloat(stt[0]);
-        Facility.BB[2] := StrToFloat(stt[1]);
-        Facility.BB[1] := Facility.BB[0] + 0.5 *
-          (Facility.BB[2] - Facility.BB[0]);
-      end;
-    4:
-      begin
-        Facility.BB[0] := StrToFloat(stt[0]);
-        Facility.BB[4] := StrToFloat(stt[1]);
-        Facility.BB[1] := Facility.BB[0] + 0.25 *
-          (Facility.BB[4] - Facility.BB[0]);
-        Facility.BB[2] := Facility.BB[0] + 0.5 *
-          (Facility.BB[4] - Facility.BB[0]);
-        Facility.BB[3] := Facility.BB[0] + 0.75 *
-          (Facility.BB[4] - Facility.BB[0]);
-      end;
-    8:
-      begin
-        Facility.BB[0] := StrToFloat(stt[0]);
-        Facility.BB[8] := StrToFloat(stt[1]);
-        Facility.BB[1] := Facility.BB[0] +
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[2] := Facility.BB[0] + 2 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[3] := Facility.BB[0] + 3 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[4] := Facility.BB[0] + 4 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[5] := Facility.BB[0] + 5 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[6] := Facility.BB[0] + 6 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-        Facility.BB[7] := Facility.BB[0] + 7 *
-          (Facility.BB[8] - Facility.BB[0]) / 8;
-      end;
-  end;
+  stt := Separation(DEfile_list[pos + 1]);
+
+  with Facility do
+    case k of
+      1:
+        begin
+          BB[0] := StrToFloat(stt[0]);
+          BB[1] := StrToFloat(stt[1]);
+        end;
+      2:
+        begin
+          BB[0] := StrToFloat(stt[0]);
+          BB[2] := StrToFloat(stt[1]);
+          BB[1] := BB[0] + 0.5 * (BB[2] - BB[0]);
+        end;
+      4:
+        begin
+          BB[0] := StrToFloat(stt[0]);
+          BB[4] := StrToFloat(stt[1]);
+          BB[1] := BB[0] + 0.25 * (BB[4] - BB[0]);
+          BB[2] := BB[0] + 0.5 * (BB[4] - BB[0]);
+          BB[3] := BB[0] + 0.75 * (BB[4] - BB[0]);
+        end;
+      8:
+        begin
+          BB[0] := StrToFloat(stt[0]);
+          BB[8] := StrToFloat(stt[1]);
+
+          temp_value := (BB[8] - BB[0]) / 8;
+          for i := 1 to 7 do
+          	BB[i] := BB[0] + i * temp_value;
+        end;
+    end; // end of case
+
   Facility.LUB := pos;
   Nu := Facility.N - 1;
   f := true;
@@ -183,23 +224,28 @@ begin
           b := Nu div 3 + 1 + pos;
         if f then
         begin
-          stt := Separation(form2.SVL.Strings[b]);
+          stt := Separation(DEfile_list[b]);
           f := False;
         end;
         a := ((Nu - 1) mod 3);
         if a = 2 then
           f := true;
 
-        if p = 0 then
-          Facility.BB[3 * i + Facility.k + 1 + cor] := 0;
-        Facility.BB[3 * i + Facility.k + 1 + cor] :=
-          Facility.BB[3 * i + Facility.k + 1 + cor] + StrToFloat(stt[a]) *
-          ChebPol((2 * date - Facility.BB[i] - Facility.BB[i + 1]) /
-          (Facility.BB[i + 1] - Facility.BB[i]), p);
+        with Facility do
+        begin
+          if p = 0 then
+            BB[3 * i + k + 1 + cor] := 0;
 
-      end;
+          BB[3 * i + k + 1 + cor] :=
+                                  BB[3 * i + k + 1 + cor] + StrToFloat(stt[a]) *
+                                  ChebPol((2 * date - BB[i] - BB[i + 1]) /
+                                  (BB[i + 1] - BB[i]), p);
+        end; // end of: with Facility do
+
+      end; // end of: for p := 0 to Facility.koefs - 1 do
 end;
 
+// ищет подынтервал, в который входит need
 function SearchSubinterval(Facility: TFacility; need: MType): TVector;
 var
   N: Smallint;
@@ -207,6 +253,7 @@ begin
   for N := 0 to Facility.k - 1 do
     if (need >= Facility.BB[N]) and (need < Facility.BB[N + 1]) then
       break;
+
   Facility.LUS := N;
   Result[0] := Facility.BB[3 * N + Facility.k + 1];
   Result[1] := Facility.BB[3 * N + Facility.k + 2];
@@ -214,49 +261,83 @@ begin
 end;
 
 function StepSearch(Facility: TFacility; need: MType): integer;
+var
+	block: TStrVector;
 begin
-  repeat
-    Facility.LUB := Facility.LUB + 341;
-  until ((need >= StrToFloat(Separation(form2.SVL.Strings[Facility.LUB + 1])[0])
-    ) and (need < StrToFloat(Separation(form2.SVL.Strings[Facility.LUB +
-    1])[1])));
+	with Facility do
+    repeat
+      LUB := LUB + 341;
+      block := Separation(DEfile_list[LUB + 1]);
+    until ( (need >= StrToFloat(block[0])) AND (need < StrToFloat(block[1])) );
+
   Result := Facility.LUB
 end;
 
-function Separation(str: string): Ttales;
+// разбивает строку на три отдельных слова
+function Separation(str: string): TStrVector;
 var
   i: Byte;
   num1, num2, num3: Byte;
+
+  work_str: string;
 begin
+  work_str := StringReplace(str, 'D', 'e', [rfReplaceAll, rfIgnoreCase]);
+
   i := 1;
-  while str[i] = ' ' do
+  while work_str[i] = ' ' do
     i := i + 1;
-  num1 := ifthen(str[i] = '-', 25, 24);
-  Result[0] := copy(str, i, num1);
-  while str[i + num1] = ' ' do
+  num1 := ifthen(work_str[i] = '-', 25, 24);
+  Result[0] := copy(work_str, i, num1);
+
+  while work_str[i + num1] = ' ' do
     i := i + 1;
-  num2 := ifthen(str[i + num1] = '-', 25, 24);
-  Result[1] := copy(str, i + num1, num2);
-  while str[i + num1 + num2] = ' ' do
+  num2 := ifthen(work_str[i + num1] = '-', 25, 24);
+  Result[1] := copy(work_str, i + num1, num2);
+
+  while work_str[i + num1 + num2] = ' ' do
     i := i + 1;
-  num3 := ifthen(str[i + num1 + num2] = '-', 25, 24);
-  Result[2] := copy(str, i + num1 + num2, num3);
+  num3 := ifthen(work_str[i + num1 + num2] = '-', 25, 24);
+  Result[2] := copy(work_str, i + num1 + num2, num3);
 end;
 
-procedure creation;
+// получение эфемерид для определённого объекта
+procedure Creation;
 begin
-  form2.SVL.Strings.LoadFromFile('Здесь мог бы быть путь к файлу');
-  Mercury := TFacility.Create(0, 0, 0, 3, 4, 14);
-  Venus := TFacility.Create(0, 0, 0, 171, 2, 10);
-  Eart_Moon := TFacility.Create(0, 0, 0, 231, 2, 13);
-  Mars := TFacility.Create(0, 0, 0, 309, 1, 11);
-  Jupiter := TFacility.Create(0, 0, 0, 342, 1, 8);
-  Saturn := TFacility.Create(0, 0, 0, 366, 1, 7);
-  Uranus := TFacility.Create(0, 0, 0, 387, 1, 6);
-  Neptune := TFacility.Create(0, 0, 0, 405, 1, 6);
-  Pluto := TFacility.Create(0, 0, 0, 423, 1, 6);
-  Moon := TFacility.Create(0, 0, 0, 441, 8, 13);
-  Sun := TFacility.Create(0, 0, 0, 753, 2, 11);
+  DEfile_list.LoadFromFile(eph_file);
+
+  case FacilityNum of
+  	1:  Mercury := TFacility.Create(0, 0, 0, 3, 4, 14);
+
+    2:  Venus := TFacility.Create(0, 0, 0, 171, 2, 10);
+
+    3:	Earth_Moon := TFacility.Create(0, 0, 0, 231, 2, 13);
+
+    4:	Mars := TFacility.Create(0, 0, 0, 309, 1, 11);
+
+    5:	Jupiter := TFacility.Create(0, 0, 0, 342, 1, 8);
+
+    6:  Saturn := TFacility.Create(0, 0, 0, 366, 1, 7);
+
+    7:  Uranus := TFacility.Create(0, 0, 0, 387, 1, 6);
+
+    8:  Neptune := TFacility.Create(0, 0, 0, 405, 1, 6);
+
+    9:  Pluto := TFacility.Create(0, 0, 0, 423, 1, 6);
+
+    10:  Moon := TFacility.Create(0, 0, 0, 441, 8, 13);
+
+    11:  Sun := TFacility.Create(0, 0, 0, 753, 2, 11)
+
+  end;
+
 end;
+
+initialization
+
+	DEfile_list := TStringList.Create;
+
+finalization
+
+	DEfile_list.Free;
 
 end.

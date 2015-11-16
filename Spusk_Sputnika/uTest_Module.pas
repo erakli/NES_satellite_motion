@@ -18,7 +18,7 @@ interface
 uses
   uConstants, uTypes, uEpheremides, Dialogs, System.SysUtils, uAtmosphericDrag,
   uKepler_Conversation, uFunctions, uTLE_conversation, uMatrix_Conversation,
-  uMatrix_Operations, uTime;
+  uMatrix_Operations, uTime, uEpheremides_new;
 
 type
   // ------------------------------------------- для dll
@@ -53,7 +53,7 @@ var
   r: array [0 .. 5] of MType;
   not_load: shortint;
 
-  JD, MJD, Sb_coeff, dist1, dist2, interval: MType;
+  JD, Sb_coeff, dist1, dist2, interval: MType;
   coord, v: TVector;
 
   TLE: TLE_lines;
@@ -78,7 +78,7 @@ function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
 
 function test_uMatrix_Operations: boolean;
 
-/// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 implementation
 
 const
@@ -87,12 +87,32 @@ const
 function EllipticalCalculate; external DLLName; // реализация в другом месте
 
 function test_uMatrix_Operations: boolean;
+const
+	testMatrix1: TMatrix = ((1, 2, 3),
+  											  (4, 5, 6),
+                          (7, 8, 9));
+  testMatrix2: TMatrix = ((4, 1, 7),
+  												(0, 3, 1),
+                          (3, 3, 4));
+  StartVector: TVector = (4, 2, 6);
+var
+	Matrix1, Matrix2: TMatrix;
+  Vector1, Vector2: TVector;
 begin
+
+	Vector1 := MultMatrVec(testMatrix1, StartVector);
+  Matrix1 := MultMatr(testMatrix1, testMatrix2);
 
 end;
 
-/// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 initialization
+
+test_uMatrix_Operations;
+
+JD := 2415284.191;
+Creation(3);
+coord := Earth_Moon.Get(JD);
 
 // MJD := 57258;
 
@@ -103,8 +123,8 @@ TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477
 TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
 
 TLE_output := ReadTLE(TLE);
-MJD := TLE_output.time;
-JD := TLE_output.time + MJDCorrection;
+//MJD := TLE_output.time;
+JD := TLE_output.time;
 
 { a, s_e, i, b_Omega, s_omega, M, n - Кеплеровские элементы орбиты (7) }
 with Elements do
@@ -122,11 +142,13 @@ end;
 Details := EllipticalCalculate(Elliptical, JD, Elements);
 
 Kepler_Elements := TLE_output.Elements;
-coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
 // метод из Дубошина
-v := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
+coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
+v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
 
-coord := MultMatrVec(ITRS2GCRS(TT_time(MJD) + MJDCorrection), coord);
+//coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
+
+coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
 
 dist1 := module(v) - 6378.1366;
 dist2 := module(coord) - 6378.1366;

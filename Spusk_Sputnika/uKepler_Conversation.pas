@@ -166,7 +166,7 @@ begin
 
 end;
 
-/// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 {
   Реализация преобразования этих элементов из Дубошина (с. 223)
@@ -183,13 +183,15 @@ var
   Ksi, Eta, // орбитальные координаты
   _p: MType;
 
-  p, Q, PQ_check, coord: TVector;
+  P, Q, PQ_check, coord: TVector;
 
   j: byte;
 
   rad_speed, tang_speed, _v, _u: MType;
   v, u: vec;
   speed: TVector;
+
+  temp: double;
 begin
 
   Dubosh := true;
@@ -201,9 +203,9 @@ begin
   s_omega := DegToRad(Elements[4]);
   M := DegToRad(Elements[5]);
 
-  p[0] := Cos(s_omega) * Cos(b_Omega) - Sin(s_omega) * Sin(b_Omega) * Cos(i);
-  p[1] := Cos(s_omega) * Sin(b_Omega) + Sin(s_omega) * Cos(b_Omega) * Cos(i);
-  p[2] := Sin(s_omega) * Sin(i);
+  P[0] := Cos(s_omega) * Cos(b_Omega) - Sin(s_omega) * Sin(b_Omega) * Cos(i);
+  P[1] := Cos(s_omega) * Sin(b_Omega) + Sin(s_omega) * Cos(b_Omega) * Cos(i);
+  P[2] := Sin(s_omega) * Sin(i);
 
   Q[0] := -Sin(s_omega) * Cos(b_Omega) - Cos(s_omega) * Sin(b_Omega) * Cos(i);
   Q[1] := -Sin(s_omega) * Sin(b_Omega) + Cos(s_omega) * Cos(b_Omega) * Cos(i);
@@ -215,14 +217,13 @@ begin
 
   for j := 0 to 2 do
   begin
-    PQ_check[0] := PQ_check[0] + sqr(p[j]);
+    PQ_check[0] := PQ_check[0] + sqr(P[j]);
     PQ_check[1] := PQ_check[1] + sqr(Q[j]);
-    PQ_check[2] := PQ_check[2] + p[j] * Q[j];
+    PQ_check[2] := PQ_check[2] + P[j] * Q[j];
   end;
 
   // контроль вычислений
-  if (PQ_check[0] <> 1) OR (PQ_check[1] <> 1) OR (Abs(PQ_check[2]) > 1.0E-15)
-  then
+  if ((PQ_check[0] <> 1) OR (PQ_check[1] <> 1) OR (Abs(PQ_check[2]) > 1.0E-15)) then
   begin
     Dubosh := false; // мы не удовлетворяем условиям проверки P и Q
     result.coord := PQ_check;
@@ -238,7 +239,7 @@ begin
   Eta := a * sqrt(1 - sqr(s_e)) * Sin(b_E);
 
   for j := 0 to 2 do
-    coord[j] := p[j] * Ksi + Q[j] * Eta;
+    coord[j] := P[j] * Ksi + Q[j] * Eta;
 
   result.coord := coord;
 
