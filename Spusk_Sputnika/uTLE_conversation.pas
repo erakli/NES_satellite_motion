@@ -26,9 +26,6 @@ begin
   begin
     Month := 0;
     Day := 0;
-    Hour := 0;
-    Minute := 0;
-    second := 0;
   end;
 
   { Читаем первую строку TLE }
@@ -43,7 +40,7 @@ begin
 
   temp_str := Copy(TLE[0], 21, 12);
 
-  epoch := FromDateToMJD(Date) + StrToFloat(temp_str); { посчитали дату в MJD,
+  epoch := FromDateToJD(Date) + StrToFloat(temp_str); { посчитали дату в JD,
     на какой момент имеются TLE }
   { Закончили её читать }
 

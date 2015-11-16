@@ -88,7 +88,7 @@ begin
   s0 := ToGetGMSTime(UT1_mjd);
 
   // Угол наклона эклиптики и нутация в долготе так же определяется в UT1?
-//  eps := GetEpsMean(UT1_mjd);
+  // eps := GetEpsMean(UT1_mjd);
   long_nut := Epheremides.GetEpheremides(UT1_mjd, true).x;
 
   { Вычисление гринвичского истинного звёездного времени. Результат - угол }

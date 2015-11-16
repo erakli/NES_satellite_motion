@@ -88,6 +88,7 @@ var
   GEO_Potential: TGEO_Potential;
 
 implementation
+
 // ---------------------------------------------------------------
 
 { TGEO_Potential }

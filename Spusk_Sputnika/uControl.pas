@@ -40,39 +40,36 @@ implementation
 
 { TControl }
 
-procedure TControl.Prepare(t0, t_end: TDate;
-												 	 step: MType;
-                           TLE: TLE_lines;
-                           mass, s, Sb_coeff: MType;
-                           lines: boolean = true);
+procedure TControl.Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
+  mass, s, Sb_coeff: MType; lines: boolean = true);
 var
   TDB: MType;
   Elements: TElements;
-//  Mpc // Матрицы перехода: от истинной экваториальной к небесной
-//    : TMatrix;
+  // Mpc // Матрицы перехода: от истинной экваториальной к небесной
+  // : TMatrix;
   temp_param: param;
 begin
 
-  // Приводим время к UTC в модифицированных юлианских днях (MJD)
-  start_time := FromDateToMJD(t0);
+  // Приводим время к UTC в модифицированных юлианских днях (JD)
+  start_time := FromDateToJD(t0);
   cur_time := start_time;
-  end_time := FromDateToMJD(t_end);
+  end_time := FromDateToJD(t_end);
 
-  Ever_step := step; // шаг в секундах или MJD?
+  Ever_step := step; // шаг в секундах или JD?
 
   // Читаем TLE
   if lines then
   begin
     Elements := ReadTLE(TLE).Elements;
-    //Elements[0] := Elements[0] * Power(mass, Third); // странная конструкция
+    // Elements[0] := Elements[0] * Power(mass, Third); // странная конструкция
   end;
 
   TDB := TT_time(cur_time);
-//  _P := ClcPrecMatr(cur_time);
-//  _N := ClcNutMatr(cur_time);
+  // _P := ClcPrecMatr(cur_time);
+  // _N := ClcNutMatr(cur_time);
 
-//  Mpc := FromTrueToFixM(start_time); // Вычислили матрицу перехода к небесной СК
-//  Mpc := FromTerraToFixM(start_time);  // пробуем из земной
+  // Mpc := FromTrueToFixM(start_time); // Вычислили матрицу перехода к небесной СК
+  // Mpc := FromTerraToFixM(start_time);  // пробуем из земной
 
   temp_param := Kepler_to_Decart(Elements, mass);
   // Получили вектор состояния в истинной экваториальной СК
@@ -80,8 +77,8 @@ begin
   // Инициализируем спутник
   with Sputnik do
   begin
-//    state.coord := MultMatrVec(Mpc, temp_param.coord);
-//    state.speed := MultMatrVec(Mpc, temp_param.speed);
+    // state.coord := MultMatrVec(Mpc, temp_param.coord);
+    // state.speed := MultMatrVec(Mpc, temp_param.speed);
     state.coord := temp_param.coord;
     state.speed := temp_param.speed;
     _space := s;
@@ -140,8 +137,8 @@ begin
     begin
       Force := Integrate(cur_time, _coord, _speed, Ever_step,
         GEO_potential.RightPart);
-//      temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
-//        AtmosphericDrag.RightPart);
+      // temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
+      // AtmosphericDrag.RightPart);
 
       Force.x := CoordSum(Force.x, temp_force.x);
       Force.dif_x := CoordSum(Force.dif_x, temp_force.dif_x);
@@ -174,9 +171,9 @@ begin
 
     TDB := TT_time(cur_time);
     // считаем в конце цикла, так как в первый раз посчитали в Prepare
-//    _P := ClcPrecMatr(TDB);
-//    // Высчитали матрицы нутации и прецессии. На каждый шаг
-//    _N := ClcNutMatr(TDB);
+    // _P := ClcPrecMatr(TDB);
+    // // Высчитали матрицы нутации и прецессии. На каждый шаг
+    // _N := ClcNutMatr(TDB);
 
   end;
 

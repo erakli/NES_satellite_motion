@@ -77,11 +77,12 @@ var
     with Result do
     begin
       Day := StrToInt(Copy(value, 1, 2));
+      // добавить считывание части дня в виде часов/минут/сек сюда
       Month := StrToInt(Copy(value, 3, 2));
       Year := StrToInt(Copy(value, 5, 4));
-      Hour := StrToInt(Copy(value, 9, 2));
-      Minute := StrToInt(Copy(value, 11, 2));
-      second := StrToFloat(Copy(value, 13, 2));
+      // Hour := StrToInt(Copy(value, 9, 2));
+      // Minute := StrToInt(Copy(value, 11, 2));
+      // second := StrToFloat(Copy(value, 13, 2));
     end;
   end;
 

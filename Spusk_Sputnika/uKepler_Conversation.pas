@@ -11,7 +11,8 @@ const
 
 function Iter_Method(s_e, M: MType; Newton: boolean = true): MType;
 function Kepler_to_Decart(Elements: TElements; mass: MType): param; overload;
-function Kepler_to_Decart(Elements: TElements; mass: MType; var Dubosh: boolean): param; overload;
+function Kepler_to_Decart(Elements: TElements; mass: MType; var Dubosh: boolean)
+  : param; overload;
 
 implementation
 
@@ -19,18 +20,18 @@ implementation
 
 function Iter_Method(s_e, M: MType; Newton: boolean = true): MType;
 const
-	max_iter = 241;
+  max_iter = 241;
 var
   iter: integer;
   E: MType;
   cur, dif: MType;
 begin
-//   E := M;
-//   for iter := 1 to Num_of_iter do
-//   E := E - ((E - s_e * sin(DegToRad(E)) - M) / (1 - s_e * cos(DegToRad(E))));
-//   result := E;
+  // E := M;
+  // for iter := 1 to Num_of_iter do
+  // E := E - ((E - s_e * sin(DegToRad(E)) - M) / (1 - s_e * cos(DegToRad(E))));
+  // result := E;
 
-  cur := M + s_e * Sin(M);  // в радианах
+  cur := M + s_e * Sin(M); // в радианах
   dif := 1;
   iter := 0;
 
@@ -51,7 +52,7 @@ begin
 
   begin
 
-  	While ((dif > 1.0E-15) AND (iter < max_iter)) Do
+    While ((dif > 1.0E-15) AND (iter < max_iter)) Do
     Begin
       E := s_e * Sin(cur) + M;
       dif := Abs(cur - E);
@@ -61,7 +62,7 @@ begin
 
   end; // if Newton
 
-  result := E;  // ответ в радианах
+  result := E; // ответ в радианах
 
 end;
 
@@ -117,7 +118,8 @@ begin
 
   a := Elements[0];
   s_e := Elements[1];
-  i := DegToRad(Elements[2]); // переводим в радианы, так как sin и cos считаются для радиан
+  i := DegToRad(Elements[2]);
+  // переводим в радианы, так как sin и cos считаются для радиан
   b_Omega := DegToRad(Elements[3]);
   s_omega := DegToRad(Elements[4]);
   M := DegToRad(Elements[5]);
@@ -164,37 +166,33 @@ begin
 
 end;
 
-////////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
 
 {
-	Реализация преобразования этих элементов из Дубошина (с. 223)
+  Реализация преобразования этих элементов из Дубошина (с. 223)
 }
-function Kepler_to_Decart(Elements: TElements; mass: MType; var Dubosh: boolean): param;
+function Kepler_to_Decart(Elements: TElements; mass: MType;
+  var Dubosh: boolean): param;
 type
   vec = record
-    sin, cos: MType;
+    Sin, Cos: MType;
   end;
 var
   a, s_e, i, b_Omega, s_omega, M, // Кеплеровы элементы орбиты
-  b_E,
-  r,        // радиус-вектор
+  b_E, r, // радиус-вектор
   Ksi, Eta, // орбитальные координаты
-  _p
-  	: MType;
+  _p: MType;
 
+  p, Q, PQ_check, coord: TVector;
 
-  P, Q, PQ_check,
-  coord: TVector;
+  j: byte;
 
-	j: byte;
-
-  rad_speed, tang_speed,
-  _v, _u: MType;
+  rad_speed, tang_speed, _v, _u: MType;
   v, u: vec;
   speed: TVector;
 begin
 
-	Dubosh := true;
+  Dubosh := true;
 
   a := Elements[0];
   s_e := Elements[1];
@@ -203,13 +201,13 @@ begin
   s_omega := DegToRad(Elements[4]);
   M := DegToRad(Elements[5]);
 
-  P[0] := cos(s_omega) * cos(b_Omega) - sin(s_omega) * sin(b_Omega) * cos(i);
-  P[1] := cos(s_omega) * sin(b_Omega) + sin(s_omega) * cos(b_Omega) * cos(i);
-  P[2] := sin(s_omega) * sin(i);
+  p[0] := Cos(s_omega) * Cos(b_Omega) - Sin(s_omega) * Sin(b_Omega) * Cos(i);
+  p[1] := Cos(s_omega) * Sin(b_Omega) + Sin(s_omega) * Cos(b_Omega) * Cos(i);
+  p[2] := Sin(s_omega) * Sin(i);
 
-  Q[0] := - sin(s_omega) * cos(b_Omega) - cos(s_omega) * sin(b_Omega) * cos(i);
-  Q[1] := - sin(s_omega) * sin(b_Omega) + cos(s_omega) * cos(b_Omega) * cos(i);
-  Q[2] := cos(s_omega) * sin(i);
+  Q[0] := -Sin(s_omega) * Cos(b_Omega) - Cos(s_omega) * Sin(b_Omega) * Cos(i);
+  Q[1] := -Sin(s_omega) * Sin(b_Omega) + Cos(s_omega) * Cos(b_Omega) * Cos(i);
+  Q[2] := Cos(s_omega) * Sin(i);
 
   PQ_check[0] := 0; // сумма квадратов P
   PQ_check[1] := 0; // сумма квадратов Q
@@ -217,61 +215,62 @@ begin
 
   for j := 0 to 2 do
   begin
-  	PQ_check[0] := PQ_check[0] + sqr(P[j]);
+    PQ_check[0] := PQ_check[0] + sqr(p[j]);
     PQ_check[1] := PQ_check[1] + sqr(Q[j]);
-    PQ_check[2] := PQ_check[2] + P[j] * Q[j];
+    PQ_check[2] := PQ_check[2] + p[j] * Q[j];
   end;
 
   // контроль вычислений
-  if (PQ_check[0] <> 1) OR (PQ_check[1] <> 1) OR (Abs(PQ_check[2]) > 1.0e-15) then
+  if (PQ_check[0] <> 1) OR (PQ_check[1] <> 1) OR (Abs(PQ_check[2]) > 1.0E-15)
+  then
   begin
     Dubosh := false; // мы не удовлетворяем условиям проверки P и Q
-    Result.coord := PQ_check;
+    result.coord := PQ_check;
     Exit; // закончили выполнение текущей функции. Снаружи нужен обработчик
   end;
 
   // E - эксцентрическая аномалия
-  b_E := Iter_Method(s_e, M, false); // сразу считается в радианах. Булинь - для выбора метода (Ньютона или неподв. точек)
+  b_E := Iter_Method(s_e, M, false);
+  // сразу считается в радианах. Булинь - для выбора метода (Ньютона или неподв. точек)
 
-  r := a * (1 - s_e * cos(b_E));
-  Ksi := a * (cos(b_E) - s_e);
-  Eta := a * sqrt(1 - sqr(s_e)) * sin(b_E);
+  r := a * (1 - s_e * Cos(b_E));
+  Ksi := a * (Cos(b_E) - s_e);
+  Eta := a * sqrt(1 - sqr(s_e)) * Sin(b_E);
 
   for j := 0 to 2 do
-  	coord[j] := P[j] * Ksi + Q[j] * Eta;
+    coord[j] := p[j] * Ksi + Q[j] * Eta;
 
-  Result.coord := coord;
-
+  result.coord := coord;
 
   { Вычисление скорости для эллиптического движения }
-  _v := 2 * arctan( sqrt( (1 + s_e)/(1 - s_e) ) * Tan( b_E / 2 ) );
+  _v := 2 * arctan(sqrt((1 + s_e) / (1 - s_e)) * Tan(b_E / 2));
   _u := _v + s_omega;
 
   // v - истинная аномалия
-  v.sin := sin(_v);
-  v.cos := cos(_v);
+  v.sin := Sin(_v);
+  v.cos := Cos(_v);
 
   // u - аргумент перицентра
-  u.sin := sin(_u);
-  u.cos := cos(_v);
+  u.sin := Sin(_u);
+  u.cos := Cos(_v);
 
-//  r := a * ( 1 - sqr(s_e) ) / ( 1 + s_e * v.cos ); // [km] - радиус-вектор
+  // r := a * ( 1 - sqr(s_e) ) / ( 1 + s_e * v.cos ); // [km] - радиус-вектор
   _p := a * (1 - sqr(s_e)); // параметр орбиты
 
-  rad_speed := sqrt(fm * mass / _p) * s_e * v.sin;          // радиальная скорость
-  tang_speed := sqrt(fm * mass / _p) * (1 + s_e * v.sin); 	 // трансверальная скорость
-
+  rad_speed := sqrt(fm * mass / _p) * s_e * v.sin; // радиальная скорость
+  tang_speed := sqrt(fm * mass / _p) * (1 + s_e * v.sin);
+  // трансверальная скорость
 
   // speed
   speed[0] := coord[0] / r * rad_speed +
-    ( -u.sin * Cos(b_Omega) - u.cos * Sin(b_Omega) * Cos(i) ) * tang_speed;
+    (-u.sin * Cos(b_Omega) - u.cos * Sin(b_Omega) * Cos(i)) * tang_speed;
 
   speed[1] := coord[1] / r * rad_speed +
-    ( -u.sin * Sin(b_Omega) + u.cos * Cos(b_Omega) * Cos(i) ) * tang_speed;
+    (-u.sin * Sin(b_Omega) + u.cos * Cos(b_Omega) * Cos(i)) * tang_speed;
 
   speed[2] := coord[2] / r * rad_speed + u.cos * Sin(i) * tang_speed;
 
-  Result.speed := speed;
+  result.speed := speed;
 
 end;
 

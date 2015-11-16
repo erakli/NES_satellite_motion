@@ -26,23 +26,23 @@ const
 
 type
   TDate = record
-    Year, Month, Day, Hour, Minute: word;
-    second: MType;
+    Year, Month: word;
+    Day: MType;
   end;
 
-function FromDateToMJD(Date: TDate): MType;
-function FromMJDToDate(MJD: MType): TDate;
+function FromDateToJD(Date: TDate): MType;
+function FromJDToDate(JD: MType): TDate;
 
 function GetDeltaTAI(Date: TDate): MType;
 // Поправка к шкале всемирного времени
-function GetDeltaUT(MJD: MType): TVector;
+function GetDeltaUT(JD: MType): TVector;
 // Получение поправки ΔUT = UT1 − UTC и координат полюса
 
-function UT1_time(MJD: MType): MType; // Вычисление Всемирного времени
-function TT_time(MJD: MType): MType; // Вычисление земного времени
-function TT2UTC(MJD: MType): MType;
+function UT1_time(JD: MType): MType; // Вычисление Всемирного времени
+function TT_time(JD: MType): MType; // Вычисление земного времени
+function TT2UTC(JD: MType): MType;
 
-function TDB_time(MJD: MType): MType;
+function TDB_time(JD: MType): MType;
 { Вычисление барицентрического динамического времени }
 
 var
@@ -51,8 +51,8 @@ var
   TAI_list, EOP // Сюда будет загружаться файл с ΔUT (finals2000A.txt)
     : TStringList;
 
-  _xp, _yp,  // глобальные переменные для мгновенного положения полюса
-    _deltaUT: MType;  // .. для поправки ΔUT = UT1 − UTC
+  _xp, _yp, // глобальные переменные для мгновенного положения полюса
+  _deltaUT: MType; // .. для поправки ΔUT = UT1 − UTC
 
   delta_got: boolean; // были ли координаты и поправка получены?
 
@@ -60,28 +60,28 @@ implementation
 
 // ---------------------------------------------------------------
 
-function FromDateToMJD(Date: TDate): MType;
+function FromDateToJD(Date: TDate): MType;
 var
   temp_year, temp_month, A, B: integer;
-//  MJD: MType;
-	JD: MType;
+  // MJD: MType;
+  JD: MType;
   short_period: boolean;
 begin
 
-	short_period := true; // если нас интересует промежуток между 1901 и 2099
+  short_period := true; // если нас интересует промежуток между 1901 и 2099
 
   with Date do
   begin
-		// реализация из comalg.pdf для MJD
-//    temp_year := Year - 1900;
-//    temp_month := Month - 3;
-//    MJD := 15078 + 365.0 * temp_year + INT(temp_year / 4) +
-//      INT(0.5 + 30.6 * temp_month);
-//
-//    result := MJD + Day + Hour / 24 + Minute / 1440 + second / SecInDay;
+    // реализация из comalg.pdf для MJD
+    // temp_year := Year - 1900;
+    // temp_month := Month - 3;
+    // MJD := 15078 + 365.0 * temp_year + INT(temp_year / 4) +
+    // INT(0.5 + 30.6 * temp_month);
+    //
+    // result := MJD + Day + Hour / 24 + Minute / 1440 + second / SecInDay;
 
-		// реализация из AA.pdf
-		temp_year := Year;
+    // реализация из AA.pdf
+    temp_year := Year;
 
     if short_period then // выбираем короткий промежуток дат
     begin
@@ -94,7 +94,7 @@ begin
       JD := 1721409.5 + Trunc(365.25 * (temp_year));
 
     end
-    else   // иначе выбрали полный диапазон
+    else // иначе выбрали полный диапазон
     begin
 
       temp_month := Month;
@@ -108,62 +108,105 @@ begin
       A := Trunc(temp_year / 100);
       B := 2 - A + Trunc(A / 4);
 
-      JD := Trunc(365.25 * (temp_year + 4716))
-       + Trunc(30.6001 * (temp_month + 1)) + Day + B - 1524.5;
+      JD := Trunc(365.25 * (temp_year + 4716)) +
+        Trunc(30.6001 * (temp_month + 1)) + Day + B - 1524.5;
 
     end;
 
-    Result := JD - MJDCorrection + Hour / 24 + Minute / 1440 + second / SecInDay;
+    Result := JD;
 
   end;
 
 end;
 
-function FromMJDToDate(MJD: MType): TDate;
+function FromJDToDate(JD: MType): TDate;
+{ из comalg.pdf для MJD }
+// var
+// sp, rd: MType;
+// nd, nz, na, nb, ma, Year, Month, Day, Hour, Minute: longword;
+// begin
+//
+// rd := INT(JD) - 15078;
+// nd := trunc(rd);
+// nz := trunc(rd / 1461.01);
+// na := nd - 1461 * nz;
+// nb := trunc(na / 365.25);
+//
+// Year := 4 * nz + nb + 1900;
+//
+// if na = 1461 then
+// begin
+// Month := 2;
+// Day := 29;
+// end
+// else
+// begin
+// nz := na - 365 * nb;
+// ma := trunc((nz - 0.5) / 30.6);
+// Month := ma + 3;
+// Day := nz - trunc(30.6 * Month - 91.3);
+// end;
+//
+// if Month > 12 then
+// begin
+// Month := Month - 12;
+// Year := Year + 1;
+// end;
+//
+// sp := 24 * (JD - INT(JD));
+// Hour := trunc(sp);
+//
+// sp := 60 * (sp - Hour);
+// Minute := trunc(sp);
+//
+// result.second := 60 * (sp - Minute);
+// result.Minute := Minute;
+// result.Hour := Hour;
+// result.Day := Day;
+// result.Month := Month;
+// result.Year := Year;
+
+{ реализация из AA+ }
 var
-  sp, rd: MType;
-  nd, nz, na, nb, ma, Year, Month, Day, Hour, Minute: longword;
+  Z: integer; // the integer part of JD + 0.5
+  F: MType; // the fractional (decimal) part of JD + 0.5
+  A, alpha, B, C, D, E, m, Year // month number
+    : integer;
 begin
 
-  rd := INT(MJD) - 15078;
-  nd := trunc(rd);
-  nz := trunc(rd / 1461.01);
-  na := nd - 1461 * nz;
-  nb := trunc(na / 365.25);
+  Z := Trunc(JD + 0.5);
+  F := Frac(JD + 0.5);
 
-  Year := 4 * nz + nb + 1900;
-
-  if na = 1461 then
-  begin
-    Month := 2;
-    Day := 29;
-  end
+  if Z < 2299161 then
+    A := Z
   else
   begin
-    nz := na - 365 * nb;
-    ma := trunc((nz - 0.5) / 30.6);
-    Month := ma + 3;
-    Day := nz - trunc(30.6 * Month - 91.3);
+    alpha := Trunc((Z - 1867216.25) / 36524.25);
+    A := Z + 1 + alpha - Trunc(alpha / 4);
   end;
 
-  if Month > 12 then
-  begin
-    Month := Month - 12;
-    Year := Year + 1;
-  end;
+  B := A + 1524;
+  C := Trunc((B - 122.1) / 365.25);
+  D := Trunc(365.25 * C);
+  E := Trunc((B - D) / 30.6001);
 
-  sp := 24 * (MJD - INT(MJD));
-  Hour := trunc(sp);
+  Result.Day := B - D - Trunc(30.6001 * E) + F;
+  // day of the month (with decimals)
 
-  sp := 60 * (sp - Hour);
-  Minute := trunc(sp);
+  // month number
+  if E < 14 then
+    m := E - 1
+  else if (E = 14) OR (E = 15) then
+    m := E - 13;
 
-  result.second := 60 * (sp - Minute);
-  result.Minute := Minute;
-  result.Hour := Hour;
-  result.Day := Day;
-  result.Month := Month;
-  result.Year := Year;
+  // year
+  if m > 2 then
+    Year := C - 4716
+  else if (m = 1) OR (m = 2) then
+    Year := C - 4715;
+
+  Result.Month := m;
+  Result.Year := Year;
 
 end;
 
@@ -203,14 +246,14 @@ begin
 
   if (i = TAI_list.Count - 1) or (text = '') then
   begin
-    ShowMessage('Ошибка поиска поправки DeltaTT для даты ' + inttostr(Date.Year)
-      + '/' + inttostr(Date.Month) + '/' + inttostr(Date.Day) + '#13#10' +
+    ShowMessage('Ошибка поиска поправки DeltaTT для даты ' + IntToStr(Date.Year)
+      + '/' + IntToStr(Date.Month) + '/' + FloatToStr(Date.Day) + '#13#10' +
       ' ' + text);
-    result := -1;
+    Result := -1;
     exit;
   end
   else
-    result := StrToFloat(text);
+    Result := StrToFloat(text);
 
 end;
 
@@ -219,8 +262,8 @@ end;
 
   На вход - время UTC
 
-  Проверить, кто обращается к этой функции}
-function GetDeltaUT(MJD: MType): TVector;
+  Проверить, кто обращается к этой функции }
+function GetDeltaUT(JD: MType): TVector;
 // 0 - DUT1, 1-2 - xp, yp (коорд. полюса)
 var
   i: integer;
@@ -236,7 +279,7 @@ begin
     // Date := FromMJDToDate(MJD);
     delta := '';
 
-    SearchDate := ' ' + inttostr(trunc(MJD - MJDCorrection)) + '.00 ';
+    SearchDate := ' ' + IntToStr(Trunc(JD)) + '.00 ';
 
     // with Date do // Формирование искомой строки по дате
     // begin
@@ -271,10 +314,11 @@ begin
 
     if (i = EOP.Count - 1) or (delta = '') then
     begin
-      ShowMessage('Ошибка поиска поправки DeltaT для даты ' + inttostr(Date.Year)
-        + '/' + inttostr(Date.Month) + '/' + inttostr(Date.Day));
+      ShowMessage('Ошибка поиска поправки DeltaT для даты ' +
+        IntToStr(Date.Year) + '/' + IntToStr(Date.Month) + '/' +
+        FloatToStr(Date.Day));
       for i := Low(TVector) to High(TVector) do
-        result[i] := -1;
+        Result[i] := -1;
       exit;
     end
     else
@@ -290,24 +334,24 @@ begin
 
   end; // end of   if NOT delta_got
 
-  result[0] := _deltaUT;
-  result[1] := _xp;
-  result[2] := _yp;
+  Result[0] := _deltaUT;
+  Result[1] := _xp;
+  Result[2] := _yp;
 
 end;
 
 // *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
 { Вычисление Всемирного времени }
-function UT1_time(MJD: MType): MType;
+function UT1_time(JD: MType): MType;
 var
   DeltaUT: MType;
   // Поправка ΔUT = UT1 − UTC, приближение UTC к UT1 (Всемирному времни)
 begin
 
-  DeltaUT := GetDeltaUT(MJD)[0];
+  DeltaUT := GetDeltaUT(JD)[0];
 
-  result := MJD + DeltaUT / SecInDay;
+  Result := JD + DeltaUT / SecInDay;
 
 end;
 
@@ -319,32 +363,31 @@ end;
 
   На поверхности Земли и в околоземном пространстве пользуются равномерной
   шкалой земного времени TT. }
-function TT_time(MJD: MType): MType;
+function TT_time(JD: MType): MType;
 var
   DeltaTAI: MType;
   Date: TDate;
 begin
 
-  Date := FromMJDToDate(MJD);
+  Date := FromJDToDate(JD);
   DeltaTAI := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
 
-  result := MJD + DeltaTAI / SecInDay; // 86400 - сек в дне
+  Result := JD + DeltaTAI / SecInDay; // 86400 - сек в дне
 
 end;
 
-function TT2UTC(MJD: MType): MType;
+function TT2UTC(JD: MType): MType;
 var
   DeltaTAI: MType;
   Date: TDate;
 begin
 
-  Date := FromMJDToDate(MJD);
+  Date := FromJDToDate(JD);
   DeltaTAI := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
 
-  result := MJD - DeltaTAI / SecInDay; // 86400 - сек в дне
+  Result := JD - DeltaTAI / SecInDay; // 86400 - сек в дне
 
 end;
-
 
 { Вычисление барицентрического динамического времени
 
@@ -354,26 +397,26 @@ end;
   ческого динамического времени TDB.
   В этой шкале вычисляются положения Луны, Солнца и параметры прецессии
   и нутации. }
-function TDB_time(MJD: MType): MType;
+function TDB_time(JD: MType): MType;
 var
-  d, g, // Вспомогательные переменные
+  D, g, // Вспомогательные переменные
   TT { Момент в шкале земного времени TT, выраженный в модифицированных юли-
     анских днях. }
     : MType;
 begin
 
-  TT := TT_time(MJD);
+  TT := TT_time(JD);
 
-  d := (TT - 51544.5) / 36525; { - интервал времени в юлианских столетиях, от
+  D := (TT - 51544.5) / 36525; { - интервал времени в юлианских столетиях, от
     стандартной эпохи J2000.0, начало которой
     соответствует 1.5 января 2000 года, до текущего
     момента }
 
-  g := 0.017453 * (357.258 + 35999.050 * d); { - приближённое значение аргумента
+  g := 0.017453 * (357.258 + 35999.050 * D); { - приближённое значение аргумента
     перигелия Земли в радианах.
     !Уточнить! }
 
-  result := TT + 0.001658 * sin(g + 0.0167 * sin(g)) / SecInDay;
+  Result := TT + 0.001658 * sin(g + 0.0167 * sin(g)) / SecInDay;
 
 end;
 
@@ -381,7 +424,9 @@ initialization
 
 // ---------------------------------------------------------------
 
-_xp := 0; _yp := 0; _deltaUT := 0;
+_xp := 0;
+_yp := 0;
+_deltaUT := 0;
 
 delta_got := false;
 

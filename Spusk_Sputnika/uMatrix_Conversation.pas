@@ -26,7 +26,7 @@ implementation
   IERS Conversation(2010) с помощью CIO
 
   Считаем, что на вход подаётся время в ТТ, для чего надо реализовать
-  перевод TT_UTC}
+  перевод TT_UTC }
 function ITRS2GCRS(t: MType): TMatrix;
 var
   TT_centuries, UT1: MType;
@@ -40,14 +40,14 @@ begin
   delta_got := false;
 
   TT_centuries := (t - J2000_Day) / 36525;
-  xpyp_vec := GetDeltaUT(TT2UTC(t));  // здесь нужно UTC на вход
+  xpyp_vec := GetDeltaUT(TT2UTC(t)); // здесь нужно UTC на вход
 
   UT1 := UT1_time(TT2UTC(t)); // и здесь
 
   transform := MultMatr(R(UT1), W(TT_centuries, xpyp_vec[1], xpyp_vec[2]));
-  result := MultMatr(Q.getQ_Matrix(TT_centuries), transform); // здесь тоже centuries?
+  result := MultMatr(Q.getQ_Matrix(TT_centuries), transform);
+  // здесь тоже centuries?
 end;
-
 
 { Transformation matrix for polar motion }
 function W(t, xp, yp: MType): TMatrix;
@@ -56,13 +56,12 @@ var
   res_matrix: TMatrix;
 begin
 
-  _s := asec2rad(-0.000047) * t;  // нужно ли переводить в радианы?
+  _s := asec2rad(-0.000047) * t; // нужно ли переводить в радианы?
 
-  res_matrix := MultMatr(RotMatr(3, - _s), RotMatr(2, xp));
+  res_matrix := MultMatr(RotMatr(3, -_s), RotMatr(2, xp));
   result := MultMatr(res_matrix, RotMatr(1, yp));
 
 end;
-
 
 { CIO based transformation matrix for Earth rotation
 
@@ -73,7 +72,6 @@ begin
   result := RotMatr(3, -ERA(t));
 
 end;
-
 
 { Earth Rotation Angle }
 function ERA(JD_ut1: MType): MType;
@@ -86,8 +84,7 @@ begin
 
 end;
 
-
-{------------------------------------------------------------------------------}
+{ ------------------------------------------------------------------------------ }
 
 { От небесной к истинной экваториальной системе координат
 
@@ -156,7 +153,7 @@ begin
   R[2] := RotMatr(2, -GetDeltaUT(UT1)[1]); // Аргументом xp вокруг OY
 
   temp_M := MultMatr(R[2], R[1]);
- // temp_M := MultMatr(temp_M, EarthRotMatr(S));
+  // temp_M := MultMatr(temp_M, EarthRotMatr(S));
 
   // R[3] := MultMatr(ClcNutMatr(TDB), ClcPrecMatr(TDB));
   R[3] := MultMatr(_N, _P);

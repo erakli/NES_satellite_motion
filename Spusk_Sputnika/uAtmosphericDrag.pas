@@ -99,8 +99,7 @@ type
 
     // function module(coord : coordinates) : MType; // Модуль трёх компонент
     function height(coord: coordinates): MType; // [km]
-    function series(h: MType; x: array of MType; n: byte;
-      plus: boolean): MType;
+    function series(h: MType; x: array of MType; n: byte; plus: boolean): MType;
 
     function densityNight(h: MType): MType;
     function density(t: MType; coord: coordinates): MType;
@@ -117,7 +116,8 @@ type
     function SetTime(Value: MType): MType;
     function SetDays(Value: MType): word;
   public
-    function RightPart(MJD: MType; coord, v: coordinates; Sb_coeff: MType): coordinates;
+    function RightPart(JD: MType; coord, v: coordinates; Sb_coeff: MType)
+      : coordinates;
 
     constructor Create;
     destructor Destroy; override;
@@ -127,6 +127,7 @@ var
   AtmosphericDrag: TAtmosphericDrag;
 
 implementation
+
 // ---------------------------------------------------------------
 
 constructor TAtmosphericDrag.Create;
@@ -200,21 +201,21 @@ end;
 
 // Получение количества секунд с начала дня по всемирному времени
 function TAtmosphericDrag.SetTime(Value: MType): MType;
-var
-  Date: TDate;
+// var
+// Date: TDate;
 begin
 
-  Date := FromMJDToDate(Value);
-  with Date do
-  begin
-    Hour := 0;
-    Minute := 0;
-    second := 0;
-  end;
+  // Date := FromJDToDate(Value);
+  // with Date do
+  // begin
+  // Hour := 0;
+  // Minute := 0;
+  // second := 0;
+  // end;
 
   { Количество сек прошедших с начала дня в юлианском формате
     * количество сек в дне }
-  result := (Value - FromDateToMJD(Date)) * SecInDay;
+  result := Frac(Value) * SecInDay;
 
 end;
 
@@ -225,7 +226,7 @@ var
   vis: byte; // Флаг на то, високосный ли год
 begin
 
-  Date := FromMJDToDate(Value);
+  Date := FromJDToDate(Value);
   with Date do
   begin
     if ((Year mod 4 = 0) AND (Year mod 100 <> 0)) OR (Year mod 400 = 0) then
@@ -249,6 +250,7 @@ var
   time, need_time_F81, need_time_Kp: TDate;
   F81_flag, Kp_flag: boolean; // признаки успешного считывания коэффициентов
 
+  _Day: word; // костыль - промежуточное хранение дня
 begin
 
   { Запаздывание каждого из параметров:
@@ -256,8 +258,8 @@ begin
     Для солнечной активности это запаздывание составляет 1,7 сут.
     Для геомагнитной возмущенности - 0,6 сут. }
 
-  need_time_F81 := FromMJDToDate(t - 1.7);
-  need_time_Kp := FromMJDToDate(t - 0.6);
+  need_time_F81 := FromJDToDate(t - 1.7);
+  need_time_Kp := FromJDToDate(t - 0.6);
 
   F81_flag := false;
   Kp_flag := false;
@@ -280,7 +282,9 @@ begin
     begin
       { Преобразуем вытащенную дату из string в TDate (присваиваем полученные
         год, месяц и день переменной TDate) }
-      DecodeDate(StrToDate(Date, FS), Year, Month, Day);
+      DecodeDate(StrToDate(Date, FS), Year, Month, _Day);
+
+      Day := _Day; // преобразование типа
 
       { Сравниваем полученную дату с необходимой для F81.
         При успехе считываем коэффициенты F10_7 и F81 }
@@ -413,7 +417,8 @@ begin
       for i := Low(b) to High(b) do
       begin
         ReadLn(f, temp_text);
-        b[i] := ReadValue(temp_text, flag);    // добавить в ReadValue проверку на пустой текст
+        b[i] := ReadValue(temp_text, flag);
+        // добавить в ReadValue проверку на пустой текст
       end;
     'c':
       for i := Low(c) to High(c) do
@@ -637,8 +642,8 @@ begin
 
 end;
 
-function TAtmosphericDrag.RightPart(MJD: MType; coord, v: coordinates; Sb_coeff: MType)
-  : coordinates;
+function TAtmosphericDrag.RightPart(JD: MType; coord, v: coordinates;
+  Sb_coeff: MType): coordinates;
 var
   speed, ro, UT1: MType;
   // Fe: TVector; // Матрица ускорения в небесной СК
@@ -646,7 +651,7 @@ begin
 
   speed := module(v);
 
-  UT1 := UT1_time(MJD);
+  UT1 := UT1_time(JD);
 
   time := SetTime(UT1);
   days := SetDays(UT1);

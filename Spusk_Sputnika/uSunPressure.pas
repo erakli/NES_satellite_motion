@@ -67,6 +67,7 @@ var
   SunPressure: TSunPressure;
 
 implementation
+
 // ---------------------------------------------------------------
 
 { TSunPressure }

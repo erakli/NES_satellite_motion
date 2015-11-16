@@ -7,7 +7,7 @@ uses
 
 const
   fm = 3.986004418E+5; // [km] Гравитационная постоянная
-//  m_size = 2; // Размер матриц
+  // m_size = 2; // Размер матриц
 
   au = 1.49597870700E+8; // [km] Astronomical unit - астрономическая единица
   c = 299792.458; // [km/s] Скорость света
@@ -20,7 +20,7 @@ const
   deletimer = '	';
 
   asecInTurn = 360 * 60 * 60;
-  MICRO = 1.0e-6;
+  MICRO = 1.0E-6;
 
 const
   ResetCoord: coordinates = (x: 0; y: 0; z: 0);
@@ -62,6 +62,5 @@ end;
 
 CurYear := 15;
 Third := 1 / 3;
-
 
 end.

@@ -68,6 +68,7 @@ var
   Everhart: TEverhart;
 
 implementation
+
 // ---------------------------------------------------------------
 
 constructor TEverhart.Create;
@@ -250,8 +251,8 @@ end;
 
 { Сама функция интегратора }
 
-function TEverhart.Integrate(time: MType; x0, dif_x0: coordinates;
-  step: MType; Func: TFunc): TResult;
+function TEverhart.Integrate(time: MType; x0, dif_x0: coordinates; step: MType;
+  Func: TFunc): TResult;
 var
   i: byte;
 begin
