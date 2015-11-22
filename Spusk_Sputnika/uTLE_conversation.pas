@@ -7,11 +7,11 @@ interface
 uses
   uConstants, uTypes, uTime, SysUtils, Math;
 
-function ReadTLE(TLE: TLE_lines): output;
+function ReadTLE(TLE: TLE_lines): TTLE_output;
 
 implementation
 
-function ReadTLE(TLE: TLE_lines): output;
+function ReadTLE(TLE: TLE_lines): TTLE_output;
 var
   epoch, MNMOTION, n: MType;
   year: integer;

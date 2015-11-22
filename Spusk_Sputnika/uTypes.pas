@@ -57,7 +57,7 @@ type
 
   TLE_lines = array [0 .. 1] of string;
 
-  output = record // специально для TLE модуля - вывод функции ReadTLE
+  TTLE_output = record // специально для TLE модуля - вывод функции ReadTLE
     time: MType; // в JD
     Elements: TElements;
   end;

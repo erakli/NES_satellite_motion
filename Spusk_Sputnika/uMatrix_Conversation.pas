@@ -52,14 +52,16 @@ end;
 { Transformation matrix for polar motion }
 function W(t, xp, yp: MType): TMatrix;
 var
-  _s: MType;
+  _s, x, y: MType;
   res_matrix: TMatrix;
 begin
 
-  _s := asec2rad(-0.000047) * t; // нужно ли переводить в радианы?
+  _s := asec2rad(-0.000047) * t;
+  x := asec2rad(xp);
+  y := asec2rad(yp);
 
-  res_matrix := MultMatr(RotMatr(3, -_s), RotMatr(2, xp));
-  result := MultMatr(res_matrix, RotMatr(1, yp));
+  res_matrix := MultMatr(RotMatr(3, -_s), RotMatr(2, x));
+  result := MultMatr(res_matrix, RotMatr(1, y));
 
 end;
 

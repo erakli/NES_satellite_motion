@@ -16,11 +16,10 @@ interface
   2 марта 1900 года по 27 февраля 2100 года. }
 
 uses
-  System.SysUtils, uConstants, uTypes, Classes, Dialogs;
+  System.SysUtils, Classes, Dialogs, uConstants, uTypes;
 
 const
-  TAI_TT = 32.184; // Константа добавляемая к Атомному времени для перевода в
-  // Земное
+  TAI_TT: MType = 32.184; // Константа добавляемая к Атомному времени для перевода в Земное
   TAI_file = 'TAI-UTC.txt';
   EOP_file = 'finals2000A.txt';
 
@@ -65,10 +64,7 @@ var
   temp_year, temp_month, A, B: integer;
   // MJD: MType;
   JD: MType;
-  short_period: boolean;
 begin
-
-  short_period := true; // если нас интересует промежуток между 1901 и 2099
 
   with Date do
   begin
@@ -83,35 +79,19 @@ begin
     // реализация из AA.pdf
     temp_year := Year;
 
-    if short_period then // выбираем короткий промежуток дат
-    begin
+    temp_month := Month;
 
+    if temp_month <= 2 then
+    begin
       temp_year := temp_year - 1;
-
-//      B := -13;
-//      A := Trunc(temp_year / 100);
-
-      JD := 1721409.5 + Trunc(365.25 * (temp_year));
-
-    end
-    else // иначе выбрали полный диапазон
-    begin
-
-      temp_month := Month;
-
-      if temp_month <= 2 then
-      begin
-        temp_year := temp_year - 1;
-        temp_month := temp_month + 12;
-      end;
-
-      A := Trunc(temp_year / 100);
-      B := 2 - A + Trunc(A / 4);
-
-      JD := Trunc(365.25 * (temp_year + 4716)) +
-        Trunc(30.6001 * (temp_month + 1)) + Day + B - 1524.5;
-
+      temp_month := temp_month + 12;
     end;
+
+    A := Trunc(temp_year / 100);
+    B := 2 - A + Trunc(A / 4);
+
+    JD := Trunc(365.25 * (temp_year + 4716)) +
+      Trunc(30.6001 * (temp_month + 1)) + Day + B - 1524.5;
 
     Result := JD;
 
@@ -218,13 +198,13 @@ end;
   (DeltaTT = TAI - UTC) в сек }
 function GetDeltaTAI(Date: TDate): MType;
 var
-  i: integer;
+  i, SearchYear: integer;
   SearchStr, text: string;
 begin
 
   text := '';
 
-  for i := 0 to TAI_list.Count - 1 do // Поиск строчки с нужной датой
+  for i := 1 to TAI_list.Count - 1 do // Поиск строчки с нужной датой
   begin
 
     SearchStr := TAI_list[i];
@@ -232,28 +212,30 @@ begin
     with Date do
     begin
 
-      if (StrToInt(Copy(SearchStr, 1, 4)) <= Year) AND
-        (StrToInt(Copy(SearchStr, 6, 2)) <= Month) AND
-        (StrToInt(Copy(SearchStr, 9, 2)) < Day) AND (i > 0) then
-      begin
-        text := Copy(TAI_list[i - 1], 14, 2);
-        break;
-      end;
+    	SearchYear := StrToInt(Copy(SearchStr, 1, 4));
+
+    	if SearchYear < Year then continue
+      else
+      if SearchYear = Year then
+      	if StrToInt(Copy(SearchStr, 6, 2)) < Month then	continue;
+
+      text := Copy(TAI_list[i - 1], 14, 2);
+      break;
 
     end;
 
   end;
 
-  if (i = TAI_list.Count - 1) or (text = '') then
+  if text <> '' then
+  	result := StrToFloat(text)
+  else
   begin
-    ShowMessage('Ошибка поиска поправки DeltaTT для даты ' + IntToStr(Date.Year)
+  	ShowMessage('Ошибка поиска поправки DeltaTT для даты ' + IntToStr(Date.Year)
       + '/' + IntToStr(Date.Month) + '/' + FloatToStr(Date.Day) + '#13#10' +
       ' ' + text);
     Result := -1;
     exit;
-  end
-  else
-    Result := StrToFloat(text);
+  end;
 
 end;
 
@@ -303,8 +285,8 @@ begin
     //
     // end;
 
-    for i := 0 to EOP.Count - 1 do // Поиск строчки с нужной датой
-      if pos(SearchDate, EOP[i]) > 0 then
+    for i := 0 to EOP.Count - 1 do
+      if pos(SearchDate, EOP[i]) > 0 then  // Поиск строчки с нужной датой
       begin
         delta := Copy(EOP[i], 59, 10);
         xp := Copy(EOP[i], 19, 9);
@@ -312,16 +294,7 @@ begin
         break;
       end;
 
-    if (i = EOP.Count - 1) or (delta = '') then
-    begin
-      ShowMessage('Ошибка поиска поправки DeltaT для даты ' +
-        IntToStr(Date.Year) + '/' + IntToStr(Date.Month) + '/' +
-        FloatToStr(Date.Day));
-      for i := Low(TVector) to High(TVector) do
-        Result[i] := -1;
-      exit;
-    end
-    else
+    if delta <> '' then
     begin
 
       _deltaUT := StrToFloat(delta);
@@ -330,6 +303,15 @@ begin
 
       delta_got := true;
 
+    end
+    else
+    begin
+      ShowMessage('Ошибка поиска поправки DeltaUT для даты ' +
+        IntToStr(Date.Year) + '/' + IntToStr(Date.Month) + '/' +
+        FloatToStr(Date.Day));
+      for i := Low(TVector) to High(TVector) do
+        Result[i] := -1;
+      exit;
     end;
 
   end; // end of   if NOT delta_got
@@ -342,7 +324,9 @@ end;
 
 // *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
-{ Вычисление Всемирного времени }
+{ Вычисление Всемирного времени
+
+	На вход UTC }
 function UT1_time(JD: MType): MType;
 var
   DeltaUT: MType;
@@ -365,27 +349,27 @@ end;
   шкалой земного времени TT. }
 function TT_time(JD: MType): MType;
 var
-  DeltaTAI: MType;
+  DeltaTT: MType;
   Date: TDate;
 begin
 
   Date := FromJDToDate(JD);
-  DeltaTAI := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
+  DeltaTT := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
 
-  Result := JD + DeltaTAI / SecInDay; // 86400 - сек в дне
+  Result := JD + DeltaTT / SecInDay; // 86400 - сек в дне
 
 end;
 
 function TT2UTC(JD: MType): MType;
 var
-  DeltaTAI: MType;
+  DeltaTT: MType;
   Date: TDate;
 begin
 
   Date := FromJDToDate(JD);
-  DeltaTAI := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
+  DeltaTT := GetDeltaTAI(Date) + TAI_TT; // Поправка к шкале всемирного времени
 
-  Result := JD - DeltaTAI / SecInDay; // 86400 - сек в дне
+  Result := JD - DeltaTT / SecInDay; // 86400 - сек в дне
 
 end;
 

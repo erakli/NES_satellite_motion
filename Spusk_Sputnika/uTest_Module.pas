@@ -16,9 +16,12 @@ unit uTest_Module;
 interface
 
 uses
-  uConstants, uTypes, uEpheremides, Dialogs, System.SysUtils, uAtmosphericDrag,
-  uKepler_Conversation, uFunctions, uTLE_conversation, uMatrix_Conversation,
-  uMatrix_Operations, uTime, uEpheremides_new;
+  Windows, Dialogs, System.SysUtils,
+  uConstants, uTypes,
+  uMatrix_Operations, uTime, uKepler_Conversation, uTLE_conversation,
+  uEpheremides,
+  uAtmosphericDrag, uFunctions,
+  uMatrix_Conversation, uEpheremides_new;
 
 type
   // ------------------------------------------- дл€ dll
@@ -47,6 +50,15 @@ const
   }
   // ------------------------------------------- /дл€ dll
 
+procedure console_output(Vector: array of MType); overload;
+procedure console_output(Matrix: TMatrix); overload;
+procedure console_output(Date: TDate); overload;
+
+function test_uMatrix_Operations: boolean;
+function test_uTime: boolean;
+function test_uTLE_conversation: boolean;
+function test_uKepler_Conversation: boolean;
+
 var
   i: byte;
   a: MType;
@@ -57,7 +69,7 @@ var
   coord, v: TVector;
 
   TLE: TLE_lines;
-  TLE_output: output;
+  TLE_output: TTLE_output;
 
   Kepler_Elements: TElements;
   Dubosh: boolean;
@@ -76,8 +88,6 @@ function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
   : tObjectDetails; stdcall;
 // ------------------------------------------- /дл€ dll
 
-function test_uMatrix_Operations: boolean;
-
 ////////////////////////////////////////////////////////////////////////////////
 implementation
 
@@ -86,29 +96,209 @@ const
 
 function EllipticalCalculate; external DLLName; // реализаци€ в другом месте
 
+
+procedure console_output(Vector: array of MType);
+var
+  j: byte;
+begin
+
+  for j := 0 to High(Vector) do
+    write(FloatToStrF(Vector[j], ffGeneral, 8, 4), '	');
+  writeln;
+  writeln;
+
+end;
+
+procedure console_output(Matrix: TMatrix);
+var
+  i, j: byte;
+begin
+
+	for i := 0 to m_size do
+  begin
+
+  	for j := 0 to m_size do
+			write(FloatToStrF(Matrix[i][j], ffGeneral, 8, 4), '	');
+    writeln;
+
+  end;
+  writeln;
+  writeln;
+
+end;
+
+procedure console_output(Date: TDate); overload;
+begin
+
+	writeln(Date.Year, '	',  Date.Month, '	', FloatToStr(Date.Day));
+  writeln;
+
+end;
+
+{ “естирование модулей }
 function test_uMatrix_Operations: boolean;
 const
 	testMatrix1: TMatrix = ((1, 2, 3),
   											  (4, 5, 6),
                           (7, 8, 9));
+
   testMatrix2: TMatrix = ((4, 1, 7),
   												(0, 3, 1),
                           (3, 3, 4));
+
   StartVector: TVector = (4, 2, 6);
+
 var
-	Matrix1, Matrix2: TMatrix;
-  Vector1, Vector2: TVector;
+	Matrix1, Matrix2,
+  R1, R2, R3
+  	: TMatrix;
+  Vector: TVector;
+
+  phi, theta, psi: MType;
 begin
 
-	Vector1 := MultMatrVec(testMatrix1, StartVector);
+	result := false;  // если не выйдем из этой функции, то будем иметь false
+
+  writeln(' * * * * * * * * test_uMatrix_Operations * * * * * * * * ');
+  writeln;
+
+	Vector := MultMatrVec(testMatrix1, StartVector);
   Matrix1 := MultMatr(testMatrix1, testMatrix2);
+  Matrix2 := TranspMatr(testMatrix1);
+
+  phi := deg2rad(30); 	// 0,523599
+  theta := deg2rad(45);	// 0,785398
+  psi := deg2rad(60);		// 1,0472
+
+  R1 := MultMatr(RotMatr(1, phi), testMatrix1);
+  R2 := MultMatr(RotMatr(2, theta), testMatrix1);
+  R3 := MultMatr(RotMatr(3, psi), testMatrix1);
+
+  writeln('MultMatrVec'); console_output(Vector);
+  writeln('MultMatr'); console_output(Matrix1);
+  writeln('TranspMatr'); console_output(Matrix2);
+
+  writeln('RotMatr');
+  writeln('R1:'); console_output(R1);
+  writeln('R2:'); console_output(R2);
+  writeln('R3:'); console_output(R3);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+end;
+
+function test_uTime: boolean;
+const
+	testDate: TDate = ( Year: 2001; Month: 11; Day: 13.5 );
+var
+	Date: TDate;
+  time, delta, UT1, TT, UTC
+  	: MType;
+  vec: TVector;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uTime * * * * * * * * ');
+  writeln;
+
+  time := FromDateToJD(testDate);
+  writeln('FromDateToJD	', FloatToStr(time));
+  writeln;
+
+  Date := FromJDToDate(time);
+  console_output(Date);
+
+  delta := GetDeltaTAI(Date);
+  writeln('GetDeltaTAI	', FloatToStr(delta));
+  writeln;
+
+  vec := GetDeltaUT(time); 	// проверить
+  writeln('GetDeltaUT');
+  writeln('DUT1, xp, yp:');
+  console_output(vec);
+
+  UT1 := UT1_time(time);  	// проверить
+  writeln('UT1_time	', FloatToStr(UT1));
+  writeln;
+
+  TT := TT_time(time);     	// проверить
+  writeln('TT_time	', FloatToStr(TT));
+  writeln;
+
+  UTC := TT2UTC(TT);
+  writeln('TT2UTC	', FloatToStr(UTC));
+	writeln;
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
+function test_uTLE_conversation: boolean;
+const
+	TLE: TLE_lines =
+  	('1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477',
+		 '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881');
+var
+	TLE_output: TTLE_output;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uTLE_conversation * * * * * * * * ');
+  writeln;
+
+  TLE_output := ReadTLE(TLE);
+  writeln('TLE_output.time	', FloatToStr(TLE_output.time));
+  writeln;
+  writeln('a, s_e, i, b_Omega, s_omega, M0, n');
+  console_output(TLE_output.Elements);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
+function test_uKepler_Conversation: boolean;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uKepler_Conversation * * * * * * * * ');
+  writeln;
+
+
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
 
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 initialization
 
+AllocConsole;							// создаЄм консольное окно
+SetConsoleCP(1251);				// устанавливаем прин€тие кириллицы
+SetConsoleOutputCP(1251);
+
+{ ¬ызов тестов модулей }
 test_uMatrix_Operations;
+test_uTime;
+test_uTLE_conversation;
+test_uKepler_Conversation;
 
 JD := 2415284.191;
 Creation(3);
@@ -153,6 +343,7 @@ coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
 dist1 := module(v) - 6378.1366;
 dist2 := module(coord) - 6378.1366;
 
+FreeConsole;  // убираем консоль
 { //---------------------------------------- дл€ случа€ из учебника AA (с. 232)
   JD := 2448170.5;
   MJD := JD - MJDCorrection;
