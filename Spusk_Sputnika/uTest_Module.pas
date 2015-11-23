@@ -17,11 +17,12 @@ interface
 
 uses
   Windows, Dialogs, System.SysUtils,
-  uConstants, uTypes,
-  uMatrix_Operations, uTime, uKepler_Conversation, uTLE_conversation,
+  uConstants, uTypes, uFunctions,
+  uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
+  uEpheremides_new,
   uEpheremides,
-  uAtmosphericDrag, uFunctions,
-  uMatrix_Conversation, uEpheremides_new;
+  uAtmosphericDrag,
+  uMatrix_Conversation;
 
 type
   // ------------------------------------------- для dll
@@ -54,10 +55,12 @@ procedure console_output(Vector: array of MType); overload;
 procedure console_output(Matrix: TMatrix); overload;
 procedure console_output(Date: TDate); overload;
 
+function test_uFunctions: boolean;
 function test_uMatrix_Operations: boolean;
 function test_uTime: boolean;
 function test_uTLE_conversation: boolean;
 function test_uKepler_Conversation: boolean;
+function test_uEpheremides_new: boolean;
 
 var
   i: byte;
@@ -68,10 +71,10 @@ var
   JD, Sb_coeff, dist1, dist2, interval: MType;
   coord, v: TVector;
 
-  TLE: TLE_lines;
-  TLE_output: TTLE_output;
+//  TLE: TLE_lines;
+//  TLE_output: TTLE_output;
 
-  Kepler_Elements: TElements;
+//  Kepler_Elements: TElements;
   Dubosh: boolean;
 
   Transform: TMatrix;
@@ -83,19 +86,23 @@ var
   Elliptical: EllipticalHandle;
 
   // функция из dll
-function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
-  Elements: tObjectElem; bHighPrecision: boolean = false)
-  : tObjectDetails; stdcall;
+//function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
+//  Elements: tObjectElem; bHighPrecision: boolean = false)
+//  : tObjectDetails; stdcall;
 // ------------------------------------------- /для dll
 
 ////////////////////////////////////////////////////////////////////////////////
 implementation
 
+//const
+//  DLLName = 'AA.dll';
+
+//function EllipticalCalculate; external DLLName; // реализация в другом месте
+
 const
-  DLLName = 'AA.dll';
-
-function EllipticalCalculate; external DLLName; // реализация в другом месте
-
+	TLE: TLE_lines =
+  	('1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477',
+		 '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881');
 
 procedure console_output(Vector: array of MType);
 var
@@ -136,6 +143,50 @@ begin
 end;
 
 { Тестирование модулей }
+function test_uFunctions: boolean;
+const
+  coordinates: TVector = ( 4, -7, 1 );
+  angle: MType = 60;
+  amin: MType = 30;
+  asec: MType = 15;
+  arg = 5;
+var
+  radians, module_res, pow_res: MType;
+begin
+
+	result := false;  // если не выйдем из этой функции, то будем иметь false
+
+  writeln(' * * * * * * * * test_uFunctions * * * * * * * * ');
+  writeln;
+
+  module_res := module(coordinates);
+  writeln('module ', FloatToStr(module_res));
+  writeln;
+
+  radians := deg2rad(angle);
+  writeln('deg2rad ', FloatToStr(radians));
+  writeln;
+
+  radians := amin2rad(amin);
+  writeln('amin2rad ', FloatToStr(radians));
+  writeln;
+
+  radians := asec2rad(asec);
+  writeln('asec2rad ', FloatToStr(radians));
+  writeln;
+
+  writeln('pow2 = ', FloatToStr(pow2(arg)), '; pow3 = ', FloatToStr(pow3(arg)));
+  writeln('pow4 = ', FloatToStr(pow4(arg)), '; pow5 = ', FloatToStr(pow5(arg)));
+  writeln;
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
 function test_uMatrix_Operations: boolean;
 const
 	testMatrix1: TMatrix = ((1, 2, 3),
@@ -210,7 +261,7 @@ begin
   writeln;
 
   Date := FromJDToDate(time);
-  console_output(Date);
+  writeln('FromJDToDate'); console_output(Date);
 
   delta := GetDeltaTAI(Date);
   writeln('GetDeltaTAI	', FloatToStr(delta));
@@ -242,10 +293,6 @@ begin
 end;
 
 function test_uTLE_conversation: boolean;
-const
-	TLE: TLE_lines =
-  	('1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477',
-		 '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881');
 var
 	TLE_output: TTLE_output;
 begin
@@ -270,6 +317,13 @@ begin
 end;
 
 function test_uKepler_Conversation: boolean;
+const
+  mass = 1;
+var
+	TLE_output: TTLE_output;
+  Kepler_Elements: TElements;
+  parameters: param;
+  Dubosh: boolean;
 begin
 
 	result := false;
@@ -277,7 +331,45 @@ begin
   writeln(' * * * * * * * * test_uKepler_Conversation * * * * * * * * ');
   writeln;
 
+  TLE_output := ReadTLE(TLE);
+  Kepler_Elements := TLE_output.Elements;
+  parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
+  writeln('Kepler_to_Decart');
+  writeln('Dubosh = ', Dubosh); writeln;
+  writeln('coordinates'); console_output(parameters.coord);
+  writeln('speed'); console_output(parameters.speed);
 
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
+function test_uEpheremides_new: boolean;
+const
+  JD: MType = 2453044.381; // 2004 70 day
+  //JD: MType = 2415284.191; // 1900
+  EphType = 3; // Earth_Moon
+var
+  planet_coord: TVector;
+  Date: TDate;
+begin
+
+  result := false;
+
+  writeln(' * * * * * * * * test_uEpheremides_new * * * * * * * * ');
+  writeln;
+
+  Date := FromJDToDate(JD);
+  writeln('FromJDToDate'); console_output(Date);
+
+
+  EphCreation(EphType);
+  planet_coord := Earth_Moon.Get(JD);
+  writeln('Earth_Moon.Get');
+  console_output(planet_coord);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -295,13 +387,15 @@ SetConsoleCP(1251);				// устанавливаем принятие кириллицы
 SetConsoleOutputCP(1251);
 
 { Вызов тестов модулей }
+test_uFunctions;
 test_uMatrix_Operations;
 test_uTime;
 test_uTLE_conversation;
 test_uKepler_Conversation;
+test_uEpheremides_new;
 
 JD := 2415284.191;
-Creation(3);
+EphCreation(3);
 coord := Earth_Moon.Get(JD);
 
 // MJD := 57258;
@@ -309,32 +403,32 @@ coord := Earth_Moon.Get(JD);
 interval := 0;
 // интервал, на который считаются координаты. необходимо для JDEquinox
 
-TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
-TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
+//TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
+//TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
 
-TLE_output := ReadTLE(TLE);
+//TLE_output := ReadTLE(TLE);
 //MJD := TLE_output.time;
-JD := TLE_output.time;
+//JD := TLE_output.time;
 
 { a, s_e, i, b_Omega, s_omega, M, n - Кеплеровские элементы орбиты (7) }
-with Elements do
-begin
-  a := TLE_output.Elements[0];
-  e := TLE_output.Elements[1];
-  i := TLE_output.Elements[2];
-  omega := TLE_output.Elements[3];
-  w := TLE_output.Elements[4];
-  JDEquinox := JD + interval; // как я понял, на этот момент получаем координаты
-  T := JDEquinox - TLE_output.Elements[5] / TLE_output.Elements[6];
+//with Elements do
+//begin
+//  a := TLE_output.Elements[0];
+//  e := TLE_output.Elements[1];
+//  i := TLE_output.Elements[2];
+//  omega := TLE_output.Elements[3];
+//  w := TLE_output.Elements[4];
+//  JDEquinox := JD + interval; // как я понял, на этот момент получаем координаты
+//  T := JDEquinox - TLE_output.Elements[5] / TLE_output.Elements[6];
   // уточнить справедливость вычитания
-end;
+//end;
 
-Details := EllipticalCalculate(Elliptical, JD, Elements);
+//Details := EllipticalCalculate(Elliptical, JD, Elements);
 
-Kepler_Elements := TLE_output.Elements;
+//Kepler_Elements := TLE_output.Elements;
 // метод из Дубошина
-coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
-v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
+//coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
+//v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
 
 //coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
 

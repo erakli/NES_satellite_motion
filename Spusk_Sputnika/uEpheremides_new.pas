@@ -15,7 +15,7 @@ const
 type
   TStrVector = array [0 .. 2] of string;
 
-  TFacility = class
+  TFacility = class(TObject)
     private
       XYZ: TVector;
       BB: array of MType;
@@ -47,7 +47,7 @@ function StepSearch(Facility: TFacility; need: MType): integer;
 function Separation(str: string): TStrVector;
 
 // получение эфемерид для определённого объекта
-procedure Creation(FacilityNum: byte);
+procedure EphCreation(FacilityNum: byte);
 {
 	 1	Mercury
    2	Venus
@@ -301,7 +301,7 @@ begin
 end;
 
 // получение эфемерид для определённого объекта
-procedure Creation;
+procedure EphCreation;
 begin
   DEfile_list.LoadFromFile(eph_file);
 
