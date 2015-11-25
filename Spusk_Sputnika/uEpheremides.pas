@@ -107,32 +107,26 @@ begin
         времени. }
 
       temp_text := nut_list[days];
-      with temp_coord do
-      begin
 
-        x := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1));
-        delete(temp_text, 0, pos(deletimer, temp_text));
-        y := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1));
-        // delete(temp_text, 0, pos(deletimer, temp_text));
-        z := 0;
+      temp_coord[0] := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1));
+      delete(temp_text, 0, pos(deletimer, temp_text));
+      temp_coord[1] := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1));
+      // delete(temp_text, 0, pos(deletimer, temp_text));
+      temp_coord[2] := 0;
 
-      end;
 
     end
     else // Нет, получаем координаты Солнца относительно Земли
     begin
 
       temp_text := eph_list[days];
-      with temp_coord do
-      begin
 
-        x := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
-        delete(temp_text, 0, pos(deletimer, temp_text));
-        y := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
-        delete(temp_text, 0, pos(deletimer, temp_text));
-        z := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
+      temp_coord[0] := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
+      delete(temp_text, 0, pos(deletimer, temp_text));
+      temp_coord[1] := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
+      delete(temp_text, 0, pos(deletimer, temp_text));
+      temp_coord[2] := StrToFloat(Copy(temp_text, 0, pos(deletimer, temp_text) - 1)) * au;
 
-      end;
 
     end;
 

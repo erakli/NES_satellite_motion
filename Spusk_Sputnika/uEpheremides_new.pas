@@ -26,8 +26,10 @@ type
       	массиве ВВ) левой границы последнего считанного подинтервала }
 
     public
-      constructor Create(aX, aY, aZ: MType; aN: Word; ak, akoefs: Byte);
       function Get(JD: MType): TVector;
+
+      constructor Create(aX, aY, aZ: MType; aN: Word; ak, akoefs: Byte);
+    	destructor Destroy; override;
   end;
 
 function ChebPol(x: MType; j: integer): MType;
@@ -86,7 +88,13 @@ begin
   N := aN; // Этот параметр - индетефикатор объекта
   k := ak;
   koefs := akoefs;
-  setlength(BB, 4 * k + 1);
+  SetLength(BB, 4 * k + 1);
+end;
+
+destructor TFacility.Destroy;
+begin
+	SetLength(BB, 0);
+	inherited;
 end;
 
 function TFacility.Get;
@@ -144,7 +152,8 @@ var
   block: TStrVector;
 begin
   LB := 1;
-  RB := 1018;
+  //RB := 1018;
+  RB := 1713; // крайний блок файла эфемерид (блоки по 32 дня)
   Result := -1;
 
   repeat

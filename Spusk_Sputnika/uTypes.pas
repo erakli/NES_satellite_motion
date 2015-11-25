@@ -19,9 +19,11 @@ type
     x, y, z: TMatrix;
   end;
 
-  coordinates = record
-    x, y, z: MType;
-  end;
+//  coordinates = record
+//    x, y, z: MType;
+//  end;
+
+	coordinates = TVector;
 
   { Параметры Земли }
   TEarth = record

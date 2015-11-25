@@ -176,8 +176,8 @@ var
 begin
 
   dist := module(coord);
-  with coord, Earth do
-    result := dist - eq_rad * (1 - alpha_0 * sqr(z / dist));
+  with Earth do
+    result := dist - eq_rad * (1 - alpha_0 * sqr(coord[2] / dist));
 
 end;
 
@@ -496,10 +496,9 @@ begin
       begin
         beta := sun.alpha - S_time - Earth.omega * time + fi_1;
         r := module(Value);
-        with Value do
-          cos_fi := 1 /
-            (r * (z * sin(sun.beta) + cos(sun.beta) * (x * cos(beta) + y *
-            sin(beta))));
+        cos_fi := 1 /
+          (r * (Value[2] * sin(sun.beta) + cos(sun.beta) *
+           		 (Value[0] * cos(beta) + Value[1] * sin(beta))));
 
         { Перевод к половинному аргументу. Модуль взят из stand_91.doc }
         cos_fi := sqrt(abs(1 + cos_fi) / 2);
@@ -660,9 +659,9 @@ begin
   ro := density(UT1, coord); // Запускаем алгоритм подсчёта плотности
 
   { ! Уточнить вычисление результирующего ускорения }
-  result.x := -Sb_coeff * ro * speed * v.x;
-  result.y := -Sb_coeff * ro * speed * v.y;
-  result.z := -Sb_coeff * ro * speed * v.z;
+  result[0] := -Sb_coeff * ro * speed * v[0];
+  result[1] := -Sb_coeff * ro * speed * v[1];
+  result[2] := -Sb_coeff * ro * speed * v[2];
 
 end;
 

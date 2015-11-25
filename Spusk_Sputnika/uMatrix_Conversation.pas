@@ -20,6 +20,9 @@ function W(t, xp, yp: MType): TMatrix;
 function R(t: MType): TMatrix;
 function ERA(JD_ut1: MType): MType;
 
+var
+	Q: TCIP_Tranform_Matrix;
+
 implementation
 
 { Перевод между Земной (ITRS) в Небесную инерциальную (GCRS) СК на основе
@@ -31,12 +34,10 @@ function ITRS2GCRS(t: MType): TMatrix;
 var
   TT_centuries, UT1: MType;
   xpyp_vec: TVector;
-  Q: TCIP_Tranform_Matrix;
 
   transform: TMatrix;
 begin
 
-  Q := TCIP_Tranform_Matrix.Create;
   delta_got := false;
 
   TT_centuries := (t - J2000_Day) / 36525;
@@ -47,6 +48,7 @@ begin
   transform := MultMatr(R(UT1), W(TT_centuries, xpyp_vec[1], xpyp_vec[2]));
   result := MultMatr(Q.getQ_Matrix(TT_centuries), transform);
   // здесь тоже centuries?
+
 end;
 
 { Transformation matrix for polar motion }
@@ -179,5 +181,13 @@ begin
     транспонирования матрицы }
 
 end;
+
+initialization
+
+Q := TCIP_Tranform_Matrix.Create;
+
+finalization
+
+Q.Destroy;
 
 end.

@@ -80,8 +80,8 @@ begin
 
   for i := Low(coefA) to High(coefA) do
   begin
-    coefA[i] := ResetCoord;
-    coefAlpha[i] := ResetCoord;
+    coefA[i] := NullVec;
+    coefAlpha[i] := NullVec;
   end;
 
   { Разбиения шага интегрирования }
@@ -129,22 +129,22 @@ var
   temp_sum: coordinates;
 begin
 
-  temp_sum := ResetCoord;
+  temp_sum := NullVec;
 
   { IntPower(X, Y) - возведение числа X в целочисленную степень Y }
   for i := Low(coefA) to High(coefA) do
   begin
-    temp_sum.x := temp_sum.x + coefCoord[i] * coefA[i].x * IntPower(t, i + 3);
-    temp_sum.y := temp_sum.y + coefCoord[i] * coefA[i].y * IntPower(t, i + 3);
-    temp_sum.z := temp_sum.z + coefCoord[i] * coefA[i].z * IntPower(t, i + 3);
+    temp_sum[0] := temp_sum[0] + coefCoord[i] * coefA[i][0] * IntPower(t, i + 3);
+    temp_sum[1] := temp_sum[1] + coefCoord[i] * coefA[i][1] * IntPower(t, i + 3);
+    temp_sum[2] := temp_sum[2] + coefCoord[i] * coefA[i][2] * IntPower(t, i + 3);
   end;
 
-  result.x := x[0].x + dif_x[0].x * t + 0.5 * F[0].x * IntPower(t, 2) +
-    temp_sum.x;
-  result.y := x[0].y + dif_x[0].y * t + 0.5 * F[0].y * IntPower(t, 2) +
-    temp_sum.y;
-  result.z := x[0].z + dif_x[0].z * t + 0.5 * F[0].z * IntPower(t, 2) +
-    temp_sum.z;
+  result[0] := x[0][0] + dif_x[0][0] * t + 0.5 * F[0][0] * IntPower(t, 2) +
+    temp_sum[0];
+  result[1] := x[0][1] + dif_x[0][1] * t + 0.5 * F[0][1] * IntPower(t, 2) +
+    temp_sum[1];
+  result[2] := x[0][2] + dif_x[0][2] * t + 0.5 * F[0][2] * IntPower(t, 2) +
+    temp_sum[2];
 
 end;
 
@@ -160,19 +160,19 @@ var
   temp_sum: coordinates;
 begin
 
-  temp_sum := ResetCoord;
+  temp_sum := NuLlVec;
 
   { IntPower(X, Y) - возведение числа X в целочисленную степень Y }
   for i := Low(coefA) to High(coefA) do
   begin
-    temp_sum.x := temp_sum.x + coefVeloc[i] * coefA[i].x * IntPower(t, i + 2);
-    temp_sum.y := temp_sum.y + coefVeloc[i] * coefA[i].y * IntPower(t, i + 2);
-    temp_sum.z := temp_sum.z + coefVeloc[i] * coefA[i].z * IntPower(t, i + 2);
+    temp_sum[0] := temp_sum[0] + coefVeloc[i] * coefA[i][0] * IntPower(t, i + 2);
+    temp_sum[1] := temp_sum[1] + coefVeloc[i] * coefA[i][1] * IntPower(t, i + 2);
+    temp_sum[2] := temp_sum[2] + coefVeloc[i] * coefA[i][2] * IntPower(t, i + 2);
   end;
 
-  result.x := dif_x[0].x + F[0].x * t + temp_sum.x;
-  result.y := dif_x[0].y + F[0].y * t + temp_sum.y;
-  result.z := dif_x[0].z + F[0].z * t + temp_sum.z;
+  result[0] := dif_x[0][0] + F[0][0] * t + temp_sum[0];
+  result[1] := dif_x[0][1] + F[0][1] * t + temp_sum[1];
+  result[2] := dif_x[0][2] + F[0][2] * t + temp_sum[2];
 
 end;
 
@@ -208,25 +208,25 @@ begin
   { Последовательный расчёт коэффициентов Альфа, присоединением новых
     вычислительных частей }
   { Вычисление основной части }
-  coefAlpha[i].x := (F[i + 1].x - F[0].x) / t[i + 1];
-  coefAlpha[i].y := (F[i + 1].y - F[0].y) / t[i + 1];
-  coefAlpha[i].z := (F[i + 1].z - F[0].z) / t[i + 1];
+  coefAlpha[i][0] := (F[i + 1][0] - F[0][0]) / t[i + 1];
+  coefAlpha[i][1] := (F[i + 1][1] - F[0][1]) / t[i + 1];
+  coefAlpha[i][2] := (F[i + 1][2] - F[0][2]) / t[i + 1];
   if i > 0 then
   begin
-    coefAlpha[i].x := coefAlpha[i].x - coefAlpha[0].x;
-    coefAlpha[i].y := coefAlpha[i].y - coefAlpha[0].y;
-    coefAlpha[i].z := coefAlpha[i].z - coefAlpha[0].z;
+    coefAlpha[i][0] := coefAlpha[i][0] - coefAlpha[0][0];
+    coefAlpha[i][1] := coefAlpha[i][1] - coefAlpha[0][1];
+    coefAlpha[i][2] := coefAlpha[i][2] - coefAlpha[0][2];
     { Вычисление дополнительных частей ("задних", на которые делится основная) }
     for j := Low(coefAlpha) + 1 to i do
     begin
-      coefAlpha[i].x := coefAlpha[i].x / (t[i + 1] - t[j]);
-      coefAlpha[i].y := coefAlpha[i].y / (t[i + 1] - t[j]);
-      coefAlpha[i].z := coefAlpha[i].z / (t[i + 1] - t[j]);
+      coefAlpha[i][0] := coefAlpha[i][0] / (t[i + 1] - t[j]);
+      coefAlpha[i][1] := coefAlpha[i][1] / (t[i + 1] - t[j]);
+      coefAlpha[i][2] := coefAlpha[i][2] / (t[i + 1] - t[j]);
       if j < i then
       begin
-        coefAlpha[i].x := coefAlpha[i].x - coefAlpha[j].x;
-        coefAlpha[i].y := coefAlpha[i].y - coefAlpha[j].y;
-        coefAlpha[i].z := coefAlpha[i].z - coefAlpha[j].z;
+        coefAlpha[i][0] := coefAlpha[i][0] - coefAlpha[j][0];
+        coefAlpha[i][1] := coefAlpha[i][1] - coefAlpha[j][1];
+        coefAlpha[i][2] := coefAlpha[i][2] - coefAlpha[j][2];
       end;
     end;
   end;
@@ -241,9 +241,9 @@ begin
   for i := Low(coefA) to n do
     for j := i to High(coefAlpha) do
     begin
-      coefA[i].x := coefA[i].x + coefAlpha[j].x * c[j, i];
-      coefA[i].y := coefA[i].y + coefAlpha[j].y * c[j, i];
-      coefA[i].z := coefA[i].z + coefAlpha[j].z * c[j, i];
+      coefA[i][0] := coefA[i][0] + coefAlpha[j][0] * c[j, i];
+      coefA[i][1] := coefA[i][1] + coefAlpha[j][1] * c[j, i];
+      coefA[i][2] := coefA[i][2] + coefAlpha[j][2] * c[j, i];
     end;
   { c[i, i] = 1, поэтому мы смело начинаем с первого шага }
 

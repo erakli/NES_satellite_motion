@@ -218,9 +218,7 @@ var
 
 begin // ---------------------------- Начало алгоритма начального шага
 
-  Rс[0] := coord.x;
-  Rс[1] := coord.y;
-  Rс[2] := coord.z;
+  Rс := coord;
 
   Mct := FromFixToTerraM(t); // Вычисление матрицы перехода из небесной в земную
 
@@ -368,9 +366,7 @@ begin
   Mtc := FromTerraToFixM(t);
   Fe := MultMatrVec(Mtc, _F);
 
-  result.x := Fe[0];
-  result.y := Fe[1];
-  result.z := Fe[2];
+  result := Fe;
 
 end;
 

@@ -19,10 +19,9 @@ uses
   Windows, Dialogs, System.SysUtils,
   uConstants, uTypes, uFunctions,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
-  uEpheremides_new,
-  uEpheremides,
+  uEpheremides_new, uPrecNut, uMatrix_Conversation,
   uAtmosphericDrag,
-  uMatrix_Conversation;
+  uEpheremides;
 
 type
   // ------------------------------------------- для dll
@@ -61,29 +60,33 @@ function test_uTime: boolean;
 function test_uTLE_conversation: boolean;
 function test_uKepler_Conversation: boolean;
 function test_uEpheremides_new: boolean;
+function test_uPrecNut: boolean;
+function test_uMatrix_Conversation: boolean;
 
-var
-  i: byte;
-  a: MType;
-  r: array [0 .. 5] of MType;
-  not_load: shortint;
+function test_uAtmosphericDrag: boolean;
 
-  JD, Sb_coeff, dist1, dist2, interval: MType;
-  coord, v: TVector;
+//var
+//  i: byte;
+//  a: MType;
+//  r: array [0 .. 5] of MType;
+//  not_load: shortint;
+
+ // JD, Sb_coeff, dist1, dist2, interval: MType;
+//  coord, v: TVector;
 
 //  TLE: TLE_lines;
 //  TLE_output: TTLE_output;
 
 //  Kepler_Elements: TElements;
-  Dubosh: boolean;
+//  Dubosh: boolean;
 
-  Transform: TMatrix;
+//  Transform: TMatrix;
 
   // ------------------------------------------- для dll
-  Elements: tObjectElem;
-  Details: tObjectDetails;
-
-  Elliptical: EllipticalHandle;
+//  Elements: tObjectElem;
+//  Details: tObjectDetails;
+//
+//  Elliptical: EllipticalHandle;
 
   // функция из dll
 //function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
@@ -103,6 +106,8 @@ const
 	TLE: TLE_lines =
   	('1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477',
 		 '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881');
+
+  JD: MType = 2453044.381; // 2004 70 day
 
 procedure console_output(Vector: array of MType);
 var
@@ -197,13 +202,13 @@ const
   												(0, 3, 1),
                           (3, 3, 4));
 
-  StartVector: TVector = (4, 2, 6);
+  testVector: TVector = (4, 2, 6);
 
 var
 	Matrix1, Matrix2,
   R1, R2, R3
   	: TMatrix;
-  Vector: TVector;
+  Vector1, Vector2: TVector;
 
   phi, theta, psi: MType;
 begin
@@ -213,7 +218,8 @@ begin
   writeln(' * * * * * * * * test_uMatrix_Operations * * * * * * * * ');
   writeln;
 
-	Vector := MultMatrVec(testMatrix1, StartVector);
+	Vector1 := MultMatrVec(testMatrix1, testVector);
+  Vector2 := ChangeRS(testVector);
   Matrix1 := MultMatr(testMatrix1, testMatrix2);
   Matrix2 := TranspMatr(testMatrix1);
 
@@ -225,7 +231,8 @@ begin
   R2 := MultMatr(RotMatr(2, theta), testMatrix1);
   R3 := MultMatr(RotMatr(3, psi), testMatrix1);
 
-  writeln('MultMatrVec'); console_output(Vector);
+  writeln('MultMatrVec'); console_output(Vector1);
+  writeln('ChangeRS'); console_output(Vector2);
   writeln('MultMatr'); console_output(Matrix1);
   writeln('TranspMatr'); console_output(Matrix2);
 
@@ -349,8 +356,6 @@ end;
 
 function test_uEpheremides_new: boolean;
 const
-  JD: MType = 2453044.381; // 2004 70 day
-  //JD: MType = 2415284.191; // 1900
   EphType = 3; // Earth_Moon
 var
   planet_coord: TVector;
@@ -368,13 +373,126 @@ begin
 
   EphCreation(EphType);
   planet_coord := Earth_Moon.Get(JD);
-  writeln('Earth_Moon.Get');
+  writeln('Earth_Moon.Get (module = ', FloatToStr(module(planet_coord)), ')');
   console_output(planet_coord);
 
   writeln(' * * * * * * * * done');
   writeln;
   writeln;
 
+	Earth_Moon.Destroy;
+  result := true;
+
+end;
+
+function test_uPrecNut: boolean;
+var
+	CIP_Tranform: TCIP_Tranform_Matrix;
+  Q: TMatrix;
+begin
+
+  result := false;
+
+  writeln(' * * * * * * * * test_uPrecNut * * * * * * * * ');
+  writeln;
+
+  CIP_Tranform := TCIP_Tranform_Matrix.Create;
+  Q := CIP_Tranform.getQ_Matrix((JD - J2000_Day) / 36525);
+  writeln('getQ_Matrix'); console_output(Q);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  CIP_Tranform.Destroy;
+  
+  result := true;
+
+end;
+
+function test_uMatrix_Conversation: boolean;
+const
+	coordinates: TVector = (1, 2, 3);
+var
+	UT1, TT, TT_centuries,
+  ERA_angle
+  	: MType;
+  xpyp_vec, transformed_vec: TVector;
+  R_matrix, W_matrix, transform_matrix: TMatrix;
+begin
+
+  result := false;
+
+  writeln(' * * * * * * * * test_uMatrix_Conversation * * * * * * * * ');
+  writeln;
+
+  delta_got := false;
+
+  xpyp_vec := GetDeltaUT(JD);
+  TT := TT_time(JD);
+  UT1 := UT1_time(JD);
+
+  ERA_angle := ERA(UT1);
+  writeln('ERA	', FloatToStr(ERA_angle));
+  writeln;
+
+  R_matrix := R(UT1);
+  writeln('R'); console_output(R_matrix);
+
+  TT_centuries := (TT - J2000_Day) / 36525;
+  W_matrix := W(TT_centuries, xpyp_vec[1], xpyp_vec[2]);
+  writeln('W'); console_output(W_matrix);
+
+  transform_matrix := ITRS2GCRS(TT);
+  writeln('ITRS2GCRS'); console_output(transform_matrix);
+
+  transformed_vec := MultMatrVec(transform_matrix, coordinates);
+  writeln('coordinates transformation'); console_output(transform_matrix);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
+{ Тест возмущений }
+function test_uAtmosphericDrag: boolean;
+const
+  mass = 1;
+  Sb_coeff = 1;
+var
+	AtmospericDrag: TAtmosphericDrag;
+  force: coordinates;
+
+	TLE_output: TTLE_output;
+  Kepler_Elements: TElements;
+  parameters: param;
+  Dubosh: boolean;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uAtmosphericDrag * * * * * * * * ');
+  writeln;
+
+  { Проверка остановилась тут }
+  
+  TLE_output := ReadTLE(TLE);
+  Kepler_Elements := TLE_output.Elements;
+  parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
+  
+  AtmospericDrag := TAtmosphericDrag.Create;
+  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Sb_coeff);
+  writeln('AtmospericDrag.RightPart'); console_output(force);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  AtmospericDrag.Destroy;
+  
   result := true;
 
 end;
@@ -393,14 +511,15 @@ test_uTime;
 test_uTLE_conversation;
 test_uKepler_Conversation;
 test_uEpheremides_new;
+test_uPrecNut;
+test_uMatrix_Conversation;
+test_uAtmosphericDrag;
 
-JD := 2415284.191;
-EphCreation(3);
-coord := Earth_Moon.Get(JD);
+//JD := 2415284.191;
 
 // MJD := 57258;
 
-interval := 0;
+//interval := 0;
 // интервал, на который считаются координаты. необходимо для JDEquinox
 
 //TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
@@ -432,10 +551,10 @@ interval := 0;
 
 //coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
 
-coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
+//coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
 
-dist1 := module(v) - 6378.1366;
-dist2 := module(coord) - 6378.1366;
+//dist1 := module(v) - 6378.1366;
+//dist2 := module(coord) - 6378.1366;
 
 FreeConsole;  // убираем консоль
 { //---------------------------------------- для случая из учебника AA (с. 232)

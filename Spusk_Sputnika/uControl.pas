@@ -96,13 +96,6 @@ var
   f: textfile;
   i: byte;
 
-  function CoordSum(one, two: coordinates): coordinates;
-  begin
-    result.x := one.x + two.x;
-    result.y := one.y + two.y;
-    result.z := one.z + two.z;
-  end;
-
 begin
 
   Assign(f, log_file);
@@ -111,25 +104,15 @@ begin
   while cur_time < end_time do
   begin
 
-    Force.x := ResetCoord;
-    Force.dif_x := ResetCoord;
+    Force.x := NullVec;
+    Force.dif_x := NullVec;
 
     with Sputnik.state do
     begin
 
-      with _coord do
-      begin
-        x := coord[0];
-        y := coord[1];
-        z := coord[2];
-      end;
+      _coord := coord;
 
-      with _speed do
-      begin
-        x := speed[0];
-        y := speed[1];
-        z := speed[2];
-      end;
+      _speed := speed;
 
     end;
 
@@ -140,26 +123,22 @@ begin
       // temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
       // AtmosphericDrag.RightPart);
 
-      Force.x := CoordSum(Force.x, temp_force.x);
-      Force.dif_x := CoordSum(Force.dif_x, temp_force.dif_x);
+      Force.x := VecSum(Force.x, temp_force.x);
+      Force.dif_x := VecSum(Force.dif_x, temp_force.dif_x);
 
       temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
         SunPressure.RightPart);
 
-      Force.x := CoordSum(Force.x, temp_force.x);
-      Force.dif_x := CoordSum(Force.dif_x, temp_force.dif_x);
+      Force.x := VecSum(Force.x, temp_force.x);
+      Force.dif_x := VecSum(Force.dif_x, temp_force.dif_x);
     end;
 
     with Sputnik.state do
     begin
 
-      coord[0] := Force.x.x;
-      coord[1] := Force.x.y;
-      coord[2] := Force.x.z;
+      coord := Force.x;
 
-      speed[0] := Force.dif_x.x;
-      speed[1] := Force.dif_x.y;
-      speed[2] := Force.dif_x.z;
+      speed := Force.dif_x;
 
       writeln(f, 'Current time = ', cur_time:5:6);
       for i := 0 to 2 do

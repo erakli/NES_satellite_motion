@@ -2,7 +2,7 @@
 
 {
   TO-DO:
-  * Доработать поворот вокруг осей в модуле uMatrix_Operations
+  * Доработать поворот вокруг осей в модуле uMatrix_Operations - done
   * Вычислять степени t изначально и подставлять это значение в места вызова
 }
 
@@ -30,10 +30,10 @@ type
     x2, y2, // квадраты координат полюса
 
     s { s being a quantity, named "CIO locator", which provides the position
-      of the CIO on the equator of the CIP corresponding to the kinematical
-      defnition of the NRO in the GCRS when the CIP is moving with respect
-      to the GCRS, between the reference epoch and the date t due to
-      precession and nutation }
+      	of the CIO on the equator of the CIP corresponding to the kinematical
+      	defnition of the NRO in the GCRS when the CIP is moving with respect
+      	to the GCRS, between the reference epoch and the date t due to
+      	precession and nutation }
       : MType;
 
     { * * * The fundamental arguments of nutation theory * * * }
@@ -63,6 +63,7 @@ type
     destructor Destroy; override;
 
   end;
+
 
 implementation
 
@@ -95,22 +96,16 @@ begin
   Y := getY(t);
   s := get_s(t);
 
-  x2 := sqr(X);
-  y2 := sqr(Y);
+  x2 := X * X;
+  y2 := Y * Y;
 
   a := get_a;
 
-  Q[0, 0] := 1 - a * x2;
-  Q[0, 1] := -a * X * Y;
-  Q[0, 2] := X;
+  Q[0, 0] := 1 - a * x2;		Q[0, 1] := -a * X * Y;		Q[0, 2] := X;
 
-  Q[1, 0] := -a * X * Y;
-  Q[1, 1] := 1 - a * y2;
-  Q[1, 2] := Y;
+  Q[1, 0] := -a * X * Y;		Q[1, 1] := 1 - a * y2;		Q[1, 2] := Y;
 
-  Q[2, 0] := -X;
-  Q[2, 1] := -Y;
-  Q[2, 2] := 1 - a * (x2 + y2);
+  Q[2, 0] := -X;						Q[2, 1] := -Y;						Q[2, 2] := 1 - a * (x2 + y2);
 
   R3 := RotMatr(3, s);
   result := MultMatr(Q, R3);
@@ -175,6 +170,7 @@ begin
   D := arctan(sqrt((x2 + y2) / (1 - x2 - y2)));
 
   result := 1 / (1 + cos(D));
+  //result := 0.5 + 0.125 * (x2 + y2);
 
 end;
 
@@ -201,67 +197,67 @@ begin
 
   // ----- j = 4
   arg := 0;
-  for f_ind := 0 to FA_SIZE - 1 do
-    arg := arg + Fa[f_ind] * aX4[0, f_ind + 4];
+  for f_ind := 0 to FA_SIZE do
+    arg := arg + Fa[f_ind] * aX4[0, f_ind + 3];
 
   non_pol := (aX4[0, 1] * sin(arg) + aX4[0, 2] * cos(arg)) * pow4(t);
 
 
-  // ----- j = 3
+  // ----- j = 3  (4)
 
   for i := ind_aX[3] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX3[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aX3[i, f_ind + 3];
 
-    sum := (aX3[0, 1] * sin(arg) + aX3[0, 2] * cos(arg)) * pow3(t);
+    sum := (aX3[i, 1] * sin(arg) + aX3[i, 2] * cos(arg)) * pow3(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 2
+  // ----- j = 2	(36)
 
   for i := ind_aX[2] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX2[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aX2[i, f_ind + 3];
 
-    sum := (aX2[0, 1] * sin(arg) + aX2[0, 2] * cos(arg)) * pow2(t);
+    sum := (aX2[i, 1] * sin(arg) + aX2[i, 2] * cos(arg)) * pow2(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 1
+  // ----- j = 1	(253)
 
   for i := ind_aX[1] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX1[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aX1[i, f_ind + 3];
 
-    sum := (aX1[0, 1] * sin(arg) + aX1[0, 2] * cos(arg)) * t;
+    sum := (aX1[i, 1] * sin(arg) + aX1[i, 2] * cos(arg)) * t;
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 0
+  // ----- j = 0	(1306)
 
   for i := ind_aX[0] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aX0[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aX0[i, f_ind + 3];
 
-    sum := aX0[0, 1] * sin(arg) + aX0[0, 2] * cos(arg);
+    sum := aX0[i, 1] * sin(arg) + aX0[i, 2] * cos(arg);
     non_pol := non_pol + sum;
 
   end;
@@ -295,67 +291,67 @@ begin
 
   // ----- j = 4
   arg := 0;
-  for f_ind := 0 to FA_SIZE - 1 do
-    arg := arg + Fa[f_ind] * aY4[0, f_ind + 4];
+  for f_ind := 0 to FA_SIZE do
+    arg := arg + Fa[f_ind] * aY4[0, f_ind + 3];
 
   non_pol := (aY4[0, 1] * cos(arg) + aY4[0, 2] * sin(arg)) * pow4(t);
 
 
-  // ----- j = 3
+  // ----- j = 3	(5)
 
   for i := ind_aY[3] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aY3[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aY3[i, f_ind + 3];
 
-    sum := (aY3[0, 1] * cos(arg) + aY3[0, 2] * sin(arg)) * pow3(t);
+    sum := (aY3[i, 1] * cos(arg) + aY3[i, 2] * sin(arg)) * pow3(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 2
+  // ----- j = 2	(30)
 
   for i := ind_aY[2] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aY2[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aY2[i, f_ind + 3];
 
-    sum := (aY2[0, 1] * cos(arg) + aY2[0, 2] * sin(arg)) * pow2(t);
+    sum := (aY2[i, 1] * cos(arg) + aY2[i, 2] * sin(arg)) * pow2(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 1
+  // ----- j = 1	(277)
 
   for i := ind_aY[1] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aY1[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aY1[i, f_ind + 3];
 
-    sum := (aY1[0, 1] * cos(arg) + aY1[0, 2] * sin(arg)) * t;
+    sum := (aY1[i, 1] * cos(arg) + aY1[i, 2] * sin(arg)) * t;
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 0
+  // ----- j = 0	(962)
 
   for i := ind_aY[0] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * aY0[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * aY0[i, f_ind + 3];
 
-    sum := aY0[0, 1] * cos(arg) + aY0[0, 2] * sin(arg);
+    sum := aY0[i, 1] * cos(arg) + aY0[i, 2] * sin(arg);
     non_pol := non_pol + sum;
 
   end;
@@ -388,74 +384,75 @@ begin
 
   // ----- j = 4
   arg := 0;
-  for f_ind := 0 to FA_SIZE - 1 do
-    arg := arg + Fa[f_ind] * as_4[0, f_ind + 4];
+  for f_ind := 0 to FA_SIZE do
+    arg := arg + Fa[f_ind] * as_4[0, f_ind + 3];
 
   non_pol := (as_4[0, 1] * sin(arg) + as_4[0, 2] * cos(arg)) * pow4(t);
 
 
-  // ----- j = 3
+  // ----- j = 3	(4)
 
   for i := ind_as_[3] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * as_3[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * as_3[i, f_ind + 3];
 
-    sum := (as_3[0, 1] * sin(arg) + as_3[0, 2] * cos(arg)) * pow3(t);
+    sum := (as_3[i, 1] * sin(arg) + as_3[i, 2] * cos(arg)) * pow3(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 2
+  // ----- j = 2	(25)
 
   for i := ind_as_[2] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * as_2[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * as_2[i, f_ind + 3];
 
-    sum := (as_2[0, 1] * sin(arg) + as_2[0, 2] * cos(arg)) * pow2(t);
+    sum := (as_2[i, 1] * sin(arg) + as_2[i, 2] * cos(arg)) * pow2(t);
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 1
+  // ----- j = 1	(3)
 
   for i := ind_as_[1] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * as_1[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * as_1[i, f_ind + 3];
 
-    sum := (as_1[0, 1] * sin(arg) + as_1[0, 2] * cos(arg)) * t;
+    sum := (as_1[i, 1] * sin(arg) + as_1[i, 2] * cos(arg)) * t;
     non_pol := non_pol + sum;
 
   end;
 
 
-  // ----- j = 0
+  // ----- j = 0	(33)
 
   for i := ind_as_[0] - 1 downto 0 do
   begin
 
     arg := 0;
-    for f_ind := 0 to FA_SIZE - 1 do
-      arg := arg + Fa[f_ind] * as_0[0, f_ind + 4];
+    for f_ind := 0 to FA_SIZE do
+      arg := arg + Fa[f_ind] * as_0[i, f_ind + 3];
 
-    sum := as_0[0, 1] * sin(arg) + as_0[0, 2] * cos(arg);
+    sum := as_0[i, 1] * sin(arg) + as_0[i, 2] * cos(arg);
     non_pol := non_pol + sum;
 
   end;
 
   // Собираем результат
-  result := asec2rad((pol + non_pol) * MICRO); { так как non_pol вычисляется в
-    МИКРОарксекундах - надо привести к арксекундам домножив на 1.0e-6 }
+  result := asec2rad((pol + non_pol) * MICRO) - X * Y / 2;
+  	{ так как non_pol вычисляется в МИКРОарксекундах - надо привести к
+    	арксекундам домножив на 1.0e-6 }
 
 end;
 

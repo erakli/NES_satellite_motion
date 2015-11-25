@@ -8,7 +8,8 @@ unit uSunPressure;
 interface
 
 uses
-  uConstants, uTypes, uFunctions, Math, uEpheremides, uTime, uSputnik;
+  uConstants, uTypes, uFunctions, Math, uEpheremides_new, {uEpheremides,}
+  uTime, uSputnik, uMatrix_Operations;
 
 type
 
@@ -102,7 +103,8 @@ begin
 
   { Вызов эферимид для рассчёта положения Солнца относительно Земли,
     возможно функция }
-  Sun.Pos := Epheremides.GetEpheremides(TDB);
+  //Sun.Pos := Epheremides.GetEpheremides(TDB);
+  Sun.Pos := ChangeRS(Earth_Moon.Get(TDB));
 
   ISZ := coord;
   Earth_ISZ := module(ISZ);
@@ -117,10 +119,9 @@ begin
     на какой угол радиус вектор спутника отстоит от радиус вектора Солнца.
 
     Узнали }
-  with Sun do // Из скалярного произведения
     { Справедливо для скалярного произведения векторов, заданных в декартовой
       СК }
-    scal_inc := ISZ.x * Pos.x + ISZ.y * Pos.y + ISZ.z * Pos.z;
+  scal_inc := DotProduct(ISZ, Sun.pos); // Из скалярного произведения
 
   cos_psi := -scal_inc / (Earth_ISZ * Earth_Sun);
 
@@ -130,12 +131,7 @@ begin
 
     Необходимо уточнить правильность вычисления расстояния между Солнцем и
     спутником }
-  with temp_vect, Sun do
-  begin
-    x := Pos.x - ISZ.x;
-    y := Pos.y - ISZ.y;
-    z := Pos.z - ISZ.z;
-  end;
+  temp_vect := VecDec(Sun.pos, ISZ);
 
   Sun_ISZ := module(temp_vect);
   // Sun_ISZ := Earth_Sun;  { Принимаем расстояние от Солнца до
@@ -171,12 +167,7 @@ begin
   temp_part := k[0] * Sun.q * Sputnik._space * Shadow(psi, true) *
     sqr(Earth.big_a / Sun_ISZ);
 
-  with result, Sun do
-  begin
-    x := temp_part * (Pos.x - ISZ.x) / Sun_ISZ;
-    y := temp_part * (Pos.y - ISZ.y) / Sun_ISZ;
-    z := temp_part * (Pos.z - ISZ.z) / Sun_ISZ;
-  end;
+  result := ConstProduct(temp_part / Sun_ISZ, VecDec(Sun.pos, ISZ));
 
 end;
 
@@ -189,12 +180,7 @@ begin
     (Earth.eq_rad / Earth_ISZ) * (k[1] * sqr(cos(fi)) + k[2] * Shadow(psi,
     false) * sin(beta - psi));
 
-  with result do
-  begin
-    x := temp_part * ISZ.x / Earth_ISZ;
-    y := temp_part * ISZ.y / Earth_ISZ;
-    z := temp_part * ISZ.z / Earth_ISZ;
-  end;
+  result := ConstProduct(temp_part / Earth_ISZ, ISZ);
 
 end;
 
@@ -211,12 +197,7 @@ begin
   temp[0] := SunP;
   temp[1] := EarthP;
 
-  with result do
-  begin
-    x := temp[0].x + temp[1].x;
-    y := temp[0].y + temp[1].y;
-    z := temp[0].z + temp[1].z;
-  end;
+  result := VecSum(temp[0], temp[1]);
 
 end;
 

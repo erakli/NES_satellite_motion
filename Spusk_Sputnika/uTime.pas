@@ -16,7 +16,7 @@ interface
   2 марта 1900 года по 27 февраля 2100 года. }
 
 uses
-  System.SysUtils, Classes, Dialogs, uConstants, uTypes;
+  System.SysUtils, Classes, Dialogs, uConstants, uTypes, uFunctions;
 
 const
   TAI_TT: MType = 32.184; // Константа добавляемая к Атомному времени для перевода в Земное

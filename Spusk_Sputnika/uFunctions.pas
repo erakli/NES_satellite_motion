@@ -6,7 +6,6 @@ interface
 
 uses uTypes;
 
-function module(coord: coordinates): MType; overload;
 function module(coord: TVector): MType; overload;
 
 { Функции преобразования к радианам из минут дуги }
@@ -20,14 +19,6 @@ function pow4(arg: MType): MType;
 function pow5(arg: MType): MType;
 
 implementation
-
-function module(coord: coordinates): MType;
-begin
-
-  with coord do
-    result := sqrt(sqr(x) + sqr(y) + sqr(z));
-
-end;
 
 function module(coord: TVector): MType;
 var
@@ -51,12 +42,12 @@ end;
 
 function amin2rad(arg: MType): MType;
 begin
-  result := arg * Pi / (180 * 60);
+  result := arg * Pi / 10800; // / (180 * 60);
 end;
 
 function asec2rad(arg: MType): MType;
 begin
-  result := arg * Pi / (180 * 60 * 60);
+  result := arg * Pi / 648000; // / (180 * 60 * 60);
 end;
 
 function pow2(arg: MType): MType;

@@ -6,24 +6,24 @@ uses
   System.SysUtils, uTypes;
 
 const
-  fm = 3.986004418E+5; // [km] √равитационна€ посто€нна€
+  fm: MType = 3.986004418E+5; // [km] √равитационна€ посто€нна€
   // m_size = 2; // –азмер матриц
 
-  au = 1.49597870700E+8; // [km] Astronomical unit - астрономическа€ единица
-  c = 299792.458; // [km/s] —корость света
+  au: MType = 1.49597870700E+8; // [km] Astronomical unit - астрономическа€ единица
+  c: MType = 299792.458; // [km/s] —корость света
 
   SecInDay = 86400; // секунд в дне
 
-  MJDCorrection = 2400000.5; // вычитать из JD
-  J2000_Day = 2451545.0; // 2000 January 1.5 TT
+  MJDCorrection: MType = 2400000.5; // вычитать из JD
+  J2000_Day: MType = 2451545.0; // 2000 January 1.5 TT
 
   deletimer = '	';
 
   asecInTurn = 360 * 60 * 60;
-  MICRO = 1.0E-6;
+  MICRO: MType = 1.0E-6;
 
-const
-  ResetCoord: coordinates = (x: 0; y: 0; z: 0);
+  NullVec: TVector = (0, 0, 0);
+  NullMatr: TMatrix = ((0, 0, 0), (0, 0, 0), (0, 0, 0));
 
 var
   Earth: TEarth;
