@@ -43,7 +43,7 @@ type
     { Private declarations }
     t_start_, t_end_: TDate;
     TLE_: TLE_lines;
-    mass_, space_, step_, Sb_coeff_: MType;
+    mass_, space_, step_, Sb_coeff_, A_: MType;
 
     procedure Proceed;
     procedure Run;
@@ -101,13 +101,14 @@ begin
   space_ := StrToFloat(ed_Space.Text);
   Sb_coeff_ := StrToFloat(ed_Sb_coeff.Text);
   step_ := StrToFloat(ed_Step.Text);
+  A_ := 1; // заглушка
 
 end;
 
 procedure TForm1.Run;
 begin
 
-  Control.Prepare(t_start_, t_end_, step_, TLE_, mass_, space_, Sb_coeff_);
+  Control.Prepare(t_start_, t_end_, step_, TLE_, mass_, space_, Sb_coeff_, A_);
   Control.Modeling;
 
 end;

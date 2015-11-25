@@ -11,7 +11,8 @@ type
   public
     state: param;
     mass, Sb_coeff, // баллистический коэффициент
-    _space { s - площадь эффективного/поперечного сечения }
+    _space, { s - площадь эффективного/поперечного сечения }
+    A
       : MType;
 
     constructor Create;

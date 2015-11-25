@@ -3,7 +3,9 @@
 interface
 
 { Модуль для вычисление ускорения, вызываемое действием геопотенциала в земной
-  СК }
+  СК
+
+  Будем вызывать во времени TT}
 
 uses
   uConstants, uFunctions, uMatrix_Conversation, uMatrix_Operations,
@@ -220,7 +222,8 @@ begin // ---------------------------- Начало алгоритма начал
 
   Rс := coord;
 
-  Mct := FromFixToTerraM(t); // Вычисление матрицы перехода из небесной в земную
+  //Mct := FromFixToTerraM(t); // Вычисление матрицы перехода из небесной в земную
+  Mct := TranspMatr(ITRS2GCRS(t));
 
   Rt := MultMatrVec(Mct, Rс); // Умножение матрицы на вектор
 
@@ -363,7 +366,8 @@ begin
   InitStep(t, coord); // Начальный шаг алгоритма
   MainStep;
 
-  Mtc := FromTerraToFixM(t);
+  //Mtc := FromTerraToFixM(t);
+  Mtc := ITRS2GCRS(t);
   Fe := MultMatrVec(Mtc, _F);
 
   result := Fe;

@@ -8,26 +8,28 @@ unit uAtmosphericDrag;
   по таблице в приложении А стандарта.
 
   Так же, при внесении любых уточнений в модель, имеет смысл обратиться к
-  стандарту и файлу с исправлениями его предшественника (stand-91.doc) }
+  стандарту и файлу с исправлениями его предшественника (stand-91.doc)
+
+
+  ! Внимание, в функции getF0_Kp есть момент, на который необходимо обратить
+  внимание! }
 
 interface
 
 uses
-  uConstants, uTime, Math, System.SysUtils, Dialogs, uSputnik, uTypes,
-  uFunctions, uStarTime, uAtmospericDrag_Coeff;
+  Math, System.SysUtils, Dialogs,
+  uConstants, uTime, uTypes, uFunctions, uStarTime, uMatrix_Operations,
+  uAtmospericDrag_Coeff, uMatrix_Conversation;
 
 const
-  num = 4;
-  AD_coef_A = 'AD_coef_A.txt';
-  AD_coef_1 = 'AD_coef_1.txt';
-  AD_coef_2 = 'AD_coef_2.txt';
+//  AD_coef_A = 'AD_coef_A.txt';
+//  AD_coef_1 = 'AD_coef_1.txt';
+//  AD_coef_2 = 'AD_coef_2.txt';
   F10_7_and_Kp = 'solarinex.txt';
 
 type
 
   // vectors = (a, b, c, n, fi_1, d, e, l);
-
-  TCoefVect = array [0 .. num] of MType;
 
   TAtmosphericDrag = class(TObject)
   private
@@ -58,7 +60,7 @@ type
     { коэффициенты модели, используемые для расчета плотности атмосферы при
       различных значениях фиксированного уровня солнечной активности F0: }
     // При ro_0 (densityNight)
-    den_a: array [0 .. num + 2] of MType;
+    den_a: array [0 .. NUM_OF_den_A] of MType;
 
     // При К0
     l: TCoefVect;
@@ -74,17 +76,17 @@ type
     { коэффициент модели, равный углу запаздывания максимума плотности
       по отношению к максимуму освещенности: }
     fi_1: MType; // [рад]
-    n: array [0 .. num - 2] of MType;
+    n: array [0 .. NUM_OF_N] of MType;
 
     // При К2
     d: TCoefVect;
-    A: array [0 .. num * 2] of MType; // Коэффициенты множителя A(d) при К2
+    A: array [0 .. NUM_OF_A] of MType; // Коэффициенты множителя A(d) при К2
 
     // При К3
     b: TCoefVect;
 
     // При К4
-    e: array [0 .. num * 2] of MType;
+    e: array [0 .. NUM_OF_E] of MType;
 
     // Коэффициенты при вычислении плотности на высоте <120 km
     h_i, // [km] Нижняя граница слоя
@@ -108,7 +110,7 @@ type
     function setK(h: MType; Index: byte; Value: coordinates): MType;
     function setA(d: word): MType;
 
-    procedure getCoeffForK(F0: word; h: MType; vec: string);
+    procedure getCoeffForK(F0: word; h: MType; vec: char);
     procedure getF0_Kp(t: MType);
 
     function ReadValue(text: string; flag: byte): MType;
@@ -116,7 +118,7 @@ type
     function SetTime(Value: MType): MType;
     function SetDays(Value: MType): word;
   public
-    function RightPart(JD: MType; coord, v: coordinates; Sb_coeff: MType)
+    function RightPart(JD: MType; coord, v: coordinates; Sb_coeff, A: MType)
       : coordinates;
 
     constructor Create;
@@ -132,8 +134,8 @@ implementation
 
 constructor TAtmosphericDrag.Create;
 var
-  f: TextFile;
-  temp_text: string;
+//  f: TextFile;
+//  temp_text: string;
   i: byte;
 begin
 
@@ -141,17 +143,20 @@ begin
 
   memo_ro := 0;
 
-  AssignFile(f, file_dir + AD_coef_A);
-  Reset(f);
+  for i := 0 to High(A) do
+  	A[i] := AD_coef_A[i];
 
-  for i := Low(A) to High(A) do
-  begin
-    ReadLn(f, temp_text);
-    A[i] := StrToFloat(Copy(temp_text, pos(deletimer, temp_text) + 1,
-      length(temp_text)));
-  end;
-
-  CloseFile(f);
+//  AssignFile(f, file_dir + AD_coef_A);
+//  Reset(f);
+//
+//  for i := Low(A) to High(A) do
+//  begin
+//    ReadLn(f, temp_text);
+//    A[i] := StrToFloat(Copy(temp_text, pos(deletimer, temp_text) + 1,
+//      length(temp_text)));
+//  end;
+//
+//  CloseFile(f);
 
 end;
 
@@ -261,6 +266,12 @@ begin
   need_time_F81 := FromJDToDate(t - 1.7);
   need_time_Kp := FromJDToDate(t - 0.6);
 
+  {
+  	Внимание, следующие моменты не учтены в функции:
+      индекс F10_7 относится к 20.00 UT
+      индекс Kp относится к середине суток (12.00 UT)
+  }
+
   F81_flag := false;
   Kp_flag := false;
 
@@ -330,12 +341,12 @@ begin
 end;
 
 { Заполняем массивы коэффициентов для вычисления массива К }
-procedure TAtmosphericDrag.getCoeffForK(F0: word; h: MType; vec: string);
+procedure TAtmosphericDrag.getCoeffForK(F0: word; h: MType; vec: char);
 var
-  f: TextFile;
-  temp_text: string;
-  i, flag: byte;
-  coef_height: integer;
+//  f: TextFile;
+//  temp_text: string;
+  i, flag, range, coef_num: byte;
+//  coef_height: integer;
 
 begin
 
@@ -358,112 +369,188 @@ begin
     flag := 4;
   end;
 
-  if h >= 500 then { Сразу проссматриваем 3 высотный диапазон }
-    temp_text := AD_coef_2 // Открываем 2 файл (с 3 высотным диапазоном)
-  else
-    temp_text := AD_coef_1; // Иначе 1 файл (со 2 (от 120 км))
+  // чтобы не вычитать каждый раз при обращении к массиву, тк индекс меньше номера на единицу в массиве
+  flag := flag - 1;
 
-  AssignFile(f, file_dir + temp_text);
-  Reset(f);
+  range := 1; // сразу смотрим 3 высотный диапазон
 
-  temp_text := ' ';
-
-  if (vec <> 'n') OR (vec <> 'fi_1') then
-  begin
-
-    while (temp_text[1] <> vec) AND not EoF(f) do
-    begin
-      ReadLn(f, temp_text);
-      if temp_text = '' then
-        temp_text := ' ';
-    end;
-    if EoF(f) then
-    begin
-      ShowMessage('Беда с названиями или файлами коэффициентов. Конец файла');
-      exit;
-    end;
-
-    // Сверяем высоту для коэффициента
-    coef_height := trunc(ReadValue(temp_text, flag));
-
-    if h < coef_height then
-    begin
-      CloseFile(f);
-
-      temp_text := AD_coef_1; { Мы находимся в 2 высотном диапазоне }
-      AssignFile(f, file_dir + temp_text);
-      Reset(f);
-    end;
-
-  end;
-
-  temp_text := ' ';
-
-
-  { Уточнить эту конструкцию }
-  while (temp_text[1] <> vec) AND not EoF(f) do
-  begin
-    ReadLn(f, temp_text);
-    if temp_text = '' then
-      temp_text := ' ';
-  end;
-  if EoF(f) then
-  begin
-    ShowMessage('Беда с названиями или файлами коэффициентов. Конец файла');
-    exit;
-  end;
-
-  // Набор имён массивов коэффициентов (den_a, b, c, n, fi_1, d, e, l)
-  case vec[1] of
+  // coef_num - номер коэффициента (для поиска границ диапазонов)
+  case vec of
     'a': // den_a
-      for i := Low(den_a) to High(den_a) do
       begin
-        ReadLn(f, temp_text);
-        den_a[i] := ReadValue(temp_text, flag);
+      	coef_num := 0;
+
+        range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
+
+        for i := 0 to High(den_a) do
+          den_a[i] := AD_coef_den_a[range][i, flag];
       end;
+
     'b':
-      for i := Low(b) to High(b) do
-      begin
-        ReadLn(f, temp_text);
-        b[i] := ReadValue(temp_text, flag);
-        // добавить в ReadValue проверку на пустой текст
+    	begin
+      	coef_num := 1;
+
+        range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
+
+        for i := 0 to High(b) do
+          b[i] := AD_coef_b[range][i, flag];
       end;
+
     'c':
-      for i := Low(c) to High(c) do
-      begin
-        ReadLn(f, temp_text);
-        c[i] := ReadValue(temp_text, flag);
+    	begin
+      	coef_num := 2;
+
+        range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
+
+        for i := 0 to High(c) do
+          c[i] := AD_coef_c[range][i, flag];
       end;
-    'n':
-      for i := Low(n) to High(n) do
-      begin
-        n[i] := ReadValue(temp_text, flag);
-        ReadLn(f, temp_text);
-      end;
-    'f':
-      fi_1 := ReadValue(temp_text, flag); // fi_1
+
     'd':
-      for i := Low(d) to High(d) do
-      begin
-        ReadLn(f, temp_text);
-        d[i] := ReadValue(temp_text, flag);
+    	begin
+      	coef_num := 3;
+
+        range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
+
+        for i := 0 to High(d) do
+          d[i] := AD_coef_d[range][i, flag];
       end;
+
     'e':
-      for i := Low(e) to High(e) do
-      begin
-        ReadLn(f, temp_text);
-        e[i] := ReadValue(temp_text, flag);
+    	begin
+      	coef_num := 4;
+
+      	range := ifthen ( h < AD_coef_h[1][coef_num, flag], 0, 1 );
+
+        for i := 0 to NUM_OF_E do
+          e[i] := AD_coef_e[range][i, flag];
       end;
+
     'l':
-      for i := Low(l) to High(l) do
-      begin
-        ReadLn(f, temp_text);
-        l[i] := ReadValue(temp_text, flag);
+    	begin
+      	coef_num := 5;
+
+        range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
+
+        for i := 0 to High(l) do
+          l[i] := AD_coef_l[range][i, flag];
       end;
+
+    'n':
+      for i := 0 to High(n) do
+        n[i] := AD_coef_n[i, flag];
+
+    'f':	fi_1 := AD_coef_fi_1[flag];	// fi_1
 
   end; // End of case
 
-  CloseFile(f);
+//  // Реализация с чтением из файла
+//  if h >= 500 then { Сразу просматриваем 3 высотный диапазон }
+//    temp_text := AD_coef_2 // Открываем 2 файл (с 3 высотным диапазоном)
+//  else
+//    temp_text := AD_coef_1; // Иначе 1 файл (со 2 (от 120 км))
+//
+//  AssignFile(f, file_dir + temp_text);
+//  Reset(f);
+//
+//  temp_text := ' ';
+//
+//  if (vec <> 'n') OR (vec <> 'fi_1') then
+//  begin
+//
+//    while (temp_text[1] <> vec) AND not EoF(f) do
+//    begin
+//      ReadLn(f, temp_text);
+//      if temp_text = '' then
+//        temp_text := ' ';
+//    end;
+//    if EoF(f) then
+//    begin
+//      ShowMessage('Беда с названиями или файлами коэффициентов. Конец файла');
+//      exit;
+//    end;
+//
+//    // Сверяем высоту для коэффициента
+//    coef_height := trunc(ReadValue(temp_text, flag));
+//
+//    if h < coef_height then
+//    begin
+//      CloseFile(f);
+//
+//      temp_text := AD_coef_1; { Мы находимся в 2 высотном диапазоне }
+//      AssignFile(f, file_dir + temp_text);
+//      Reset(f);
+//    end;
+//
+//  end;
+//
+//  temp_text := ' ';
+//
+//
+//  { Уточнить эту конструкцию }
+//  while (temp_text[1] <> vec) AND not EoF(f) do
+//  begin
+//    ReadLn(f, temp_text);
+//    if temp_text = '' then
+//      temp_text := ' ';
+//  end;
+//  if EoF(f) then
+//  begin
+//    ShowMessage('Беда с названиями или файлами коэффициентов. Конец файла');
+//    exit;
+//  end;
+//
+//  // Набор имён массивов коэффициентов (den_a, b, c, n, fi_1, d, e, l)
+//  case vec[1] of
+//    'a': // den_a
+//      for i := Low(den_a) to High(den_a) do
+//      begin
+//        ReadLn(f, temp_text);
+//        den_a[i] := ReadValue(temp_text, flag);
+//      end;
+//    'b':
+//      for i := Low(b) to High(b) do
+//      begin
+//        ReadLn(f, temp_text);
+//        b[i] := ReadValue(temp_text, flag);
+//        // добавить в ReadValue проверку на пустой текст
+//      end;
+//    'c':
+//      for i := Low(c) to High(c) do
+//      begin
+//        ReadLn(f, temp_text);
+//        c[i] := ReadValue(temp_text, flag);
+//      end;
+//    'n':
+//      for i := Low(n) to High(n) do
+//      begin
+//        n[i] := ReadValue(temp_text, flag);
+//        ReadLn(f, temp_text);
+//      end;
+//    'f':
+//      fi_1 := ReadValue(temp_text, flag); // fi_1
+//    'd':
+//      for i := Low(d) to High(d) do
+//      begin
+//        ReadLn(f, temp_text);
+//        d[i] := ReadValue(temp_text, flag);
+//      end;
+//    'e':
+//      for i := Low(e) to High(e) do
+//      begin
+//        ReadLn(f, temp_text);
+//        e[i] := ReadValue(temp_text, flag);
+//      end;
+//    'l':
+//      for i := Low(l) to High(l) do
+//      begin
+//        ReadLn(f, temp_text);
+//        l[i] := ReadValue(temp_text, flag);
+//      end;
+//
+//  end; // End of case
+//
+//  CloseFile(f);
 
 end;
 
@@ -499,7 +586,7 @@ begin
 
   case Index of
     0:
-      K[Index] := 1 + series(h, l, num, false) * (F81 - F0) / F0;
+      K[Index] := 1 + series(h, l, NUM_OF_COEF, false) * (F81 - F0) / F0;
     1:
       begin
         beta := sun.alpha - S_time - Earth.omega * time + fi_1;
@@ -511,16 +598,16 @@ begin
         { Перевод к половинному аргументу. Модуль взят из stand_91.doc }
         cos_fi := sqrt(abs(1 + cos_fi) / 2);
 
-        K[Index] := series(h, c, num, false) *
-          Power(cos_fi, series(h, n, num - 2, false));
+        K[Index] := series(h, c, NUM_OF_COEF, false) *
+          Power(cos_fi, series(h, n, NUM_OF_COEF - 2, false));
       end;
     2:
-      K[Index] := series(h, d, num, false) * setA(days);
+      K[Index] := series(h, d, NUM_OF_COEF, false) * setA(days);
     3:
-      K[Index] := series(h, b, num, false) * (F10_7 - F81) /
+      K[Index] := series(h, b, NUM_OF_COEF, false) * (F10_7 - F81) /
         (F81 + abs(F10_7 - F81));
     4:
-      K[Index] := series(h, e, num, false) * series(Kp, e, num, true);
+      K[Index] := series(h, e, NUM_OF_COEF, false) * series(Kp, e, NUM_OF_COEF, true);
   end;
 
   result := K[Index];
@@ -544,7 +631,7 @@ end;
 function TAtmosphericDrag.densityNight(h: MType): MType;
 begin
 
-  result := Earth.density_120 * exp(series(h, den_a, num + 2, false));
+  result := Earth.density_120 * exp(series(h, den_a, NUM_OF_COEF + 2, false));
 
 end;
 
@@ -634,7 +721,7 @@ begin
       end;
     end;
 
-    for i := Low(vec) + 1 to High(vec) do // !Проверить нижнюю границу
+    for i := Low(vec) to High(vec) do
       getCoeffForK(F0, h, vec[i]); // Получили коэффициенты для текущей высоты
 
     for i := Low(K) to High(K) do
@@ -650,26 +737,32 @@ begin
 end;
 
 function TAtmosphericDrag.RightPart(JD: MType; coord, v: coordinates;
-  Sb_coeff: MType): coordinates;
+  Sb_coeff, A: MType): coordinates;
 var
   speed, ro, UT1: MType;
   // Fe: TVector; // Матрица ускорения в небесной СК
+  Mct: TMatrix;
 begin
 
-  speed := module(v);
-
+  speed := module(v); // относительная скорость как-то по-другому вычисляется
+                      // скорее всего небходимо перейти в скоростную СК, связанную с ИСЗ
   UT1 := UT1_time(JD);
 
   time := SetTime(UT1);
   days := SetDays(UT1);
-  S_time := ToGetGMSTime(UT1);
+//  S_time := ToGetGMSTime(UT1);
+	S_time := GMSTime(UT1, TT_time(JD));
 
   ro := density(UT1, coord); // Запускаем алгоритм подсчёта плотности
 
-  { ! Уточнить вычисление результирующего ускорения }
-  result[0] := -Sb_coeff * ro * speed * v[0];
-  result[1] := -Sb_coeff * ro * speed * v[1];
-  result[2] := -Sb_coeff * ro * speed * v[2];
+  { ! ! ! Уточнить вычисление результирующего ускорения }
+//  result[0] := -Sb_coeff * ro * speed * v[0];
+//  result[1] := -Sb_coeff * ro * speed * v[1];
+//  result[2] := -Sb_coeff * ro * speed * v[2];
+
+	Mct := TranspMatr( ITRS2GCRS(TT_time(JD)) ); // матрица перехода из небесной в земную
+
+	result := ConstProduct( A * Sb_coeff * ro * 0.5, MultMatrVec(Mct, v) );
 
 end;
 

@@ -40,7 +40,7 @@ begin
 
   delta_got := false;
 
-  TT_centuries := (t - J2000_Day) / 36525;
+  TT_centuries := (t - J2000_Day) / JCentury;
   xpyp_vec := GetDeltaUT(TT2UTC(t)); // здесь нужно UTC на вход
 
   UT1 := UT1_time(TT2UTC(t)); // и здесь
@@ -83,8 +83,11 @@ var
   Tu: MType; // = JD_ut1 - 2451545.0
 begin
 
-  Tu := JD_ut1 - 2451545.0;
-  result := 2 * pi * (0.7790572732640 + 1.00273781191135448 * Tu);
+  Tu := JD_ut1 - J2000_Day;
+
+  // уточнить на счёт первого слагаемого (IERS Conversations (2003), ch. 5.4.4, eq. 14)
+  // нормализации угла
+  result := AngleNormalize(PI2 * (Trunc(Tu) - 0.7790572732640 + 1.00273781191135448 * Tu));
 
 end;
 

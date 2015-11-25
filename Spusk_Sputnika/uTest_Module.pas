@@ -21,7 +21,8 @@ uses
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
   uAtmosphericDrag,
-  uEpheremides;
+  uEpheremides,
+  uGauss;
 
 type
   // ------------------------------------------- для dll
@@ -64,6 +65,7 @@ function test_uPrecNut: boolean;
 function test_uMatrix_Conversation: boolean;
 
 function test_uAtmosphericDrag: boolean;
+function test_uGEO_Potential: boolean;
 
 //var
 //  i: byte;
@@ -154,6 +156,9 @@ const
   angle: MType = 60;
   amin: MType = 30;
   asec: MType = 15;
+
+  BigAngle: MType = 270;
+
   arg = 5;
 var
   radians, module_res, pow_res: MType;
@@ -180,6 +185,10 @@ begin
   writeln('asec2rad ', FloatToStr(radians));
   writeln;
 
+  radians := AngleNormalize(deg2rad(BigAngle));
+  writeln('AngleNormalize ', FloatToStr(radians));
+  writeln;
+
   writeln('pow2 = ', FloatToStr(pow2(arg)), '; pow3 = ', FloatToStr(pow3(arg)));
   writeln('pow4 = ', FloatToStr(pow4(arg)), '; pow5 = ', FloatToStr(pow5(arg)));
   writeln;
@@ -202,7 +211,15 @@ const
   												(0, 3, 1),
                           (3, 3, 4));
 
-  testVector: TVector = (4, 2, 6);
+  testGauss: TMatrix = ((1, 0, -1),
+  											(0, 4, 5),
+                        (-1, 4, 14));
+
+  testVector1: TVector = (4, 2, 6);
+
+  testVector2: TVector = (1, -4, 5);
+
+  testNum: MType = 14;
 
 var
 	Matrix1, Matrix2,
@@ -210,6 +227,7 @@ var
   	: TMatrix;
   Vector1, Vector2: TVector;
 
+  x,
   phi, theta, psi: MType;
 begin
 
@@ -218,10 +236,37 @@ begin
   writeln(' * * * * * * * * test_uMatrix_Operations * * * * * * * * ');
   writeln;
 
-	Vector1 := MultMatrVec(testMatrix1, testVector);
-  Vector2 := ChangeRS(testVector);
+  writeln(' ------------ Vector operations');
+  writeln;
+
+  Vector1 := ChangeRS(testVector1);
+  writeln('ChangeRS'); console_output(Vector1);
+
+  Vector2 := VecSum(testVector1, testVector2);
+  writeln('VecSum'); console_output(Vector2);
+
+  Vector2 := VecDec(testVector1, testVector2);
+  writeln('VecDec'); console_output(Vector2);
+
+  Vector1 := ConstProduct(testNum, testVector1);
+  writeln('ConstProduct'); console_output(Vector1);
+
+  x := DotProduct(testVector1, testVector2);
+  writeln('DotProduct', FloatToStr(x));
+  writeln;
+
+  writeln(' ------------ Matrix operations');
+  writeln;
+
+	Vector1 := MultMatrVec(testMatrix1, testVector1);
+  writeln('MultMatrVec'); console_output(Vector1);
+
   Matrix1 := MultMatr(testMatrix1, testMatrix2);
+  writeln('MultMatr'); console_output(Matrix1);
+
   Matrix2 := TranspMatr(testMatrix1);
+  writeln('TranspMatr'); console_output(Matrix2);
+
 
   phi := deg2rad(30); 	// 0,523599
   theta := deg2rad(45);	// 0,785398
@@ -231,15 +276,16 @@ begin
   R2 := MultMatr(RotMatr(2, theta), testMatrix1);
   R3 := MultMatr(RotMatr(3, psi), testMatrix1);
 
-  writeln('MultMatrVec'); console_output(Vector1);
-  writeln('ChangeRS'); console_output(Vector2);
-  writeln('MultMatr'); console_output(Matrix1);
-  writeln('TranspMatr'); console_output(Matrix2);
-
   writeln('RotMatr');
   writeln('R1:'); console_output(R1);
   writeln('R2:'); console_output(R2);
   writeln('R3:'); console_output(R3);
+
+  Matrix2 := inverse(testGauss);
+  writeln('Gauss'); console_output(Matrix2);
+
+  Matrix2 := MultMatr(Matrix2, testGauss);
+  writeln('CheckGauss'); console_output(Matrix2);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -397,7 +443,7 @@ begin
   writeln;
 
   CIP_Tranform := TCIP_Tranform_Matrix.Create;
-  Q := CIP_Tranform.getQ_Matrix((JD - J2000_Day) / 36525);
+  Q := CIP_Tranform.getQ_Matrix((JD - J2000_Day) / JCentury);
   writeln('getQ_Matrix'); console_output(Q);
 
   writeln(' * * * * * * * * done');
@@ -412,7 +458,7 @@ end;
 
 function test_uMatrix_Conversation: boolean;
 const
-	coordinates: TVector = (1, 2, 3);
+	coordinates: TVector = (-1432.9871, 6564.9368, -607.86027);
 var
 	UT1, TT, TT_centuries,
   ERA_angle
@@ -449,6 +495,9 @@ begin
   transformed_vec := MultMatrVec(transform_matrix, coordinates);
   writeln('coordinates transformation'); console_output(transformed_vec);
 
+  transformed_vec := MultMatrVec(TranspMatr(transform_matrix), transformed_vec);
+  writeln('coordinates back transformation'); console_output(transformed_vec);
+
   writeln(' * * * * * * * * done');
   writeln;
   writeln;
@@ -462,6 +511,7 @@ function test_uAtmosphericDrag: boolean;
 const
   mass = 1;
   Sb_coeff = 1;
+  A = 1;
 var
 	AtmospericDrag: TAtmosphericDrag;
   force: coordinates;
@@ -477,14 +527,14 @@ begin
   writeln(' * * * * * * * * test_uAtmosphericDrag * * * * * * * * ');
   writeln;
 
-  { Проверка остановилась тут }
+  { Временно неверно вычисляется }
   
   TLE_output := ReadTLE(TLE);
   Kepler_Elements := TLE_output.Elements;
   parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
   
   AtmospericDrag := TAtmosphericDrag.Create;
-  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Sb_coeff);
+  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Sb_coeff, A);
   writeln('AtmospericDrag.RightPart'); console_output(force);
 
   writeln(' * * * * * * * * done');
@@ -493,6 +543,24 @@ begin
 
   AtmospericDrag.Destroy;
   
+  result := true;
+
+end;
+
+function test_uGEO_Potential: boolean;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uGEO_Potential * * * * * * * * ');
+  writeln;
+
+
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
   result := true;
 
 end;

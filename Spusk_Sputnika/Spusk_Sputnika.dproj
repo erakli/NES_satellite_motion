@@ -103,6 +103,7 @@
         <DCCReference Include="uTypes.pas"/>
         <DCCReference Include="uEpheremides_new.pas"/>
         <DCCReference Include="uAtmospericDrag_Coeff.pas"/>
+        <DCCReference Include="uGauss.pas"/>
         <None Include="Spusk_Sputnika.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

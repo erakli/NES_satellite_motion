@@ -23,16 +23,52 @@ interface
   ΔUT измеряется в секундах. }
 
 uses
-  uPrecNut, uConstants, uTypes, uTime, uEpheremides;
+  uFunctions, uPrecNut, uConstants, uTypes, uTime, uEpheremides;
 
-function ToGetGMSTime(UT1_mjd: MType; Midnight: boolean = true): MType;
+function GMSTime(UT1, TT: MType; theory2006: Boolean = true): MType;
+
+function ToGetGMSTime(UT1_jd: MType; Midnight: boolean = true): MType;
 // Гринвичское среднее звёздное время
 function ToGetGASTime(UT1_mjd: MType): MType; { Гринвичское истинное
   звёздное время }
 
 implementation
-
 // ---------------------------------------------------------------
+
+uses
+  uMatrix_Conversation;
+
+{ Greenwich mean sidereal time
+
+	Реализация на основе алгоритмов iauGmst00 и iauGmst06 из библиотеки SOFA
+  (должно удовлетворять резолюциям IERS) }
+function GMSTime(UT1, TT: MType; theory2006: Boolean = true): MType;
+var
+	t_cent: MType;	// юлианские столетия
+begin
+
+	t_cent := (TT - J2000_Day) / JCentury;
+
+  if theory2006 then
+    result := AngleNormalize(deg2rad(ERA(UT1) +
+                  (    0.014506     +
+                  (  4612.156534    +
+                  (     1.3915817   +
+                  (    -0.00000044  +
+                  (    -0.000029956 +
+                  (    -0.0000000368 )
+              * t_cent) * t_cent) * t_cent) * t_cent) * t_cent)))
+  else
+  	result := AngleNormalize(deg2rad(ERA(UT1) +
+                  (    0.014506     +
+                  (  4612.156534    +
+                  (    1.39667721   +
+                  (    -0.00009344  +
+                  (      0.00001882 )
+              * t_cent) * t_cent) * t_cent) * t_cent)));
+
+end;
+
 
 { Гринвичское среднее звёздное время
 
@@ -41,9 +77,9 @@ implementation
 
   Гринвичское среднее звёздное время Sm является функцией всемирного вре-
   мени UT1. }
-function ToGetGMSTime(UT1_mjd: MType; Midnight: boolean = true): MType;
+function ToGetGMSTime(UT1_jd: MType; Midnight: boolean = true): MType;
 var
-  // UT1, // содержит текущее значение всемирного времени в MJD
+  // UT1, // содержит текущее значение всемирного времени в JD
   Tu, { время, отсчитываемое в юлианских столетиях по 36525 суток в системе
     всемирного времени UT1 от эпохи 2000, январь 1, 12h UT1 (MJD51544.5) }
   s0, // GMST в 0h UT1
@@ -51,7 +87,7 @@ var
 begin
 
   // UT1 := UT1_time(UTCmjd);
-  Tu := (trunc(UT1_mjd) - 51544.5) / 36525;
+  Tu := (trunc(UT1_jd) - J2000_Day) / JCentury;
 
   s0 := 1.753368559233266 +
     (628.3319706888409 + (6.770713944903336E-06 - 4.508767234318685E-10 * Tu)
@@ -62,7 +98,7 @@ begin
   if Midnight then
     result := s0
   else
-    result := s0 + r * (UT1_mjd - trunc(UT1_mjd));
+    result := s0 + r * (UT1_jd - trunc(UT1_jd));
   { Промежуток звёездного времени от
     0h UT1 до момента, соответствующего
     моменту всемирного времени UT1 }
@@ -91,7 +127,7 @@ begin
   // eps := GetEpsMean(UT1_mjd);
   long_nut := Epheremides.GetEpheremides(UT1_mjd, true)[0];
 
-  { Вычисление гринвичского истинного звёездного времени. Результат - угол }
+  { Вычисление гринвичского истинного звёздного времени. Результат - угол }
   result := s0 + long_nut * cos(eps);
 
 end;

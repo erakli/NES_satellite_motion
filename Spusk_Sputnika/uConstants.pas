@@ -6,6 +6,9 @@ uses
   System.SysUtils, uTypes;
 
 const
+
+	PI2: MType = 2 * Pi;
+
   fm: MType = 3.986004418E+5; // [km] Гравитационная постоянная
   // m_size = 2; // Размер матриц
 
@@ -16,6 +19,7 @@ const
 
   MJDCorrection: MType = 2400000.5; // вычитать из JD
   J2000_Day: MType = 2451545.0; // 2000 January 1.5 TT
+  JCentury = 36525; // дней в юлианском столетии
 
   deletimer = '	';
 

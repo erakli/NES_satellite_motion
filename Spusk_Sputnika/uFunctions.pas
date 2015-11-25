@@ -4,7 +4,7 @@ unit uFunctions;
 
 interface
 
-uses uTypes;
+uses uTypes, uConstants;
 
 function module(coord: TVector): MType; overload;
 
@@ -12,6 +12,8 @@ function module(coord: TVector): MType; overload;
 function deg2rad(arg: MType): MType;
 function amin2rad(arg: MType): MType;
 function asec2rad(arg: MType): MType;
+
+function AngleNormalize(angle: MType): MType;
 
 function pow2(arg: MType): MType;
 function pow3(arg: MType): MType;
@@ -50,6 +52,23 @@ begin
   result := arg * Pi / 648000; // / (180 * 60 * 60);
 end;
 
+{ Нормализация угла в диапазон от 0 до 2 Pi
+
+	входной угол в радианах }
+function AngleNormalize(angle: MType): MType;
+var
+	NewAngle: MType;
+begin
+
+	NewAngle := angle / PI2;
+  NewAngle := NewAngle - Trunc(NewAngle);
+  if NewAngle < 0 then NewAngle := NewAngle + PI2;
+
+  result := NewAngle;
+
+end;
+
+{ Функции возведения в степень }
 function pow2(arg: MType): MType;
 begin
   result := arg * arg;

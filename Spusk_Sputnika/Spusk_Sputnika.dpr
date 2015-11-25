@@ -24,7 +24,8 @@ uses
   uPrecNut_InitialParam in 'uPrecNut_InitialParam.pas',
   uTypes in 'uTypes.pas',
   uEpheremides_new in 'uEpheremides_new.pas',
-  uAtmospericDrag_Coeff in 'uAtmospericDrag_Coeff.pas';
+  uAtmospericDrag_Coeff in 'uAtmospericDrag_Coeff.pas',
+  uGauss in 'uGauss.pas';
 
 {$R *.res}
 
