@@ -2,7 +2,7 @@ program Spusk_Sputnika;
 
 uses
   Vcl.Forms,
-  UI_unit in 'UI_unit.pas' {Main_Window} ,
+  UI_unit in 'UI_unit.pas' {Main_Window},
   uKepler_Conversation in 'uKepler_Conversation.pas',
   uConstants in 'uConstants.pas',
   uGEO_Potential in 'uGEO_Potential.pas',
@@ -23,7 +23,8 @@ uses
   uControl in 'uControl.pas',
   uPrecNut_InitialParam in 'uPrecNut_InitialParam.pas',
   uTypes in 'uTypes.pas',
-  uEpheremides_new in 'uEpheremides_new.pas';
+  uEpheremides_new in 'uEpheremides_new.pas',
+  uAtmospericDrag_Coeff in 'uAtmospericDrag_Coeff.pas';
 
 {$R *.res}
 

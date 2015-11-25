@@ -14,7 +14,7 @@ interface
 
 uses
   uConstants, uTime, Math, System.SysUtils, Dialogs, uSputnik, uTypes,
-  uFunctions, uStarTime;
+  uFunctions, uStarTime, uAtmospericDrag_Coeff;
 
 const
   num = 4;
@@ -29,7 +29,7 @@ type
 
   TCoefVect = array [0 .. num] of MType;
 
-  TAtmosphericDrag = class
+  TAtmosphericDrag = class(TObject)
   private
     { Основные индексы вычисления плотности атмосферы: }
     F10_7: MType; { [10^-22 * Вт * м^-2 * Гц^-1]
@@ -288,21 +288,27 @@ begin
 
       { Сравниваем полученную дату с необходимой для F81.
         При успехе считываем коэффициенты F10_7 и F81 }
-      if (Year = need_time_F81.Year) AND (Month = need_time_F81.Month) AND
-        (Day = need_time_F81.Day) then
-      begin
-        F10_7 := ReadValue(temp_text, 1);
-        F81 := ReadValue(temp_text, 2);
-        F81_flag := true;
-      end;
+      if (Year = need_time_F81.Year) then
+        if (Month = need_time_F81.Month) then
+          if (Day = Trunc(need_time_F81.Day)) then
+          // день округляем, так как 'требуемый' является типом double
+          begin
+            F10_7 := ReadValue(temp_text, 1);
+            F81 := ReadValue(temp_text, 2);
+            F81_flag := true;
+          end;
 
       // Аналогично для Kp, при успехе считываем коэффициенты Kp
-      if (Year = need_time_Kp.Year) AND (Month = need_time_Kp.Month) AND
-        (Day = need_time_Kp.Day) then
-      begin
-        Kp := trunc(ReadValue(temp_text, 3));
-        Kp_flag := true;
-      end;
+      if (Year = need_time_Kp.Year) then
+        if (Month = need_time_Kp.Month) then
+          if (Day = Trunc(need_time_Kp.Day)) then
+          begin
+            Kp := trunc(ReadValue(temp_text, 3));
+            Kp_flag := true;
+          end
+          else continue // day
+        else continue   // month
+      else continue;    // year
 
     end;
 
@@ -393,6 +399,8 @@ begin
 
   temp_text := ' ';
 
+
+  { Уточнить эту конструкцию }
   while (temp_text[1] <> vec) AND not EoF(f) do
   begin
     ReadLn(f, temp_text);

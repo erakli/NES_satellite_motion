@@ -102,6 +102,7 @@
         <DCCReference Include="uPrecNut_InitialParam.pas"/>
         <DCCReference Include="uTypes.pas"/>
         <DCCReference Include="uEpheremides_new.pas"/>
+        <DCCReference Include="uAtmospericDrag_Coeff.pas"/>
         <None Include="Spusk_Sputnika.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

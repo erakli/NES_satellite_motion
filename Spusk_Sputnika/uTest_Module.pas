@@ -447,7 +447,7 @@ begin
   writeln('ITRS2GCRS'); console_output(transform_matrix);
 
   transformed_vec := MultMatrVec(transform_matrix, coordinates);
-  writeln('coordinates transformation'); console_output(transform_matrix);
+  writeln('coordinates transformation'); console_output(transformed_vec);
 
   writeln(' * * * * * * * * done');
   writeln;
