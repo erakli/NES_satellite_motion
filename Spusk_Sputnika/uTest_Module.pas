@@ -255,6 +255,9 @@ begin
   writeln('DotProduct', FloatToStr(x));
   writeln;
 
+  Vector1 := CrossProduct(testVector1, testVector2);
+  writeln('CrossProduct'); console_output(Vector1);
+
   writeln(' ------------ Matrix operations');
   writeln;
 
@@ -509,9 +512,9 @@ end;
 { Тест возмущений }
 function test_uAtmosphericDrag: boolean;
 const
-  mass = 1;
-  Sb_coeff = 1;
-  A = 1;
+  mass = 100;
+  Sb_coeff = 2.2;
+  A = 2;
 var
 	AtmospericDrag: TAtmosphericDrag;
   force: coordinates;
@@ -624,6 +627,7 @@ test_uAtmosphericDrag;
 //dist1 := module(v) - 6378.1366;
 //dist2 := module(coord) - 6378.1366;
 
+readln;
 FreeConsole;  // убираем консоль
 { //---------------------------------------- для случая из учебника AA (с. 232)
   JD := 2448170.5;

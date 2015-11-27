@@ -741,7 +741,8 @@ function TAtmosphericDrag.RightPart(JD: MType; coord, v: coordinates;
 var
   speed, ro, UT1: MType;
   // Fe: TVector; // Матрица ускорения в небесной СК
-  Mct: TMatrix;
+  AtmospereSpeed, EarthRot: TVector;
+//  Mct: TMatrix;
 begin
 
   speed := module(v); // относительная скорость как-то по-другому вычисляется
@@ -760,9 +761,14 @@ begin
 //  result[1] := -Sb_coeff * ro * speed * v[1];
 //  result[2] := -Sb_coeff * ro * speed * v[2];
 
-	Mct := TranspMatr( ITRS2GCRS(TT_time(JD)) ); // матрица перехода из небесной в земную
+  EarthRot := NullVec;
+  EarthRot[2] := Earth.omega;
 
-	result := ConstProduct( A * Sb_coeff * ro * 0.5, MultMatrVec(Mct, v) );
+  AtmospereSpeed := CrossProduct(EarthRot, coord);
+
+//	Mct := TranspMatr( ITRS2GCRS(TT_time(JD)) ); // матрица перехода из небесной в земную
+
+	result := ConstProduct( A * Sb_coeff * ro * 0.5, VecDec(v, AtmospereSpeed) );
 
 end;
 

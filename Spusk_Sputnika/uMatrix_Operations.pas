@@ -12,6 +12,7 @@ function VecSum(first, second: TVector): TVector;
 function VecDec(first, second: TVector): TVector;
 function ConstProduct(num: MType; vector: TVector): TVector;
 function DotProduct(first, second: TVector): MType;
+function CrossProduct(first, second: TVector): TVector;
 
 function MultMatrVec(matrx: TMatrix; vec: TVector): TVector;
 function MultMatr(m, q: TMatrix): TMatrix;
@@ -75,6 +76,16 @@ begin
   result := 0;
   for i := Low(first) to High(first) do
     result := result + first[i] * second[i];
+
+end;
+
+{ Векторное произведение векторов }
+function CrossProduct(first, second: TVector): TVector;
+begin
+
+  result[0] := first[1] * second[2] - first[2] * second[1];
+  result[1] := first[2] * second[0] - first[0] * second[2];
+  result[2] := first[0] * second[1] - first[1] * second[0];
 
 end;
 
