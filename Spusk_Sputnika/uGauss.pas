@@ -26,7 +26,8 @@ const
 var
 	Ed, Matr: TMatrix;
   i, j, k, p: byte;
-  divider, left_side, right_side, Det: MType;
+  divider, // делитель, равный не-единичному диаг. элементу
+  left_side, right_side, Det: MType;
 begin
 
 	Ed := InitialEd;
@@ -39,8 +40,6 @@ begin
   	// равен ли диагональный элемент 1
     if Matr[i][i] <> 1 then
     begin
-
-    	divider := 0; // делитель, равный не-единичному диаг. элементу
 
       // проверили текущий диагональный элемент на 0
       if Matr[i][i] = 0 then

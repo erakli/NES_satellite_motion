@@ -37,13 +37,26 @@ type
   end;
 
   { Параметры Солнца }
-  TSun = record
-    alpha, // прямое восхождение
-    beta, // и склонение Солнца
-    q { солнечная постоянная (для давления света),
-      q = 4.65e+5 [дин/см^2] }
+  TSun = class(TObject)
+  private
+    _alpha, // прямое восхождение (рад)
+    _beta,  // и склонение Солнца (рад)
+    _q { солнечная постоянная (для давления света),
+      	 q = 4.65e+5 [дин/см^2] }
       : MType;
-    pos: coordinates; // положение в Геоцентрической СК
+    _pos: coordinates; // положение в Геоцентрической СК
+
+    procedure SetPos(cur_pos: coordinates);
+
+  public
+  	property alpha: MType read _alpha;
+    property beta: MType read _beta;
+    property q: MType read _q;
+    property pos: coordinates read _pos write SetPos;
+
+    procedure SetParams(JD: MType);
+
+    constructor Create;
   end;
 
   // coord_diff = record
@@ -65,5 +78,41 @@ type
   end;
 
 implementation
+
+uses
+	uTime, uFunctions;
+
+const
+	DegInDay: MType = 360 / 365; // кол-во градусов, которое в среднем проходит Земля в день (!костыль!)
+
+
+{ TSun }
+
+constructor TSun.Create;
+begin
+	inherited;
+
+  _q := 4.65E+5;
+end;
+
+procedure TSun.SetPos(cur_pos: coordinates);
+begin
+  pos := cur_pos;
+end;
+
+procedure TSun.SetParams(JD: MType);
+var
+	Days: word; // Дней с начала года
+begin
+
+	{ !низкая точность! }
+
+	Days := DayNumber(JD);
+  _alpha := Days * DegInDay;
+  _alpha := deg2rad(_alpha);
+
+  _beta := deg2rad(23.45) * sin( deg2rad(DegInDay * (Days - 81)) );
+
+end;
 
 end.

@@ -29,7 +29,7 @@ type
     cur_time, Ever_step: MType;
   public
     procedure Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
-      mass, s, Sb_coeff, A: MType; lines: boolean = true);
+      mass, s, Ñb_coeff, CrossSecArea: MType; lines: boolean = true);
     procedure Modeling;
   end;
 
@@ -41,7 +41,7 @@ implementation
 { TControl }
 
 procedure TControl.Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
-  mass, s, Sb_coeff, A: MType; lines: boolean = true);
+  mass, s, Ñb_coeff, CrossSecArea: MType; lines: boolean = true);
 var
   TDB: MType;
   Elements: TElements;
@@ -84,8 +84,8 @@ begin
     _space := s;
   end;
   Sputnik.mass := mass;
-  Sputnik.Sb_coeff := Sb_coeff;
-  Sputnik.A := A;
+  Sputnik.Cb_coeff := Ñb_coeff;
+  Sputnik.CrossSecArea := CrossSecArea;
 
 end;
 

@@ -116,9 +116,9 @@ type
     function ReadValue(text: string; flag: byte): MType;
 
     function SetTime(Value: MType): MType;
-    function SetDays(Value: MType): word;
+//    function SetDays(Value: MType): word;
   public
-    function RightPart(JD: MType; coord, v: coordinates; Sb_coeff, A: MType)
+    function RightPart(JD: MType; coord, v: coordinates; Cb_coeff, CrossSecArea: MType)
       : coordinates;
 
     constructor Create;
@@ -225,26 +225,26 @@ begin
 end;
 
 // Получение количества суток с начала года
-function TAtmosphericDrag.SetDays(Value: MType): word;
-var
-  Date: TDate;
-  vis: byte; // Флаг на то, високосный ли год
-begin
-
-  Date := FromJDToDate(Value);
-  with Date do
-  begin
-    if ((Year mod 4 = 0) AND (Year mod 100 <> 0)) OR (Year mod 400 = 0) then
-      vis := 1 // для високосного года
-    else
-      vis := 2; // для обычного
-
-    // Количество дней, прошедших с начала года
-    result := trunc((275 * Month) / 9) - vis * trunc((Month + 9) / 12) +
-      days - 30;
-  end;
-
-end;
+//function TAtmosphericDrag.SetDays(Value: MType): word;
+//var
+//  Date: TDate;
+//  vis: byte; // Флаг на то, високосный ли год
+//begin
+//
+//  Date := FromJDToDate(Value);
+//  with Date do
+//  begin
+//    if ((Year mod 4 = 0) AND (Year mod 100 <> 0)) OR (Year mod 400 = 0) then
+//      vis := 1 // для високосного года
+//    else
+//      vis := 2; // для обычного
+//
+//    // Количество дней, прошедших с начала года
+//    result := trunc((275 * Month) / 9) - vis * trunc((Month + 9) / 12) +
+//      days - 30;
+//  end;
+//
+//end;
 
 { Получение параметров F10_7, F81 и Kp из файла (на данный момент
   - solarinex.txt) }
@@ -563,12 +563,12 @@ var
 begin
 
   sum := 0;
+  if NOT plus then // Флаг на вычисление второй части множителей K[4]
   for i := 0 to n do
-    sum := sum + x[i] * IntPower(h, i);
-
-  if plus then // Флаг на вычисление второй части множителей K[4]
-    for i := 0 to n do
-      sum := sum + x[i + 5] * IntPower(h, i);
+    sum := sum + x[i] * IntPower(h, i)
+  else
+  for i := 0 to n do
+    sum := sum + x[i + 5] * IntPower(h, i);
 
   result := sum;
 
@@ -737,20 +737,24 @@ begin
 end;
 
 function TAtmosphericDrag.RightPart(JD: MType; coord, v: coordinates;
-  Sb_coeff, A: MType): coordinates;
+  Cb_coeff, CrossSecArea: MType): coordinates;
 var
-  speed, ro, UT1: MType;
+//  speed,
+  ro, UT1: MType;
   // Fe: TVector; // Матрица ускорения в небесной СК
   AtmospereSpeed, EarthRot: TVector;
 //  Mct: TMatrix;
+	Mtc: TMatrix;
 begin
 
-  speed := module(v); // относительная скорость как-то по-другому вычисляется
-                      // скорее всего небходимо перейти в скоростную СК, связанную с ИСЗ
+//  speed := module(v);
+
+	Sun.SetParams(JD);
+
   UT1 := UT1_time(JD);
 
   time := SetTime(UT1);
-  days := SetDays(UT1);
+  days := DayNumber(UT1);
 //  S_time := ToGetGMSTime(UT1);
 	S_time := GMSTime(UT1, TT_time(JD));
 
@@ -764,11 +768,14 @@ begin
   EarthRot := NullVec;
   EarthRot[2] := Earth.omega;
 
+  Mtc := ITRS2GCRS( TT_time(JD) );
+  EarthRot := MultMatrVec(Mtc, EarthRot);
+
   AtmospereSpeed := CrossProduct(EarthRot, coord);
 
 //	Mct := TranspMatr( ITRS2GCRS(TT_time(JD)) ); // матрица перехода из небесной в земную
 
-	result := ConstProduct( A * Sb_coeff * ro * 0.5, VecDec(v, AtmospereSpeed) );
+	result := ConstProduct( CrossSecArea * Cb_coeff * ro * 0.5, VecDec(v, AtmospereSpeed) );
 
 end;
 

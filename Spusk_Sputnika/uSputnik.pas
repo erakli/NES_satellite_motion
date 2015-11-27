@@ -10,9 +10,10 @@ type
   private
   public
     state: param;
-    mass, Sb_coeff, // баллистический коэффициент
-    _space, { s - площадь эффективного/поперечного сечения }
-    A
+    mass,
+    Cb_coeff, // баллистический коэффициент
+    CrossSecArea, // площадь поперечного сечения (в нашей задаче они равны со _space)
+    _space // s - площадь эффективного/поперечного сечения
       : MType;
 
     constructor Create;

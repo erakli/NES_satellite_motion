@@ -59,10 +59,7 @@ begin
   big_a := au;
 end;
 
-with Sun do
-begin
-  q := 4.65E+5;
-end;
+Sun := TSun.Create;
 
 CurYear := 15;
 Third := 1 / 3;

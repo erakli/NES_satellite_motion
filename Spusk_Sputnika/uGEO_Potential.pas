@@ -47,7 +47,7 @@ type
     * Проверить правильность всех формул
   }
 
-  TGEO_Potential = class
+  TGEO_Potential = class(TObject)
   private
 
     _F, // Трёхкомпонентный вектор ускорения в земной СК

@@ -20,7 +20,7 @@ uses
   uConstants, uTypes, uFunctions,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
-  uAtmosphericDrag,
+  uAtmosphericDrag, uGEO_Potential,
   uEpheremides,
   uGauss;
 
@@ -58,6 +58,7 @@ procedure console_output(Date: TDate); overload;
 function test_uFunctions: boolean;
 function test_uMatrix_Operations: boolean;
 function test_uTime: boolean;
+function test_uTypes: boolean;
 function test_uTLE_conversation: boolean;
 function test_uKepler_Conversation: boolean;
 function test_uEpheremides_new: boolean;
@@ -111,6 +112,8 @@ const
 
   JD: MType = 2453044.381; // 2004 70 day
 
+    mass = 100;
+
 procedure console_output(Vector: array of MType);
 var
   j: byte;
@@ -161,7 +164,7 @@ const
 
   arg = 5;
 var
-  radians, module_res, pow_res: MType;
+  radians, module_res: MType;
 begin
 
 	result := false;  // если не выйдем из этой функции, то будем иметь false
@@ -304,6 +307,7 @@ var
 	Date: TDate;
   time, delta, UT1, TT, UTC
   	: MType;
+  day: word;
   vec: TVector;
 begin
 
@@ -319,6 +323,10 @@ begin
   Date := FromJDToDate(time);
   writeln('FromJDToDate'); console_output(Date);
 
+  day := DayNumber(time);
+  writeln('DayNumber	', IntToStr(day));
+  writeln;
+  
   delta := GetDeltaTAI(Date);
   writeln('GetDeltaTAI	', FloatToStr(delta));
   writeln;
@@ -339,6 +347,34 @@ begin
   UTC := TT2UTC(TT);
   writeln('TT2UTC	', FloatToStr(UTC));
 	writeln;
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+
+end;
+
+function test_uTypes: boolean;
+const
+	Date: TDate = (Year: 2014; Month: 1; Day: 2);
+var
+	Sun: TSun;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uTypes (TSun) * * * * * * * * ');
+  writeln;
+
+  Sun := TSun.Create;
+  Sun.SetParams(FromDateToJD(Date));
+  writeln('SetParams (JD = ', FloatToStr(FromDateToJD(Date)), ')');
+  writeln('alpha	', FloatToStr(Sun.alpha));
+  writeln('beta	', FloatToStr(Sun.beta));
+	writeln;
+  
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -512,9 +548,8 @@ end;
 { Тест возмущений }
 function test_uAtmosphericDrag: boolean;
 const
-  mass = 100;
-  Sb_coeff = 2.2;
-  A = 2;
+  Cb_coeff = 2.2;
+  CrossSecArea = 3;
 var
 	AtmospericDrag: TAtmosphericDrag;
   force: coordinates;
@@ -537,8 +572,12 @@ begin
   parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
   
   AtmospericDrag := TAtmosphericDrag.Create;
-  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Sb_coeff, A);
+  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Cb_coeff, CrossSecArea);
   writeln('AtmospericDrag.RightPart'); console_output(force);
+
+  parameters.coord[1] := parameters.coord[1] - 300;
+  force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Cb_coeff, CrossSecArea);
+  writeln('AtmospericDrag.RightPart (height - 300)'); console_output(force);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -551,6 +590,14 @@ begin
 end;
 
 function test_uGEO_Potential: boolean;
+var
+	GEO_Potential: TGEO_Potential;
+  force: coordinates;
+
+  TLE_output: TTLE_output;
+  Kepler_Elements: TElements;
+  parameters: param;
+  Dubosh: boolean;
 begin
 
 	result := false;
@@ -558,7 +605,13 @@ begin
   writeln(' * * * * * * * * test_uGEO_Potential * * * * * * * * ');
   writeln;
 
+  TLE_output := ReadTLE(TLE);
+  Kepler_Elements := TLE_output.Elements;
+  parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
 
+  GEO_Potential := TGEO_Potential.Create;
+  force := GEO_Potential.RightPart(JD, parameters.coord, parameters.speed);
+  writeln('GEO_Potential.RightPart'); console_output(force);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -576,15 +629,17 @@ SetConsoleCP(1251);				// устанавливаем принятие кириллицы
 SetConsoleOutputCP(1251);
 
 { Вызов тестов модулей }
-test_uFunctions;
-test_uMatrix_Operations;
-test_uTime;
-test_uTLE_conversation;
-test_uKepler_Conversation;
-test_uEpheremides_new;
-test_uPrecNut;
-test_uMatrix_Conversation;
+//test_uFunctions;
+//test_uMatrix_Operations;
+//test_uTime;
+//test_uTypes;
+//test_uTLE_conversation;
+//test_uKepler_Conversation;
+//test_uEpheremides_new;
+//test_uPrecNut;
+//test_uMatrix_Conversation;
 test_uAtmosphericDrag;
+test_uGEO_Potential;
 
 //JD := 2415284.191;
 
@@ -627,6 +682,7 @@ test_uAtmosphericDrag;
 //dist1 := module(v) - 6378.1366;
 //dist2 := module(coord) - 6378.1366;
 
+writeln('Press any key to finish tests...');
 readln;
 FreeConsole;  // убираем консоль
 { //---------------------------------------- для случая из учебника AA (с. 232)

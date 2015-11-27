@@ -190,8 +190,6 @@ var
   rad_speed, tang_speed, _v, _u: MType;
   v, u: vec;
   speed: TVector;
-
-  temp: double;
 begin
 
   Dubosh := true;

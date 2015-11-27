@@ -32,6 +32,8 @@ type
 function FromDateToJD(Date: TDate): MType;
 function FromJDToDate(JD: MType): TDate;
 
+function DayNumber(JD: MType): word;
+
 function GetDeltaTAI(Date: TDate): MType;
 // Поправка к шкале всемирного времени
 function GetDeltaUT(JD: MType): TVector;
@@ -187,6 +189,30 @@ begin
 
   Result.Month := m;
   Result.Year := Year;
+
+end;
+
+
+// Получение количества суток с начала года
+function DayNumber(JD: MType): word;
+var
+  Date: TDate;
+  vis: byte; // Флаг на то, високосный ли год
+begin
+
+  Date := FromJDToDate(JD);
+  with Date do
+  begin
+    if ( (Year mod 4 = 0) AND (Year mod 100 <> 0) ) OR
+    	   (Year mod 400 = 0) then
+      vis := 1 // для високосного года
+    else
+      vis := 2; // для обычного
+
+    // Количество дней, прошедших с начала года
+    result := trunc((275 * Month) / 9) - vis * trunc((Month + 9) / 12) +
+      Trunc(Day) - 30;
+  end;
 
 end;
 
