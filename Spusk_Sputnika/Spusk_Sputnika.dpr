@@ -25,7 +25,8 @@ uses
   uTypes in 'uTypes.pas',
   uEpheremides_new in 'uEpheremides_new.pas',
   uAtmospericDrag_Coeff in 'uAtmospericDrag_Coeff.pas',
-  uGauss in 'uGauss.pas';
+  uGauss in 'uGauss.pas',
+  uGEO_Potential_new in 'uGEO_Potential_new.pas';
 
 {$R *.res}
 

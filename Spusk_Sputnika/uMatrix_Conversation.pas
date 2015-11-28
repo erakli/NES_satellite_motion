@@ -20,6 +20,10 @@ function W(t, xp, yp: MType): TMatrix;
 function R(t: MType): TMatrix;
 function ERA(JD_ut1: MType): MType;
 
+// -----------------------------------------------------------------------------
+function Fix2Spher(FixCoord: coordinates): coordinates;
+function Spher2Fix(SpherCoord: coordinates): coordinates;
+
 var
 	Q: TCIP_Tranform_Matrix;
 
@@ -88,6 +92,96 @@ begin
   // уточнить на счёт первого слагаемого (IERS Conversations (2003), ch. 5.4.4, eq. 14)
   // нормализации угла
   result := AngleNormalize(PI2 * (Trunc(Tu) - 0.7790572732640 + 1.00273781191135448 * Tu));
+
+end;
+
+{ ------------------------------------------------------------------------------ }
+
+{ Из земной связанной в сферическую (географическую)
+
+	На выходе 1 - радиус вектор, 2-3 - углы в радианах }
+
+function Fix2Spher(FixCoord: coordinates): coordinates;
+var
+	x, y, z, // геоцентрические декартовы координаты
+
+  SqrSum, // сумма квадратов
+
+	ro, 		// радиус-вектор, км
+  fi, 		// широта (-Pi/2..+Pi/2), от Южн. полюса к Сев., радианы
+  lambda // долгота (-Pi..+Pi), От Зап. полушария к Восточному, радианы
+  	: MType;
+begin
+
+	ro := module(FixCoord);
+
+  // входная проверка координат
+  if ro = 0 then
+  begin
+    Result := NullVec;
+    Exit;
+  end
+
+  else
+  begin
+
+  	x := FixCoord[0];
+    y := FixCoord[1];
+    z := FixCoord[2];
+
+    SqrSum := pow2(x) + pow2(y);
+
+    if SqrSum = 0 then
+    begin
+      Result := NullVec;
+      Exit;
+    end;
+
+  end;
+
+  fi :=  ArcTan(
+                  z /
+                  Sqrt( SqrSum )
+                );
+
+  lambda := ArcTan( y / x );
+
+  if (x > 0) AND (y >= 0) then
+
+  else
+  if x <= 0 then
+  	lambda := lambda + Pi
+
+  else
+  if (x >= 0) AND (y < 0) then
+  	lambda := lambda + PI2
+  else
+  begin
+      Result := NullVec;
+      Exit;
+  end;
+
+  Result[0] := ro;
+  Result[1] := fi;
+  Result[2] := lambda;
+
+end;
+
+
+{ Из сферической в декартову СК }
+
+function Spher2Fix(SpherCoord: coordinates): coordinates;
+var
+	ro, fi, lambda: MType; // сферические координаты
+begin
+
+	ro := SpherCoord[0];
+  fi := SpherCoord[1];
+  lambda := SpherCoord[2];
+
+	Result[0] := ro * cos(fi) * cos(lambda);
+  Result[1] := ro * cos(fi) * sin(lambda);
+  Result[2] := ro * sin(fi);
 
 end;
 

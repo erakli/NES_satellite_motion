@@ -20,7 +20,7 @@ uses
   uConstants, uTypes, uFunctions,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
-  uAtmosphericDrag, uGEO_Potential,
+  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new,
   uEpheremides,
   uGauss;
 
@@ -502,7 +502,8 @@ var
 	UT1, TT, TT_centuries,
   ERA_angle
   	: MType;
-  xpyp_vec, transformed_vec: TVector;
+  xpyp_vec, transformed_vec,
+  SpherCoord,FixCoord: TVector;
   R_matrix, W_matrix, transform_matrix: TMatrix;
 begin
 
@@ -534,8 +535,11 @@ begin
   transformed_vec := MultMatrVec(transform_matrix, coordinates);
   writeln('coordinates transformation'); console_output(transformed_vec);
 
-  transformed_vec := MultMatrVec(TranspMatr(transform_matrix), transformed_vec);
-  writeln('coordinates back transformation'); console_output(transformed_vec);
+  SpherCoord := Fix2Spher(coordinates);
+  writeln('Fix2Spher'); console_output(SpherCoord);
+
+  FixCoord := Spher2Fix(SpherCoord);
+  writeln('Spher2Fix'); console_output(FixCoord);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -591,7 +595,8 @@ end;
 
 function test_uGEO_Potential: boolean;
 var
-	GEO_Potential: TGEO_Potential;
+	GEO_Potential_new: TGEO_Potential_new;
+  GEO_Potential: TGEO_Potential;
   force: coordinates;
 
   TLE_output: TTLE_output;
@@ -612,6 +617,10 @@ begin
   GEO_Potential := TGEO_Potential.Create;
   force := GEO_Potential.RightPart(JD, parameters.coord, parameters.speed);
   writeln('GEO_Potential.RightPart'); console_output(force);
+
+  GEO_Potential_new := TGEO_Potential_new.Create;
+  force := GEO_Potential_new.RightPart(JD, parameters.coord, parameters.speed);
+  writeln('GEO_Potential_new.RightPart'); console_output(force);
 
   writeln(' * * * * * * * * done');
   writeln;
@@ -634,10 +643,10 @@ SetConsoleOutputCP(1251);
 //test_uTime;
 //test_uTypes;
 //test_uTLE_conversation;
-//test_uKepler_Conversation;
+test_uKepler_Conversation;
 //test_uEpheremides_new;
 //test_uPrecNut;
-//test_uMatrix_Conversation;
+test_uMatrix_Conversation;
 test_uAtmosphericDrag;
 test_uGEO_Potential;
 
