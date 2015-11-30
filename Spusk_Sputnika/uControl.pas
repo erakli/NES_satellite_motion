@@ -127,8 +127,8 @@ begin
       Force.x := VecSum(Force.x, temp_force.x);
       Force.dif_x := VecSum(Force.dif_x, temp_force.dif_x);
 
-      temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
-        SunPressure.RightPart);
+//      temp_force := Integrate(cur_time, _coord, _speed, Ever_step,
+//        SunPressure.RightPart);
 
       Force.x := VecSum(Force.x, temp_force.x);
       Force.dif_x := VecSum(Force.dif_x, temp_force.dif_x);

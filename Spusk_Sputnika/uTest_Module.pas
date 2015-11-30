@@ -20,9 +20,8 @@ uses
   uConstants, uTypes, uFunctions,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
-  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new,
-  uEpheremides,
-  uGauss;
+  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new, uSunPressure,
+  uEpheremides, uGauss;
 
 type
   // ------------------------------------------- для dll
@@ -67,6 +66,7 @@ function test_uMatrix_Conversation: boolean;
 
 function test_uAtmosphericDrag: boolean;
 function test_uGEO_Potential: boolean;
+function test_uSunPressure: boolean;
 
 //var
 //  i: byte;
@@ -574,7 +574,7 @@ begin
   TLE_output := ReadTLE(TLE);
   Kepler_Elements := TLE_output.Elements;
   parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
-  
+
   AtmospericDrag := TAtmosphericDrag.Create;
   force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Cb_coeff, CrossSecArea);
   writeln('AtmospericDrag.RightPart'); console_output(force);
@@ -630,6 +630,41 @@ begin
 
 end;
 
+function test_uSunPressure: boolean;
+const
+  CrossSecArea = 3;
+var
+	SunPressure: TSunPressure;
+  force: coordinates;
+
+  TLE_output: TTLE_output;
+  Kepler_Elements: TElements;
+  parameters: param;
+  Dubosh: boolean;
+begin
+
+	result := false;
+
+  writeln(' * * * * * * * * test_uSunPressure * * * * * * * * ');
+  writeln;
+
+  TLE_output := ReadTLE(TLE);
+  Kepler_Elements := TLE_output.Elements;
+  parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
+
+  parameters.coord := ChangeRS(parameters.coord);
+
+  SunPressure := TSunPressure.Create;
+  force := SunPressure.RightPart(JD, parameters.coord, parameters.speed, CrossSecArea);
+  writeln('SunPressure.RightPart'); console_output(force);
+
+  writeln(' * * * * * * * * done');
+  writeln;
+  writeln;
+
+  result := true;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 initialization
 
@@ -645,10 +680,11 @@ SetConsoleOutputCP(1251);
 //test_uTLE_conversation;
 test_uKepler_Conversation;
 //test_uEpheremides_new;
-//test_uPrecNut;
+test_uPrecNut;
 test_uMatrix_Conversation;
 test_uAtmosphericDrag;
 test_uGEO_Potential;
+test_uSunPressure;
 
 //JD := 2415284.191;
 

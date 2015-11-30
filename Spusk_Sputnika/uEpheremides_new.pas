@@ -68,7 +68,7 @@ var
 	// можно оптимизировать, введя динамический массив, расширяемый при добавлении
   // нового объекта
   Mercury, Venus, Earth_Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
-    Moon, Sun: TFacility;
+    Moon, Sun_bary: TFacility;
 
   // Глобальная переменная для хранения всего файла DE.
   // Внимание: может оказаться ресурсоёмким
@@ -335,7 +335,7 @@ begin
 
     10:  Moon := TFacility.Create(0, 0, 0, 441, 8, 13);
 
-    11:  Sun := TFacility.Create(0, 0, 0, 753, 2, 11)
+    11:  Sun_bary := TFacility.Create(0, 0, 0, 753, 2, 11)
 
   end;
 

@@ -10,7 +10,7 @@ uses
   System.SysUtils, Math;
 
 const
-	fM: MType = 398600.44E9; // m^3 s^-2
+	fM: MType = 398600.44E+9; // m^3 s^-2
   ae: MType = 6378136; // m
 
   NUM_OF_HARMONICS = 36;
@@ -284,17 +284,18 @@ var
 begin
 
 	SpherCoord := Fix2Spher(coord);
+  SpherCoord[0] := SpherCoord[0] * 1000; // привели к метрам
   Prepare_P(SpherCoord[1]);
   MainStep;
 
   // полное гравитационное ускорение (вычитание - из пособия Кружкова, с.39)
-  FixCoord[0] := FixCoord[0] - fM / sqr(SpherCoord[0]);
+  _delta_g[0] := _delta_g[0] - fM / sqr(SpherCoord[0]);
 
   // переводим координаты обратно в декартовы, в земную СК
   FixCoord := MultMatrVec(OnFixProject(coord), _delta_g);
 
-  // сразу перешли в небесную инерциальную
-  Result := MultMatrVec(ITRS2GCRS(t), FixCoord);
+  // сразу перешли в небесную инерциальную, заодно возвращаемся к км, но надо ли
+  Result := ConstProduct(1/1000, MultMatrVec(ITRS2GCRS(t), FixCoord));
 
 end;
 

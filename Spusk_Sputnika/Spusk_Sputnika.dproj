@@ -104,7 +104,11 @@
         <DCCReference Include="uEpheremides_new.pas"/>
         <DCCReference Include="uAtmospericDrag_Coeff.pas"/>
         <DCCReference Include="uGauss.pas"/>
-        <DCCReference Include="uGEO_Potential_new.pas"/>
+        <DCCReference Include="uGEO_Potential_new.pas">
+            <Form>/  uModel in &apos;uModel.pas&apos;;</Form>
+        </DCCReference>
+        <DCCReference Include="uMatrix.pas"/>
+        <DCCReference Include="uDormanPrince.pas"/>
         <None Include="Spusk_Sputnika.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
