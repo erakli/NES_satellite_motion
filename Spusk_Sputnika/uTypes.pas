@@ -42,7 +42,7 @@ type
     _alpha, // прямое восхождение (рад)
     _beta,  // и склонение Солнца (рад)
     _q { солнечная постоянная (для давления света),
-      	 q = 4.65e+5 [дин/см^2] }
+      	 q = 4.65e-5 [дин/км^2] }
       : MType;
     _pos: coordinates; // положение в Геоцентрической СК
 
@@ -77,6 +77,9 @@ type
     Elements: TElements;
   end;
 
+var
+  Sun: TSun;
+
 implementation
 
 uses
@@ -92,12 +95,12 @@ constructor TSun.Create;
 begin
 	inherited;
 
-  _q := 4.65E+5;
+  _q := 4.65E-5; // для км^2
 end;
 
 procedure TSun.SetPos(cur_pos: coordinates);
 begin
-  pos := cur_pos;
+  _pos := cur_pos;
 end;
 
 procedure TSun.SetParams(JD: MType);
@@ -114,5 +117,9 @@ begin
   _beta := deg2rad(23.45) * sin( deg2rad(DegInDay * (Days - 81)) );
 
 end;
+
+initialization
+
+Sun := TSun.Create;
 
 end.

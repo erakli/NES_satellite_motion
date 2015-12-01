@@ -31,7 +31,6 @@ const
 
 var
   Earth: TEarth;
-  Sun: TSun;
   file_dir: string;
 
   CurYear: shortint;
@@ -58,8 +57,6 @@ begin
   // big_a := 149.597868E+6;
   big_a := au;
 end;
-
-Sun := TSun.Create;
 
 CurYear := 15;
 Third := 1 / 3;

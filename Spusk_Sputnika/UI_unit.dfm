@@ -33,13 +33,6 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
-    object lab_Step: TLabel
-      Left = 272
-      Top = 117
-      Width = 119
-      Height = 13
-      Caption = #1064#1072#1075' '#1080#1085#1090#1077#1075#1088#1080#1088#1086#1074#1072#1085#1080#1103', '#1089
-    end
     object memo_TLE: TMemo
       Left = 272
       Top = 40
@@ -125,71 +118,6 @@ object Form1: TForm1
       TabOrder = 2
       OnClick = btn_RunClick
     end
-    object ed_Step: TEdit
-      Left = 405
-      Top = 114
-      Width = 65
-      Height = 21
-      TabOrder = 3
-      Text = '3600'
-    end
-  end
-  object gbox_Result: TGroupBox
-    Left = 376
-    Top = 159
-    Width = 306
-    Height = 106
-    Caption = #1056#1077#1079#1091#1083#1100#1090#1072#1090#1099' '#1084#1086#1076#1077#1083#1080#1088#1086#1074#1072#1085#1080#1103
-    TabOrder = 1
-    object lab_ResultX: TLabel
-      Left = 16
-      Top = 42
-      Width = 6
-      Height = 13
-      Caption = 'X'
-    end
-    object lab_ResultY: TLabel
-      Left = 16
-      Top = 56
-      Width = 6
-      Height = 13
-      Caption = 'Y'
-    end
-    object lab_ResultZ: TLabel
-      Left = 16
-      Top = 69
-      Width = 6
-      Height = 13
-      Caption = 'Z'
-    end
-    object lab_ResultName: TLabel
-      Left = 40
-      Top = 21
-      Width = 64
-      Height = 13
-      Caption = #1050#1086#1086#1088#1076#1080#1085#1072#1090#1099
-    end
-    object lab_ResultNameSpeed: TLabel
-      Left = 168
-      Top = 21
-      Width = 48
-      Height = 13
-      Caption = #1057#1082#1086#1088#1086#1089#1090#1100
-    end
-    object memo_Result: TMemo
-      Left = 37
-      Top = 40
-      Width = 124
-      Height = 49
-      TabOrder = 0
-    end
-    object memo_ResultSpeed: TMemo
-      Left = 167
-      Top = 40
-      Width = 124
-      Height = 49
-      TabOrder = 1
-    end
   end
   object gbox_Aditional: TGroupBox
     Left = 8
@@ -197,7 +125,7 @@ object Form1: TForm1
     Width = 273
     Height = 105
     Caption = #1044#1086#1087#1086#1083#1100#1085#1080#1090#1077#1083#1100#1085#1099#1077' '#1076#1072#1085#1085#1099#1077
-    TabOrder = 2
+    TabOrder = 1
     object lab_Mass: TLabel
       Left = 11
       Top = 47
@@ -225,7 +153,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 0
-      Text = '1'
+      Text = '100'
     end
     object ed_Space: TEdit
       Left = 205
@@ -233,7 +161,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 1
-      Text = '1'
+      Text = '3'
     end
     object ed_Sb_coeff: TEdit
       Left = 205
@@ -241,7 +169,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 2
-      Text = '1'
+      Text = '2.2'
     end
   end
 end
