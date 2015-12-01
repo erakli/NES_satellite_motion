@@ -18,29 +18,28 @@ interface
 uses
   Windows, Dialogs, System.SysUtils,
   uConstants, uTypes, uFunctions,
-  uMatrix,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
-  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new, uSunPressure,
-  uModel, uDormanPrince,
-  uEpheremides, uGauss;
+  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new,
+  uEpheremides,
+  uGauss;
 
-//type
-//  // ------------------------------------------- дл€ dll
-//  EllipticalHandle = THandle;
-//
-//  tObjectElem = record
-//    a, e, i, w, omega, JDEquinox, T: MType;
-//  end;
-//
-//  tObjectDetails = record
-//    CoordinateEquatorial, CoordinateEcliptical: TVector;
-//    elments: array [0 .. 11] of MType;
-//  end;
-//
-//const
-//  ElemInit: array [0 .. 6] of MType = (2.2091404, 0.8502196, 11.94524,
-//    334.75006, 186.23352, 2448192.5 + 0.54502, 2451544.5); // дл€ примера из AA
+type
+  // ------------------------------------------- дл€ dll
+  EllipticalHandle = THandle;
+
+  tObjectElem = record
+    a, e, i, w, omega, JDEquinox, T: MType;
+  end;
+
+  tObjectDetails = record
+    CoordinateEquatorial, CoordinateEcliptical: TVector;
+    elments: array [0 .. 11] of MType;
+  end;
+
+const
+  ElemInit: array [0 .. 6] of MType = (2.2091404, 0.8502196, 11.94524,
+    334.75006, 186.23352, 2448192.5 + 0.54502, 2451544.5); // дл€ примера из AA
   {
     a := ElemInit[0];
     e := ElemInit[1];
@@ -53,14 +52,10 @@ uses
   // ------------------------------------------- /дл€ dll
 
 procedure console_output(Vector: array of MType); overload;
-procedure console_output(Vector: PDVector); overload;
 procedure console_output(Matrix: TMatrix); overload;
 procedure console_output(Date: TDate); overload;
 
 function test_uFunctions: boolean;
-
-function test_uMatrix: boolean;
-
 function test_uMatrix_Operations: boolean;
 function test_uTime: boolean;
 function test_uTypes: boolean;
@@ -70,11 +65,8 @@ function test_uEpheremides_new: boolean;
 function test_uPrecNut: boolean;
 function test_uMatrix_Conversation: boolean;
 
-function test_uDormanPrince: boolean;
-
 function test_uAtmosphericDrag: boolean;
 function test_uGEO_Potential: boolean;
-function test_uSunPressure: boolean;
 
 //var
 //  i: byte;
@@ -129,18 +121,6 @@ begin
 
   for j := 0 to High(Vector) do
     write(FloatToStrF(Vector[j], ffGeneral, 8, 4), '	');
-  writeln;
-  writeln;
-
-end;
-
-procedure console_output(Vector: PDVector);
-var
-  j: integer;
-begin
-
-  for j := 0 to Vector.getSize - 1 do
-    write(FloatToStrF(Vector^[j], ffGeneral, 8, 4), '	');
   writeln;
   writeln;
 
@@ -222,53 +202,6 @@ begin
 
   result := true;
 
-end;
-
-function test_uMatrix: boolean;
-const
-  size = 3;
-
-  testVector: TVector = (4, 2, 6);
-var
-  DVector, DVector2: TDVector;
-
-  i: integer;
-begin
-
-	result := false;  // если не выйдем из этой функции, то будем иметь false
-
-  writeln(' * * * * * * * * test_uMatrix * * * * * * * * ');
-  writeln;
-
-  DVector := TDVector.Create;
-  writeln('size ', DVector.getSize);
-  Writeln;
-  DVector.Destroy;
-
-  DVector := TDVector.Create(size);
-  writeln('size ', DVector.getSize);
-  Writeln;
-
-  for i := 0 to size - 1 do
-    DVector[i] := testVector[i];
-  console_output(@DVector);
-
-  writeln('length ', FloatToStr(DVector.getLength));
-  Writeln;
-
-  DVector2 := DVector;
-
-  DVector.Add(DVector2);
-  writeln('Add'); console_output(@DVector);
-
-  DVector.ConstProduct(size);
-  writeln('ConstProduct'); console_output(@DVector);
-
-  writeln(' * * * * * * * * done');
-  writeln;
-  writeln;
-
-  result := true;
 end;
 
 function test_uMatrix_Operations: boolean;
@@ -641,7 +574,7 @@ begin
   TLE_output := ReadTLE(TLE);
   Kepler_Elements := TLE_output.Elements;
   parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
-
+  
   AtmospericDrag := TAtmosphericDrag.Create;
   force := AtmospericDrag.RightPart(JD, parameters.coord, parameters.speed, Cb_coeff, CrossSecArea);
   writeln('AtmospericDrag.RightPart'); console_output(force);
@@ -697,83 +630,15 @@ begin
 
 end;
 
-function test_uSunPressure: boolean;
-const
-  CrossSecArea = 3;
-var
-	SunPressure: TSunPressure;
-  force: coordinates;
-
-  TLE_output: TTLE_output;
-  Kepler_Elements: TElements;
-  parameters: param;
-  Dubosh: boolean;
-begin
-
-	result := false;
-
-  writeln(' * * * * * * * * test_uSunPressure * * * * * * * * ');
-  writeln;
-
-  TLE_output := ReadTLE(TLE);
-  Kepler_Elements := TLE_output.Elements;
-  parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
-
-  parameters.coord := ChangeRS(parameters.coord);
-
-  SunPressure := TSunPressure.Create;
-  force := SunPressure.RightPart(JD, parameters.coord, parameters.speed, CrossSecArea);
-  writeln('SunPressure.RightPart'); console_output(force);
-
-  writeln(' * * * * * * * * done');
-  writeln;
-  writeln;
-
-  result := true;
-end;
-
-function test_uDormanPrince: boolean;
-var
-  Model: TArenstorfModel;
-  Integrator: TDormanPrince;
-begin
-
-	result := false;
-
-  writeln(' * * * * * * * * test_uDormanPrince * * * * * * * * ');
-  writeln;
-
-  Model := TArenstorfModel.Create(0);
-  Integrator := TDormanPrince.Create;
-
-  Model.t1 := Model.Period * 5;
-
-  Integrator.Run(Model);
-
-  Model.Destroy;
-  Integrator.Destroy;
-
-  writeln('result file is placed in C:\ directory');
-  writeln;
-
-  writeln(' * * * * * * * * done');
-  writeln;
-  writeln;
-
-  result := true;
-end;
-
-
 ////////////////////////////////////////////////////////////////////////////////
 initialization
 
 AllocConsole;							// создаЄм консольное окно
-//SetConsoleCP(1251);				// устанавливаем прин€тие кириллицы
-//SetConsoleOutputCP(1251);
+SetConsoleCP(1251);				// устанавливаем прин€тие кириллицы
+SetConsoleOutputCP(1251);
 
 { ¬ызов тестов модулей }
 //test_uFunctions;
-//test_uMatrix;
 //test_uMatrix_Operations;
 //test_uTime;
 //test_uTypes;
@@ -781,16 +646,9 @@ AllocConsole;							// создаЄм консольное окно
 test_uKepler_Conversation;
 //test_uEpheremides_new;
 //test_uPrecNut;
-//test_uMatrix_Conversation;
-//test_uAtmosphericDrag;
-//test_uGEO_Potential;
-//test_uSunPressure;
-//
-//test_uDormanPrince;
-
-
-
-
+test_uMatrix_Conversation;
+test_uAtmosphericDrag;
+test_uGEO_Potential;
 
 //JD := 2415284.191;
 
@@ -833,15 +691,9 @@ test_uKepler_Conversation;
 //dist1 := module(v) - 6378.1366;
 //dist2 := module(coord) - 6378.1366;
 
-
-
-
 writeln('Press any key to finish tests...');
 readln;
 FreeConsole;  // убираем консоль
-
-
-
 { //---------------------------------------- дл€ случа€ из учебника AA (с. 232)
   JD := 2448170.5;
   MJD := JD - MJDCorrection;

@@ -190,9 +190,6 @@ var
   rad_speed, tang_speed, _v, _u: MType;
   v, u: vec;
   speed: TVector;
-
-  SqrV, sqrV_sum: MType;
-  V_flag: boolean;
 begin
 
   Dubosh := true;
@@ -259,8 +256,8 @@ begin
   // r := a * ( 1 - sqr(s_e) ) / ( 1 + s_e * v.cos ); // [km] - радиус-вектор
   _p := a * (1 - sqr(s_e)); // параметр орбиты
 
-  rad_speed := sqrt(fm / _p) * s_e * v.sin; // радиальная скорость
-  tang_speed := sqrt(fm / _p) * (1 + s_e * v.sin);
+  rad_speed := sqrt(fm * mass / _p) * s_e * v.sin; // радиальная скорость
+  tang_speed := sqrt(fm * mass / _p) * (1 + s_e * v.sin);
   // трансверальная скорость
 
   // speed
@@ -273,19 +270,6 @@ begin
   speed[2] := coord[2] / r * rad_speed + u.cos * Sin(i) * tang_speed;
 
   result.speed := speed;
-
-
-  // проверка скорости
-  SqrV := fm * ( 2 / r - 1 / a );
-
-  sqrV_sum := 0;
-  for j := 0 to 2 do
-  	sqrV_sum := sqrV_sum + sqr(speed[j]);
-
-  V_flag := false;
-
-  if SqrV = sqrV_sum then
-  	V_flag := true;
 
 end;
 

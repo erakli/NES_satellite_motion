@@ -1,4 +1,5 @@
 ﻿unit uTime;
+
 interface
 
 { Счёт юлианских дней идёт от 1 января 4713 года до нашей эры.
@@ -244,8 +245,7 @@ begin
       if SearchYear = Year then
       	if StrToInt(Copy(SearchStr, 6, 2)) < Month then	continue;
 
-//      text := Copy(TAI_list[i - 1], 14, 2);
-      text := '32';
+      text := Copy(TAI_list[i - 1], 14, 2);
       break;
 
     end;

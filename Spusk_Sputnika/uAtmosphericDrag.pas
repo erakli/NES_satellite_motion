@@ -775,7 +775,7 @@ begin
 
 //	Mct := TranspMatr( ITRS2GCRS(TT_time(JD)) ); // матрица перехода из небесной в земную
 
-	result := ConstProduct( - CrossSecArea * Cb_coeff * ro * 0.5, VecDec(v, AtmospereSpeed) );
+	result := ConstProduct( CrossSecArea * Cb_coeff * ro * 0.5, VecDec(v, AtmospereSpeed) );
 
 end;
 
