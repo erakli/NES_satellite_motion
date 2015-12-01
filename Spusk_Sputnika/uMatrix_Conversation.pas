@@ -244,7 +244,7 @@ var
 begin
 
   UT1 := UT1_time(t);
-  S := ToGetGASTime(UT1);
+//  S := ToGetGASTime(UT1);
 
   // TDB := TT_time(t);
   { Перевод полученного времени в барицентрическое. Получение

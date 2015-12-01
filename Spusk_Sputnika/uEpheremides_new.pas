@@ -68,7 +68,7 @@ var
 	// можно оптимизировать, введя динамический массив, расширяемый при добавлении
   // нового объекта
   Mercury, Venus, Earth_Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
-    Moon, Sun: TFacility;
+    Moon, Sun_bary: TFacility;
 
   // Глобальная переменная для хранения всего файла DE.
   // Внимание: может оказаться ресурсоёмким
@@ -107,16 +107,19 @@ begin
   	if (JD >= BB[0]) and (JD < BB[k]) then // Входит ли в тот же интервал?
 
       if (JD >= BB[LUS]) and (JD < BB[LUS + 1]) then
-      { Да, Входит ли в тот же подынтервал? Первое выражение в квадратных
-      	скобках позволяет получить позицию, на которой в ВВ хранится первая
-        граница полуинтервала, второе - соответственно }
+      { Да, Входит ли в тот же подынтервал?
+
+      	Первое выражение в квадратных скобках позволяет получить позицию,
+        на которой в ВВ хранится первая граница полуинтервала,
+        второе - соответственно }
       begin // Да
         Result := XYZ;
         exit;
       end
       else
       begin
-        Result := SearchSubinterval(self, JD);
+        XYZ := SearchSubinterval(self, JD);
+        Result := XYZ;
         exit;
       end
 
@@ -125,7 +128,8 @@ begin
 
   FillBB(self, Search, JD);
   LUB := Search;
-  Result := SearchSubinterval(self, JD);
+  XYZ := SearchSubinterval(self, JD);
+  Result := XYZ;
 end;
 
 
@@ -272,14 +276,25 @@ end;
 function StepSearch(Facility: TFacility; need: MType): integer;
 var
 	block: TStrVector;
+  dec_const: ShortInt;
 begin
+	dec_const := 1;
+
 	with Facility do
+  begin
+
+  	block := Separation(DEfile_list[LUB + 1]);
+  	if need < StrToFloat(block[0]) then     // если искомая дата находится до нижней границы текущего блока, идём в обратном направлении
+    	dec_const := -1;
+
     repeat
-      LUB := LUB + 341;
+      LUB := LUB + 341 * dec_const;
       block := Separation(DEfile_list[LUB + 1]);
     until ( (need >= StrToFloat(block[0])) AND (need < StrToFloat(block[1])) );
 
-  Result := Facility.LUB
+  end;
+
+  Result := Facility.LUB;
 end;
 
 // разбивает строку на три отдельных слова
@@ -335,7 +350,7 @@ begin
 
     10:  Moon := TFacility.Create(0, 0, 0, 441, 8, 13);
 
-    11:  Sun := TFacility.Create(0, 0, 0, 753, 2, 11)
+    11:  Sun_bary := TFacility.Create(0, 0, 0, 753, 2, 11)
 
   end;
 

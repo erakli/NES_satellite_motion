@@ -25,16 +25,6 @@ type
     lab_StartTime: TLabel;
     lab_EndTime: TLabel;
     btn_Run: TButton;
-    gbox_Result: TGroupBox;
-    memo_Result: TMemo;
-    lab_ResultX: TLabel;
-    lab_ResultY: TLabel;
-    lab_ResultZ: TLabel;
-    memo_ResultSpeed: TMemo;
-    lab_ResultName: TLabel;
-    lab_ResultNameSpeed: TLabel;
-    ed_Step: TEdit;
-    lab_Step: TLabel;
     gbox_Aditional: TGroupBox;
     ed_Sb_coeff: TEdit;
     lab_Sb_coeff: TLabel;
@@ -47,7 +37,7 @@ type
 
     procedure Proceed;
     procedure Run;
-    procedure Result;
+//    procedure Result;
   public
     { Public declarations }
   end;
@@ -100,7 +90,7 @@ begin
   mass_ := StrToFloat(ed_Mass.Text);
   space_ := StrToFloat(ed_Space.Text);
   Cb_coeff_ := StrToFloat(ed_Sb_coeff.Text);
-  step_ := StrToFloat(ed_Step.Text);
+//  step_ := StrToFloat(ed_Step.Text);
   CrossSecArea_ := 3; // заглушка
 
 end;
@@ -113,17 +103,17 @@ begin
 
 end;
 
-procedure TForm1.Result;
-var
-  i: byte;
-begin
-
-  for i := 0 to 2 do
-  begin
-    memo_Result.Lines[i] := FloatToStr(Sputnik.state.coord[i]);
-    memo_ResultSpeed.Lines[i] := FloatToStr(Sputnik.state.speed[i]);
-  end;
-
-end;
+//procedure TForm1.Result;
+////var
+////  i: byte;
+//begin
+//
+////  for i := 0 to 2 do
+////  begin
+////    memo_Result.Lines[i] := FloatToStr(Sputnik.state.coord[i]);
+////    memo_ResultSpeed.Lines[i] := FloatToStr(Sputnik.state.speed[i]);
+////  end;
+//
+//end;
 
 end.
