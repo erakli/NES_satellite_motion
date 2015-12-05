@@ -42,7 +42,7 @@ type
     _alpha, // прямое восхождение (рад)
     _beta,  // и склонение Солнца (рад)
     _q { солнечная постоянная (для давления света),
-      	 q = 4.65e-5 [дин/км^2] }
+      	 q = 4.65 [дин/м^2]  перевести в метры!!! }
       : MType;
     _pos: coordinates; // положение в Геоцентрической СК
 
@@ -95,7 +95,7 @@ constructor TSun.Create;
 begin
 	inherited;
 
-  _q := 4.65E-5; // для км^2
+  _q := 4.65; // для м^2
 end;
 
 procedure TSun.SetPos(cur_pos: coordinates);

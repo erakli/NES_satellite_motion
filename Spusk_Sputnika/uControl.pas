@@ -67,6 +67,7 @@ end;
 procedure TControl.Modeling;
 begin
 
+  // Доперевести все размерности в метры
   Integrator.Run(Sputnik);
 
   Sputnik.Destroy;

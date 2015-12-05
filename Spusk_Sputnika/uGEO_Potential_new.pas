@@ -285,7 +285,7 @@ var
 begin
 
 	SpherCoord := Fix2Spher(coord);
-  SpherCoord[0] := SpherCoord[0] * 1000; // привели к метрам
+  SpherCoord[0] := SpherCoord[0]; // привели к метрам
   Prepare_P(SpherCoord[1]);
   MainStep;
 
@@ -295,8 +295,8 @@ begin
   // переводим координаты обратно в декартовы, в земную СК
   FixCoord := MultMatrVec(OnFixProject(coord), _delta_g);
 
-  // сразу перешли в небесную инерциальную, заодно возвращаемся к км, но надо ли
-  Result := ConstProduct(1/1000, MultMatrVec(ITRS2GCRS(t), FixCoord));
+  // сразу перешли в небесную инерциальную
+  Result := MultMatrVec(ITRS2GCRS(t), FixCoord);
 
 end;
 

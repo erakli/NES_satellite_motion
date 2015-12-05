@@ -153,7 +153,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 0
-      Text = '100'
+      Text = '417289'
     end
     object ed_Space: TEdit
       Left = 205

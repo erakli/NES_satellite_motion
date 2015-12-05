@@ -143,12 +143,13 @@ begin
 
     if isSunLight then
     begin
-      if psi <= abs(fi) then
+      if abs(psi) <= abs(fi) then
         result := 0
     end
 
     else
-    if cos(psi) < cos(beta) then
+    // здесь знак сравнения взят обратный, так как в случае из Бордовициной алгоритм не работает
+    if cos(psi) > cos(beta) then
       result := 0;
 
 end;
@@ -193,7 +194,7 @@ var
   temp: array [0 .. 1] of coordinates;
 begin
 
-   _space := space / 1000; // инициализируем площадь поперечного сечения ИСЗ, в км
+   _space := space; // инициализируем площадь поперечного сечения ИСЗ
 
   SunPressureInit(t, coord);
 

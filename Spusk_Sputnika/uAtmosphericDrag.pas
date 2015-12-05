@@ -18,7 +18,10 @@ interface
 
 uses
   Math, System.SysUtils, Dialogs,
-  uConstants, uTime, uTypes, uFunctions, uStarTime, uMatrix_Operations,
+  uConstants,
+  uTime,
+  uTypes,
+  uFunctions, uStarTime, uMatrix_Operations,
   uAtmospericDrag_Coeff, uMatrix_Conversation;
 
 const
@@ -66,7 +69,7 @@ type
     l: TCoefVect;
 
     // При К1
-    c: TCoefVect;
+    _с: TCoefVect;
 
     // Sun : TSun;     // Параметры Солнца - необходимо их задать
 
@@ -181,8 +184,10 @@ var
 begin
 
   dist := module(coord);
+
+  // экваториальный радиус переводим к км (так как весь стандарт в км)
   with Earth do
-    result := dist - eq_rad * (1 - alpha_0 * sqr(coord[2] / dist));
+    result := dist - eq_rad / 1000 * (1 - alpha_0 * sqr(coord[2] / dist));
 
 end;
 
@@ -402,8 +407,8 @@ begin
 
         range := ifthen ( h < AD_coef_h[range][coef_num, flag], 0, 1 );
 
-        for i := 0 to High(c) do
-          c[i] := AD_coef_c[range][i, flag];
+        for i := 0 to High(_с) do
+          _с[i] := AD_coef_c[range][i, flag];
       end;
 
     'd':
@@ -598,7 +603,7 @@ begin
         { Перевод к половинному аргументу. Модуль взят из stand_91.doc }
         cos_fi := sqrt(abs(1 + cos_fi) / 2);
 
-        K[Index] := series(h, c, NUM_OF_COEF, false) *
+        K[Index] := series(h, _с, NUM_OF_COEF, false) *
           Power(cos_fi, series(h, n, NUM_OF_COEF - 2, false));
       end;
     2:
@@ -758,7 +763,8 @@ begin
 //  S_time := ToGetGMSTime(UT1);
 	S_time := GMSTime(UT1, TT_time(JD));
 
-  ro := density(UT1, coord); // Запускаем алгоритм подсчёта плотности
+  // переводим в км
+  ro := density(UT1, ConstProduct(1.0e-3, coord)); // Запускаем алгоритм подсчёта плотности
 
   { ! ! ! Уточнить вычисление результирующего ускорения }
 //  result[0] := -Sb_coeff * ro * speed * v[0];

@@ -9,11 +9,11 @@ const
 
 	PI2: MType = 2 * Pi;
 
-  fm: MType = 3.986004418E+5; // [km] Гравитационная постоянная
+  fm: MType = 3.986004418E+14; // [m] Гравитационная постоянная
   // m_size = 2; // Размер матриц
 
-  au: MType = 1.49597870700E+8; // [km] Astronomical unit - астрономическая единица
-  c: MType = 299792.458; // [km/s] Скорость света
+  au: MType = 1.49597870700E+11; // [m] Astronomical unit - астрономическая единица
+  c: MType = 299792458; // [m/s] Скорость света
 
   SecInDay = 86400; // секунд в дне
 
@@ -50,7 +50,7 @@ file_dir := ExtractFileDir(ParamStr(0)) + '\';
 
 with Earth do
 begin
-  eq_rad := 6378.1366;
+  eq_rad := 6378136.6;
   alpha_0 := 1 / 298.25642;
   omega := 7.292115E-5;
   density_120 := 1.58868E-8;
