@@ -1,6 +1,6 @@
 unit uFunctions;
 
-{ Служебные функции }
+{ РЎР»СѓР¶РµР±РЅС‹Рµ С„СѓРЅРєС†РёРё }
 
 interface
 
@@ -8,7 +8,7 @@ uses uTypes, uConstants;
 
 function module(coord: TVector): MType; overload;
 
-{ Функции преобразования к радианам из минут дуги }
+{ Р¤СѓРЅРєС†РёРё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє СЂР°РґРёР°РЅР°Рј РёР· РјРёРЅСѓС‚ РґСѓРіРё }
 function deg2rad(arg: MType): MType;
 function amin2rad(arg: MType): MType;
 function asec2rad(arg: MType): MType;
@@ -36,7 +36,7 @@ begin
 
 end;
 
-{ Функции преобразования к радианам из минут дуги }
+{ Р¤СѓРЅРєС†РёРё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє СЂР°РґРёР°РЅР°Рј РёР· РјРёРЅСѓС‚ РґСѓРіРё }
 function deg2rad(arg: MType): MType;
 begin
   result := arg * Pi / 180;
@@ -52,9 +52,9 @@ begin
   result := arg * Pi / 648000; // / (180 * 60 * 60);
 end;
 
-{ Нормализация угла в диапазон от 0 до 2 Pi
+{ РќРѕСЂРјР°Р»РёР·Р°С†РёСЏ СѓРіР»Р° РІ РґРёР°РїР°Р·РѕРЅ РѕС‚ 0 РґРѕ 2 Pi
 
-	входной угол в радианах }
+	РІС…РѕРґРЅРѕР№ СѓРіРѕР» РІ СЂР°РґРёР°РЅР°С… }
 function AngleNormalize(angle: MType): MType;
 var
 	NewAngle: MType;
@@ -68,7 +68,7 @@ begin
 
 end;
 
-{ Функции возведения в степень }
+{ Р¤СѓРЅРєС†РёРё РІРѕР·РІРµРґРµРЅРёСЏ РІ СЃС‚РµРїРµРЅСЊ }
 function pow2(arg: MType): MType;
 begin
   result := arg * arg;

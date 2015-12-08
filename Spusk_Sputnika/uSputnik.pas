@@ -12,10 +12,10 @@ type
   private
   public
 //    position: coordinates;
-    mass, Cb_coeff, // баллистический коэффициент
+    mass, Cb_coeff, // Р±Р°Р»Р»РёСЃС‚РёС‡РµСЃРєРёР№ РєРѕСЌС„С„РёС†РёРµРЅС‚
     CrossSecArea,
-    // площадь поперечного сечения (в нашей задаче они равны со _space)
-    _space // s - площадь эффективного/поперечного сечения
+    // РїР»РѕС‰Р°РґСЊ РїРѕРїРµСЂРµС‡РЅРѕРіРѕ СЃРµС‡РµРЅРёСЏ (РІ РЅР°С€РµР№ Р·Р°РґР°С‡Рµ РѕРЅРё СЂР°РІРЅС‹ СЃРѕ _space)
+    _space // s - РїР»РѕС‰Р°РґСЊ СЌС„С„РµРєС‚РёРІРЅРѕРіРѕ/РїРѕРїРµСЂРµС‡РЅРѕРіРѕ СЃРµС‡РµРЅРёСЏ
       : MType;
 
     function getRight(X: PDVector; t: MType): TDVector; override;
@@ -79,7 +79,7 @@ begin
   for i := 0 to 2 do
   begin
     coord[i] := _X[i];
-    uskor[i] := _X[i + 3]; // ускорение за пред. шаг
+    uskor[i] := _X[i + 3]; // СѓСЃРєРѕСЂРµРЅРёРµ Р·Р° РїСЂРµРґ. С€Р°Рі
   end;
 
   Mas1 := SunPressure.RightPart(t, coord, uskor, _space);
@@ -90,7 +90,7 @@ begin
   res2 := ConstProduct(1 / mass, Mas3);
 
   Summ1 := VecSum(res1, res2);
-  Summ2 := Perevod(VecSum(Mas2, Summ1)); // ускорение за этот шаг
+  Summ2 := Perevod(VecSum(Mas2, Summ1)); // СѓСЃРєРѕСЂРµРЅРёРµ Р·Р° СЌС‚РѕС‚ С€Р°Рі
 
 //	Summ2 := Perevod(Mas1);
 //	Summ2 := Perevod(Mas2);
@@ -103,7 +103,7 @@ begin
     Y[i + 3] := Summ2[i];
   end;
 
-  result := Y; // заглушка
+  result := Y; // Р·Р°РіР»СѓС€РєР°
 end;
 
 function TSputnik.Stop_Calculation(t: Double; Step: Double; PrevStep: PDVector;

@@ -20,7 +20,7 @@ begin
   GEO_Potential_new := TGEO_Potential_new.Create;
   SunPressure := TSunPressure.Create;
   //Epheremides := TEpheremides.Create;
-	EphCreation(3); // создаём объект эферемид для получения координат Земли
+	EphCreation(3); // СЃРѕР·РґР°С‘Рј РѕР±СЉРµРєС‚ СЌС„РµСЂРµРјРёРґ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚ Р—РµРјР»Рё
   Control := TControl.Create;
 end;
 

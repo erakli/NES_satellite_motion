@@ -114,7 +114,7 @@ begin
     ipt[12][2] := ephemeris_version;
     ephemeris_version := de_version;
 
-//  Дописать про неверный порядок байтов
+//  Р”РѕРїРёСЃР°С‚СЊ РїСЂРѕ РЅРµРІРµСЂРЅС‹Р№ РїРѕСЂСЏРґРѕРє Р±Р°Р№С‚РѕРІ
 //    swap_bytes :=
 
     if (emrat > 81.3008) or (emrat < 81.30055) then
@@ -137,7 +137,7 @@ begin
    ncoeff := kernel_size div 2;
   end;
 
-//  rval := @(jpl_eph_data + temp_data.recsize);         // проверить
+//  rval := @(jpl_eph_data + temp_data.recsize);         // РїСЂРѕРІРµСЂРёС‚СЊ
 
 //  if rval = null then
 //  begin

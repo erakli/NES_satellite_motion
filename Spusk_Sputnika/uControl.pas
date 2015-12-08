@@ -2,9 +2,9 @@ unit uControl;
 
 interface
 
-{ Управляющий модуль
+{ РЈРїСЂР°РІР»СЏСЋС‰РёР№ РјРѕРґСѓР»СЊ
 
-  Здесь идёт управление алгоритмом }
+  Р—РґРµСЃСЊ РёРґС‘С‚ СѓРїСЂР°РІР»РµРЅРёРµ Р°Р»РіРѕСЂРёС‚РјРѕРј }
 
 uses
   uSputnik, uKepler_conversation, uTLE_conversation, uConstants, uTime, Math,
@@ -18,7 +18,7 @@ type
     start_time, end_time: MType;
   public
     procedure Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
-      mass, s, Сb_coeff, CrossSecArea: MType; lines: boolean = true);
+      mass, s, РЎb_coeff, CrossSecArea: MType; lines: boolean = true);
     procedure Modeling;
   end;
 
@@ -30,7 +30,7 @@ implementation
 { TControl }
 
 procedure TControl.Prepare(t0, t_end: TDate; step: MType; TLE: TLE_lines;
-  mass, s, Сb_coeff, CrossSecArea: MType; lines: boolean = true);
+  mass, s, РЎb_coeff, CrossSecArea: MType; lines: boolean = true);
 var
   input_values: TDVector;
   i: Integer;
@@ -51,9 +51,9 @@ begin
     input_values[i + 3] := parameters.speed[i];
   end;
 
-  Sputnik := TSputnik.Create(mass, Сb_coeff, CrossSecArea, s);
+  Sputnik := TSputnik.Create(mass, РЎb_coeff, CrossSecArea, s);
 
-  // Приводим время к UTC в модифицированных юлианских днях (JD)
+  // РџСЂРёРІРѕРґРёРј РІСЂРµРјСЏ Рє UTC РІ РјРѕРґРёС„РёС†РёСЂРѕРІР°РЅРЅС‹С… СЋР»РёР°РЅСЃРєРёС… РґРЅСЏС… (JD)
   start_time := TT_time(FromDateToJD(t0));
   end_time := TT_time(FromDateToJD(t_end));
 
@@ -67,7 +67,7 @@ end;
 procedure TControl.Modeling;
 begin
 
-  // Доперевести все размерности в метры
+  // Р”РѕРїРµСЂРµРІРµСЃС‚Рё РІСЃРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РІ РјРµС‚СЂС‹
   Integrator.Run(Sputnik);
 
   Sputnik.Destroy;

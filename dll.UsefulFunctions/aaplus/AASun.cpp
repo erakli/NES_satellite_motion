@@ -3,7 +3,7 @@ Module : AASUN.CPP
 Purpose: Implementation for the algorithms which obtain the position of the Sun
 Created: PJN / 29-12-2003
 History: PJN / 17-01-2007 1. Changed name of CAASun::ApparentEclipticLongtitude to 
-                          CAASun::ApparentEclipticLongitude. Thanks to Mathieu Peyréga for reporting this
+                          CAASun::ApparentEclipticLongitude. Thanks to Mathieu PeyrÐ¹ga for reporting this
                           typo!.
          PJN / 26-07-2008 1. Changed name of CAASun::EclipticRectangularCoordinatesMeanEquinox to
                           CAASun::EquatorialRectangularCoordinatesMeanEquinox to refer to the fact that it 

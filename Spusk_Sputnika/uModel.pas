@@ -2,9 +2,9 @@ unit uModel;
 
 interface
 
-{ Модуль с базовым классом модели
+{ РњРѕРґСѓР»СЊ СЃ Р±Р°Р·РѕРІС‹Рј РєР»Р°СЃСЃРѕРј РјРѕРґРµР»Рё
 
-  Надо придумать с TDVector }
+  РќР°РґРѕ РїСЂРёРґСѓРјР°С‚СЊ СЃ TDVector }
 
 uses
   uTypes, Math, uMatrix, SysUtils;
@@ -14,15 +14,15 @@ type
   TModel = class(TObject)
   protected
     StartValues: TDVector;
-    s_size: byte; // длина вектора StartValues
+    s_size: byte; // РґР»РёРЅР° РІРµРєС‚РѕСЂР° StartValues
 
-    _Interval, // должен ли быть интервал между знач. задан тут?
+    _Interval, // РґРѕР»Р¶РµРЅ Р»Рё Р±С‹С‚СЊ РёРЅС‚РµСЂРІР°Р» РјРµР¶РґСѓ Р·РЅР°С‡. Р·Р°РґР°РЅ С‚СѓС‚?
     _t0, _t1
       : MType;
 
     Result: TextFile;
 
-    // Остановка интегрирования при малых изменениях приращения координаты
+    // РћСЃС‚Р°РЅРѕРІРєР° РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёСЏ РїСЂРё РјР°Р»С‹С… РёР·РјРµРЅРµРЅРёСЏС… РїСЂРёСЂР°С‰РµРЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚С‹
     stop_condition: MType;
     stop_count, stop_count_max: byte;
     stop_flag: boolean;
@@ -38,7 +38,7 @@ type
 
     procedure addResult(X: PDVector; t: MType);
 
-    // инкапсуляция в чистом виде
+    // РёРЅРєР°РїСЃСѓР»СЏС†РёСЏ РІ С‡РёСЃС‚РѕРј РІРёРґРµ
     procedure setStart(arg: PDVector);
     function getStart: TDVector;
 
@@ -59,13 +59,13 @@ type
     m, big_M: MType;
 
   public
-    Period: MType;  // Период обращения конкретной орбиты
-    orbit: byte; // Выбор орбиты (малая/большая)
+    Period: MType;  // РџРµСЂРёРѕРґ РѕР±СЂР°С‰РµРЅРёСЏ РєРѕРЅРєСЂРµС‚РЅРѕР№ РѕСЂР±РёС‚С‹
+    orbit: byte; // Р’С‹Р±РѕСЂ РѕСЂР±РёС‚С‹ (РјР°Р»Р°СЏ/Р±РѕР»СЊС€Р°СЏ)
 
     constructor Create(variant: byte);
     function getRight(X: PDVector; t: MType): TDVector; override;
 
-    // заглушка
+    // Р·Р°РіР»СѓС€РєР°
     function Stop_Calculation(t, Step: MType; PrevStep, CurStep: PDVector): boolean; override;
   end;
 
@@ -79,7 +79,7 @@ constructor TModel.Create;
 const
   output_file = 'output.txt';
 begin
-	Interval := 0.1; // перенести на ручной ввод
+	Interval := 0.1; // РїРµСЂРµРЅРµСЃС‚Рё РЅР° СЂСѓС‡РЅРѕР№ РІРІРѕРґ
 	t0 := 0;
 	t1 := 5;
 
@@ -115,25 +115,25 @@ begin
   writeln(Result);
 
 //	Row := Result.getRowCount;
-//	compile(s_size + 1); // вектор результата + время
+//	compile(s_size + 1); // РІРµРєС‚РѕСЂ СЂРµР·СѓР»СЊС‚Р°С‚Р° + РІСЂРµРјСЏ
 //
 //	{
-//		по хорошему, стоит ввести обработчик,
-//		который будет добавлять строки в матрицу,
-//		не переписывая её с нуля
+//		РїРѕ С…РѕСЂРѕС€РµРјСѓ, СЃС‚РѕРёС‚ РІРІРµСЃС‚Рё РѕР±СЂР°Р±РѕС‚С‡РёРє,
+//		РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ РґРѕР±Р°РІР»СЏС‚СЊ СЃС‚СЂРѕРєРё РІ РјР°С‚СЂРёС†Сѓ,
+//		РЅРµ РїРµСЂРµРїРёСЃС‹РІР°СЏ РµС‘ СЃ РЅСѓР»СЏ
 //	}
 //	Result.setSize(Row + 1, s_size + 1);
 //
-//	compile[0] = t; // первым элементом идёт время - для удобства выборки
+//	compile[0] = t; // РїРµСЂРІС‹Рј СЌР»РµРјРµРЅС‚РѕРј РёРґС‘С‚ РІСЂРµРјСЏ - РґР»СЏ СѓРґРѕР±СЃС‚РІР° РІС‹Р±РѕСЂРєРё
 //	for i := 1 to s_size do
 //	begin
 //		compile[i] := X[i - 1];
 //	end;
 //
-//	Result[Row] := compile; // последней строке должен быть назначен итоговый вектор
+//	Result[Row] := compile; // РїРѕСЃР»РµРґРЅРµР№ СЃС‚СЂРѕРєРµ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅР°Р·РЅР°С‡РµРЅ РёС‚РѕРіРѕРІС‹Р№ РІРµРєС‚РѕСЂ
 end;
 
-// ----- свойства
+// ----- СЃРІРѕР№СЃС‚РІР°
 function TModel.getStart: TDVector;
 begin
   result := StartValues;
@@ -163,7 +163,7 @@ procedure TModel.set_t1(const arg: MType);
 begin
 	_t1 := arg;
 end;
-// ----- конец свойств
+// ----- РєРѕРЅРµС† СЃРІРѕР№СЃС‚РІ
 
 
 {* * * * * * * * * * TArenstorfModel * * * * * * * * * *}
@@ -184,12 +184,12 @@ begin
 	StartValues[0] := 0.994; // y1
 	StartValues[1] := 0;     // y2
 	StartValues[2] := 0;     // y1'
-	if orbit = 1 then // выбираем большую орбиту
+	if orbit = 1 then // РІС‹Р±РёСЂР°РµРј Р±РѕР»СЊС€СѓСЋ РѕСЂР±РёС‚Сѓ
 	begin
 		StartValues[3] := -2.00158510637908252240537862224; // y2'
 		Period := 17.0652165601579625588917206249;
 	end
-	else // иначе малую
+	else // РёРЅР°С‡Рµ РјР°Р»СѓСЋ
 	begin
 		StartValues[3] := -2.0317326295573368357302057924; // y2'
 		Period := 11.124340337266085134999734047;
@@ -208,12 +208,12 @@ begin
   R[0] := power(power(_X[0] + m, 2) + power(_X[1], 2), 1.5);
   R[1] := power(power(_X[0] - big_M, 2) + power(_X[1], 2), 1.5);
 
-	Y[0] := _X[2]; // v1 = y1' - замена переменной. После интегрирования получим y1
+	Y[0] := _X[2]; // v1 = y1' - Р·Р°РјРµРЅР° РїРµСЂРµРјРµРЅРЅРѕР№. РџРѕСЃР»Рµ РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёСЏ РїРѕР»СѓС‡РёРј y1
 	Y[1] := _X[3]; // v2 = y2'
 	Y[2] := _X[0] + 2 * _X[3] - big_M * (_X[0] + m) / R[0] - m * (_X[0] - big_M) / R[1];
 	Y[3] := _X[1] - 2 * _X[2] - big_M * _X[1] / R[0] - m * _X[1] / R[1];
 
-	result := Y; // заглушка
+	result := Y; // Р·Р°РіР»СѓС€РєР°
 end;
 
 function TArenstorfModel.Stop_Calculation(t, Step: MType; PrevStep,

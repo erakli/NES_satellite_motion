@@ -3,7 +3,7 @@ Module : AAABERRATION.CPP
 Purpose: Implementation for the algorithms for Aberration
 Created: PJN / 29-12-2003
 History: PJN / 21-04-2005 1. Renamed "AAAberation.cpp" to "AAAberration.cpp" so that all source code filenames 
-                          match their corresponding header files. Thanks to Jürgen Schuck for suggesting this 
+                          match their corresponding header files. Thanks to JÑŒrgen Schuck for suggesting this 
                           update.
          PJN / 18-03-2012 1. All global "g_*" tables are now const. Thanks to Roger Dahl for reporting this 
                           issue when compiling AA+ on ARM.

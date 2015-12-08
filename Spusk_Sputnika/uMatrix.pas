@@ -2,7 +2,7 @@ unit uMatrix;
 
 interface
 
-{ Реализация линейной алгебры }
+{ Р РµР°Р»РёР·Р°С†РёСЏ Р»РёРЅРµР№РЅРѕР№ Р°Р»РіРµР±СЂС‹ }
 
 uses
   uTypes, Math;
@@ -12,7 +12,7 @@ uses
 
 type
 
-  // класс для вектора ----------------------------------
+  // РєР»Р°СЃСЃ РґР»СЏ РІРµРєС‚РѕСЂР° ----------------------------------
   TDVector = class(TObject)
   private
     Elements: array of MType;
@@ -20,13 +20,13 @@ type
     function getElement(Index: integer): MType;
     procedure setElement(Index: integer; value: MType);
   public
-    // constructor пустой
+    // constructor РїСѓСЃС‚РѕР№
     constructor Create; overload;
 
-    // создаём вектор заданной длины
+    // СЃРѕР·РґР°С‘Рј РІРµРєС‚РѕСЂ Р·Р°РґР°РЅРЅРѕР№ РґР»РёРЅС‹
     constructor Create(n: integer); overload;
 
-    // конструктор копии вектора arg
+    // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёРё РІРµРєС‚РѕСЂР° arg
 //    function Create(const arg: ^TDVector): TDVector; overload;
 
     function getSize: integer;
@@ -47,7 +47,7 @@ type
 
 implementation
 
-{* * * * * * * * вектор * * * * * * * *}
+{* * * * * * * * РІРµРєС‚РѕСЂ * * * * * * * *}
 
 constructor TDVector.Create;
 begin
@@ -82,7 +82,7 @@ end;
 
 function TDVector.getSize: integer;
 begin
-	result := High(Elements) + 1;  // Нужно ли здесь прибавление 1
+	result := High(Elements) + 1;  // РќСѓР¶РЅРѕ Р»Рё Р·РґРµСЃСЊ РїСЂРёР±Р°РІР»РµРЅРёРµ 1
 end;
 
 function TDVector.getLength: MType;
@@ -100,7 +100,7 @@ end;
 
 procedure TDVector.setSize(i: integer);
 begin
-	SetLength(Elements, i); // новые элементы заполняются 0
+	SetLength(Elements, i); // РЅРѕРІС‹Рµ СЌР»РµРјРµРЅС‚С‹ Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ 0
 end;
 
 function TDVector.Add(SecVec: TDVector): TDVector;

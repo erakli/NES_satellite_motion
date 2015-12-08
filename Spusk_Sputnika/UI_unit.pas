@@ -67,7 +67,7 @@ var
     with Result do
     begin
       Day := StrToInt(Copy(value, 1, 2));
-      // добавить считывание части дня в виде часов/минут/сек сюда
+      // РґРѕР±Р°РІРёС‚СЊ СЃС‡РёС‚С‹РІР°РЅРёРµ С‡Р°СЃС‚Рё РґРЅСЏ РІ РІРёРґРµ С‡Р°СЃРѕРІ/РјРёРЅСѓС‚/СЃРµРє СЃСЋРґР°
       Month := StrToInt(Copy(value, 3, 2));
       Year := StrToInt(Copy(value, 5, 4));
       // Hour := StrToInt(Copy(value, 9, 2));
@@ -91,7 +91,7 @@ begin
   space_ := StrToFloat(ed_Space.Text);
   Cb_coeff_ := StrToFloat(ed_Sb_coeff.Text);
 //  step_ := StrToFloat(ed_Step.Text);
-  CrossSecArea_ := 3; // заглушка
+  CrossSecArea_ := 3; // Р·Р°РіР»СѓС€РєР°
 
 end;
 

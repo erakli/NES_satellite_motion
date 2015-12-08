@@ -2,15 +2,15 @@ unit uTest_Module;
 
 {
   TO-DO:
-  * Ввести поиск необходимой TLE с последующим отсчётом от неё интервала
-  (здесь принято за интервал). По факту, это время заданное пользователем
-  минус время ближайшей TLE
+  * Р’РІРµСЃС‚Рё РїРѕРёСЃРє РЅРµРѕР±С…РѕРґРёРјРѕР№ TLE СЃ РїРѕСЃР»РµРґСѓСЋС‰РёРј РѕС‚СЃС‡С‘С‚РѕРј РѕС‚ РЅРµС‘ РёРЅС‚РµСЂРІР°Р»Р°
+  (Р·РґРµСЃСЊ РїСЂРёРЅСЏС‚Рѕ Р·Р° РёРЅС‚РµСЂРІР°Р»). РџРѕ С„Р°РєС‚Сѓ, СЌС‚Рѕ РІСЂРµРјСЏ Р·Р°РґР°РЅРЅРѕРµ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј
+  РјРёРЅСѓСЃ РІСЂРµРјСЏ Р±Р»РёР¶Р°Р№С€РµР№ TLE
 
-  * Не забыть сделать перевод гелеоцентрических координат в ГЕО (которые выдаёт
-  функция из DLL). Под 4 индексом массива elements имеется геоцентрическое
-  расстояние объекта в AU - это надо учитывать.
+  * РќРµ Р·Р°Р±С‹С‚СЊ СЃРґРµР»Р°С‚СЊ РїРµСЂРµРІРѕРґ РіРµР»РµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ РІ Р“Р•Рћ (РєРѕС‚РѕСЂС‹Рµ РІС‹РґР°С‘С‚
+  С„СѓРЅРєС†РёСЏ РёР· DLL). РџРѕРґ 4 РёРЅРґРµРєСЃРѕРј РјР°СЃСЃРёРІР° elements РёРјРµРµС‚СЃСЏ РіРµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРѕРµ
+  СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕР±СЉРµРєС‚Р° РІ AU - СЌС‚Рѕ РЅР°РґРѕ СѓС‡РёС‚С‹РІР°С‚СЊ.
 
-  * Разобраться с JDEquinox
+  * Р Р°Р·РѕР±СЂР°С‚СЊСЃСЏ СЃ JDEquinox
 }
 
 interface
@@ -26,7 +26,7 @@ uses
   uEpheremides, uGauss;
 
 //type
-//  // ------------------------------------------- для dll
+//  // ------------------------------------------- РґР»СЏ dll
 //  EllipticalHandle = THandle;
 //
 //  tObjectElem = record
@@ -40,7 +40,7 @@ uses
 //
 //const
 //  ElemInit: array [0 .. 6] of MType = (2.2091404, 0.8502196, 11.94524,
-//    334.75006, 186.23352, 2448192.5 + 0.54502, 2451544.5); // для примера из AA
+//    334.75006, 186.23352, 2448192.5 + 0.54502, 2451544.5); // РґР»СЏ РїСЂРёРјРµСЂР° РёР· AA
   {
     a := ElemInit[0];
     e := ElemInit[1];
@@ -50,7 +50,7 @@ uses
     T := ElemInit[5];
     JDEquinox := ElemInit[6];
   }
-  // ------------------------------------------- /для dll
+  // ------------------------------------------- /РґР»СЏ dll
 
 procedure console_output(Vector: array of MType); overload;
 procedure console_output(Vector: PDVector); overload;
@@ -93,17 +93,17 @@ function test_uSunPressure: boolean;
 
 //  Transform: TMatrix;
 
-  // ------------------------------------------- для dll
+  // ------------------------------------------- РґР»СЏ dll
 //  Elements: tObjectElem;
 //  Details: tObjectDetails;
 //
 //  Elliptical: EllipticalHandle;
 
-  // функция из dll
+  // С„СѓРЅРєС†РёСЏ РёР· dll
 //function EllipticalCalculate(handle: EllipticalHandle; JD: MType;
 //  Elements: tObjectElem; bHighPrecision: boolean = false)
 //  : tObjectDetails; stdcall;
-// ------------------------------------------- /для dll
+// ------------------------------------------- /РґР»СЏ dll
 
 ////////////////////////////////////////////////////////////////////////////////
 implementation
@@ -111,7 +111,7 @@ implementation
 //const
 //  DLLName = 'AA.dll';
 
-//function EllipticalCalculate; external DLLName; // реализация в другом месте
+//function EllipticalCalculate; external DLLName; // СЂРµР°Р»РёР·Р°С†РёСЏ РІ РґСЂСѓРіРѕРј РјРµСЃС‚Рµ
 
 const
 	TLE: TLE_lines =
@@ -172,7 +172,7 @@ begin
 
 end;
 
-{ Тестирование модулей }
+{ РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ РјРѕРґСѓР»РµР№ }
 function test_uFunctions: boolean;
 const
   coordinates: TVector = ( 4, -7, 1 );
@@ -187,7 +187,7 @@ var
   radians, module_res: MType;
 begin
 
-	result := false;  // если не выйдем из этой функции, то будем иметь false
+	result := false;  // РµСЃР»Рё РЅРµ РІС‹Р№РґРµРј РёР· СЌС‚РѕР№ С„СѓРЅРєС†РёРё, С‚Рѕ Р±СѓРґРµРј РёРјРµС‚СЊ false
 
   writeln(' * * * * * * * * test_uFunctions * * * * * * * * ');
   writeln;
@@ -235,7 +235,7 @@ var
   i: integer;
 begin
 
-	result := false;  // если не выйдем из этой функции, то будем иметь false
+	result := false;  // РµСЃР»Рё РЅРµ РІС‹Р№РґРµРј РёР· СЌС‚РѕР№ С„СѓРЅРєС†РёРё, С‚Рѕ Р±СѓРґРµРј РёРјРµС‚СЊ false
 
   writeln(' * * * * * * * * test_uMatrix * * * * * * * * ');
   writeln;
@@ -301,7 +301,7 @@ var
   phi, theta, psi: MType;
 begin
 
-	result := false;  // если не выйдем из этой функции, то будем иметь false
+	result := false;  // РµСЃР»Рё РЅРµ РІС‹Р№РґРµРј РёР· СЌС‚РѕР№ С„СѓРЅРєС†РёРё, С‚Рѕ Р±СѓРґРµРј РёРјРµС‚СЊ false
 
   writeln(' * * * * * * * * test_uMatrix_Operations * * * * * * * * ');
   writeln;
@@ -398,16 +398,16 @@ begin
   writeln('GetDeltaTAI	', FloatToStr(delta));
   writeln;
 
-  vec := GetDeltaUT(time); 	// проверить
+  vec := GetDeltaUT(time); 	// РїСЂРѕРІРµСЂРёС‚СЊ
   writeln('GetDeltaUT');
   writeln('DUT1, xp, yp:');
   console_output(vec);
 
-  UT1 := UT1_time(time);  	// проверить
+  UT1 := UT1_time(time);  	// РїСЂРѕРІРµСЂРёС‚СЊ
   writeln('UT1_time	', FloatToStr(UT1));
   writeln;
 
-  TT := TT_time(time);     	// проверить
+  TT := TT_time(time);     	// РїСЂРѕРІРµСЂРёС‚СЊ
   writeln('TT_time	', FloatToStr(TT));
   writeln;
 
@@ -616,7 +616,7 @@ begin
 
 end;
 
-{ Тест возмущений }
+{ РўРµСЃС‚ РІРѕР·РјСѓС‰РµРЅРёР№ }
 function test_uAtmosphericDrag: boolean;
 const
   Cb_coeff = 2.2;
@@ -636,7 +636,7 @@ begin
   writeln(' * * * * * * * * test_uAtmosphericDrag * * * * * * * * ');
   writeln;
 
-  { Временно неверно вычисляется }
+  { Р’СЂРµРјРµРЅРЅРѕ РЅРµРІРµСЂРЅРѕ РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ }
   
   TLE_output := ReadTLE(TLE);
   Kepler_Elements := TLE_output.Elements;
@@ -767,11 +767,11 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 initialization
 
-AllocConsole;							// создаём консольное окно
-//SetConsoleCP(1251);				// устанавливаем принятие кириллицы
+AllocConsole;							// СЃРѕР·РґР°С‘Рј РєРѕРЅСЃРѕР»СЊРЅРѕРµ РѕРєРЅРѕ
+//SetConsoleCP(1251);				// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёРЅСЏС‚РёРµ РєРёСЂРёР»Р»РёС†С‹
 //SetConsoleOutputCP(1251);
 
-{ Вызов тестов модулей }
+{ Р’С‹Р·РѕРІ С‚РµСЃС‚РѕРІ РјРѕРґСѓР»РµР№ }
 //test_uFunctions;
 //test_uMatrix;
 //test_uMatrix_Operations;
@@ -797,7 +797,7 @@ test_uKepler_Conversation;
 // MJD := 57258;
 
 //interval := 0;
-// интервал, на который считаются координаты. необходимо для JDEquinox
+// РёРЅС‚РµСЂРІР°Р», РЅР° РєРѕС‚РѕСЂС‹Р№ СЃС‡РёС‚Р°СЋС‚СЃСЏ РєРѕРѕСЂРґРёРЅР°С‚С‹. РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ JDEquinox
 
 //TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
 //TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
@@ -806,7 +806,7 @@ test_uKepler_Conversation;
 //MJD := TLE_output.time;
 //JD := TLE_output.time;
 
-{ a, s_e, i, b_Omega, s_omega, M, n - Кеплеровские элементы орбиты (7) }
+{ a, s_e, i, b_Omega, s_omega, M, n - РљРµРїР»РµСЂРѕРІСЃРєРёРµ СЌР»РµРјРµРЅС‚С‹ РѕСЂР±РёС‚С‹ (7) }
 //with Elements do
 //begin
 //  a := TLE_output.Elements[0];
@@ -814,19 +814,19 @@ test_uKepler_Conversation;
 //  i := TLE_output.Elements[2];
 //  omega := TLE_output.Elements[3];
 //  w := TLE_output.Elements[4];
-//  JDEquinox := JD + interval; // как я понял, на этот момент получаем координаты
+//  JDEquinox := JD + interval; // РєР°Рє СЏ РїРѕРЅСЏР», РЅР° СЌС‚РѕС‚ РјРѕРјРµРЅС‚ РїРѕР»СѓС‡Р°РµРј РєРѕРѕСЂРґРёРЅР°С‚С‹
 //  T := JDEquinox - TLE_output.Elements[5] / TLE_output.Elements[6];
-  // уточнить справедливость вычитания
+  // СѓС‚РѕС‡РЅРёС‚СЊ СЃРїСЂР°РІРµРґР»РёРІРѕСЃС‚СЊ РІС‹С‡РёС‚Р°РЅРёСЏ
 //end;
 
 //Details := EllipticalCalculate(Elliptical, JD, Elements);
 
 //Kepler_Elements := TLE_output.Elements;
-// метод из Дубошина
+// РјРµС‚РѕРґ РёР· Р”СѓР±РѕС€РёРЅР°
 //coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
 //v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
 
-//coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
+//coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // РјРµС‚РѕРґ РёР· comalg.pdf
 
 //coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
 
@@ -838,11 +838,11 @@ test_uKepler_Conversation;
 
 writeln('Press any key to finish tests...');
 readln;
-FreeConsole;  // убираем консоль
+FreeConsole;  // СѓР±РёСЂР°РµРј РєРѕРЅСЃРѕР»СЊ
 
 
 
-{ //---------------------------------------- для случая из учебника AA (с. 232)
+{ //---------------------------------------- РґР»СЏ СЃР»СѓС‡Р°СЏ РёР· СѓС‡РµР±РЅРёРєР° AA (СЃ. 232)
   JD := 2448170.5;
   MJD := JD - MJDCorrection;
 
@@ -857,7 +857,7 @@ FreeConsole;  // убираем консоль
   JDEquinox := ElemInit[6];
   end;
 
-  Details := EllipticalCalculate(Elliptical, Jd, Elements); // вычисляем геоцентричискую позицию спутника
+  Details := EllipticalCalculate(Elliptical, Jd, Elements); // РІС‹С‡РёСЃР»СЏРµРј РіРµРѕС†РµРЅС‚СЂРёС‡РёСЃРєСѓСЋ РїРѕР·РёС†РёСЋ СЃРїСѓС‚РЅРёРєР°
 
   dist1 := 0;
   dist2 := 0;
@@ -880,7 +880,7 @@ FreeConsole;  // убираем консоль
 // coord := Kepler_to_Decart(Elements, 0).coord;
 
 
-// AtmosphericDrag.RightPart(MJD, coord, v, Sb_coeff);  // Необходимы параметры
+// AtmosphericDrag.RightPart(MJD, coord, v, Sb_coeff);  // РќРµРѕР±С…РѕРґРёРјС‹ РїР°СЂР°РјРµС‚СЂС‹
 
 // a := 2457198.5;
 // not_load := 0;
