@@ -23,7 +23,7 @@ interface
   ΔUT измеряется в секундах. }
 
 uses
-  uFunctions, uPrecNut, uConstants, uTypes, uTime, uEpheremides;
+  uFunctions, uPrecNut, uConstants, uTypes, uTime;//, uEpheremides;
 
 function GMSTime(UT1, TT: MType; theory2006: Boolean = true): MType;
 
@@ -125,7 +125,7 @@ begin
 
   // Угол наклона эклиптики и нутация в долготе так же определяется в UT1?
   // eps := GetEpsMean(UT1_mjd);
-  long_nut := Epheremides.GetEpheremides(UT1_mjd, true)[0];
+//  long_nut := Epheremides.GetEpheremides(UT1_mjd, true)[0];
 
   { Вычисление гринвичского истинного звёздного времени. Результат - угол }
   result := s0 + long_nut * cos(eps);

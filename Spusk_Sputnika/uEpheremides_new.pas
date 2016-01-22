@@ -1,4 +1,4 @@
-unit uEpheremides_new;
+﻿unit uEpheremides_new;
 
 interface
 
@@ -105,24 +105,23 @@ begin
     Search := BinSearch(JD)
   else
   	if (JD >= BB[0]) and (JD < BB[k]) then // Входит ли в тот же интервал?
+    begin
 
-      if (JD >= BB[LUS]) and (JD < BB[LUS + 1]) then
-      { Да, Входит ли в тот же подынтервал?
+      if NOT ((JD >= BB[LUS]) and (JD < BB[LUS + 1])) then
+      { Да, НЕ Входит ли в тот же подынтервал?
 
       	Первое выражение в квадратных скобках позволяет получить позицию,
         на которой в ВВ хранится первая граница полуинтервала,
         второе - соответственно }
-      begin // Да
-        Result := XYZ;
-        exit;
-      end
-      else
-      begin
-        XYZ := SearchSubinterval(self, JD);
-        Result := XYZ;
-        exit;
-      end
 
+      // Нет, не входит
+        XYZ := SearchSubinterval(self, JD);
+      // end of if
+
+      Result := XYZ;
+      exit;
+
+    end
     else
       Search := StepSearch(self, JD);
 

@@ -1,4 +1,4 @@
-unit uTest_Module;
+﻿unit uTest_Module;
 
 {
   TO-DO:
@@ -21,9 +21,9 @@ uses
   uMatrix,
   uMatrix_Operations, uTime, uTLE_conversation, uKepler_Conversation,
   uEpheremides_new, uPrecNut, uMatrix_Conversation,
-  uAtmosphericDrag, uGEO_Potential, uGEO_Potential_new, uSunPressure,
+  uAtmosphericDrag, {uGEO_Potential,} uGEO_Potential_new, uSunPressure,
   uModel, uDormanPrince,
-  uEpheremides, uGauss;
+  {uEpheremides,} uGauss;
 
 //type
 //  // ------------------------------------------- для dll
@@ -172,6 +172,7 @@ begin
 
 end;
 
+
 { Тестирование модулей }
 function test_uFunctions: boolean;
 const
@@ -224,6 +225,7 @@ begin
 
 end;
 
+
 function test_uMatrix: boolean;
 const
   size = 3;
@@ -270,6 +272,7 @@ begin
 
   result := true;
 end;
+
 
 function test_uMatrix_Operations: boolean;
 const
@@ -367,6 +370,7 @@ begin
   result := true;
 end;
 
+
 function test_uTime: boolean;
 const
 	testDate: TDate = ( Year: 2001; Month: 11; Day: 13.5 );
@@ -423,6 +427,7 @@ begin
 
 end;
 
+
 function test_uTypes: boolean;
 const
 	Date: TDate = (Year: 2014; Month: 1; Day: 2);
@@ -451,6 +456,7 @@ begin
 
 end;
 
+
 function test_uTLE_conversation: boolean;
 var
 	TLE_output: TTLE_output;
@@ -474,6 +480,7 @@ begin
   result := true;
 
 end;
+
 
 function test_uKepler_Conversation: boolean;
 const
@@ -506,6 +513,7 @@ begin
 
 end;
 
+
 function test_uEpheremides_new: boolean;
 const
   EphType = 3; // Earth_Moon
@@ -537,6 +545,7 @@ begin
 
 end;
 
+
 function test_uPrecNut: boolean;
 var
 	CIP_Tranform: TCIP_Tranform_Matrix;
@@ -561,6 +570,7 @@ begin
   result := true;
 
 end;
+
 
 function test_uMatrix_Conversation: boolean;
 const
@@ -616,6 +626,7 @@ begin
 
 end;
 
+
 { Тест возмущений }
 function test_uAtmosphericDrag: boolean;
 const
@@ -660,10 +671,11 @@ begin
 
 end;
 
+
 function test_uGEO_Potential: boolean;
 var
 	GEO_Potential_new: TGEO_Potential_new;
-  GEO_Potential: TGEO_Potential;
+//  GEO_Potential: TGEO_Potential;
   force: coordinates;
 
   TLE_output: TTLE_output;
@@ -681,9 +693,9 @@ begin
   Kepler_Elements := TLE_output.Elements;
   parameters :=  Kepler_to_Decart(Kepler_Elements, mass, Dubosh);
 
-  GEO_Potential := TGEO_Potential.Create;
-  force := GEO_Potential.RightPart(JD, parameters.coord, parameters.speed);
-  writeln('GEO_Potential.RightPart'); console_output(force);
+//  GEO_Potential := TGEO_Potential.Create;
+//  force := GEO_Potential.RightPart(JD, parameters.coord, parameters.speed);
+//  writeln('GEO_Potential.RightPart'); console_output(force);
 
   GEO_Potential_new := TGEO_Potential_new.Create;
   force := GEO_Potential_new.RightPart(JD, parameters.coord, parameters.speed);
@@ -696,6 +708,7 @@ begin
   result := true;
 
 end;
+
 
 function test_uSunPressure: boolean;
 const
@@ -731,6 +744,7 @@ begin
 
   result := true;
 end;
+
 
 function test_uDormanPrince: boolean;
 var
@@ -778,10 +792,10 @@ AllocConsole;							// создаём консольное окно
 //test_uTime;
 //test_uTypes;
 //test_uTLE_conversation;
-test_uKepler_Conversation;
+//test_uKepler_Conversation;
 //test_uEpheremides_new;
 //test_uPrecNut;
-//test_uMatrix_Conversation;
+test_uMatrix_Conversation;
 //test_uAtmosphericDrag;
 //test_uGEO_Potential;
 //test_uSunPressure;

@@ -84,9 +84,7 @@
         </DCCReference>
         <DCCReference Include="uKepler_Conversation.pas"/>
         <DCCReference Include="uConstants.pas"/>
-        <DCCReference Include="uGEO_Potential.pas"/>
         <DCCReference Include="uSputnik.pas"/>
-        <DCCReference Include="uIntegrator.pas"/>
         <DCCReference Include="uAtmosphericDrag.pas"/>
         <DCCReference Include="uCreate.pas"/>
         <DCCReference Include="uTime.pas"/>
@@ -95,7 +93,6 @@
         <DCCReference Include="uMatrix_Conversation.pas"/>
         <DCCReference Include="uTest_Module.pas"/>
         <DCCReference Include="uSunPressure.pas"/>
-        <DCCReference Include="uEpheremides.pas"/>
         <DCCReference Include="uPrecNut.pas"/>
         <DCCReference Include="uStarTime.pas"/>
         <DCCReference Include="uTLE_conversation.pas"/>

@@ -1,4 +1,4 @@
-unit uSputnik;
+﻿unit uSputnik;
 
 interface
 
@@ -82,18 +82,18 @@ begin
     uskor[i] := _X[i + 3]; // ускорение за пред. шаг
   end;
 
-  Mas1 := SunPressure.RightPart(t, coord, uskor, _space);
+//  Mas1 := SunPressure.RightPart(t, coord, uskor, _space);
   Mas2 := GEO_Potential_new.RightPart(t, coord, uskor);
-  Mas3 := AtmosphericDrag.RightPart(t, coord, uskor, Cb_coeff, CrossSecArea);
+//  Mas3 := AtmosphericDrag.RightPart(t, coord, uskor, Cb_coeff, CrossSecArea);
 
-  res1 := ConstProduct(1 / mass, Mas1);
-  res2 := ConstProduct(1 / mass, Mas3);
+//  res1 := ConstProduct(1 / mass, Mas1);
+//  res2 := ConstProduct(1 / mass, Mas3);
 
-  Summ1 := VecSum(res1, res2);
-  Summ2 := Perevod(VecSum(Mas2, Summ1)); // ускорение за этот шаг
+//  Summ1 := VecSum(res1, res2);
+//  Summ2 := Perevod(VecSum(Mas2, Summ1)); // ускорение за этот шаг
 
 //	Summ2 := Perevod(Mas1);
-//	Summ2 := Perevod(Mas2);
+	Summ2 := Perevod(Mas2);
 //	Summ2 := Perevod(Mas3);
 //	Summ2 := Perevod(VecSum(mas1, Mas3));
 

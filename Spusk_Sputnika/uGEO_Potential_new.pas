@@ -1,4 +1,4 @@
-unit uGEO_Potential_new;
+﻿unit uGEO_Potential_new;
 
 interface
 
@@ -22,7 +22,7 @@ type
   	// +1 для дополнительно вычисленной производной от нормированной функции Лежандра
 
  	TGEO_Potential_new = class(TObject)
-  private
+  strict private
 
     _delta_g, // Трёхкомпонентный вектор ускорения в сферической СК
     SpherCoord // Вектор положения объекта в сферической (географической) СК (преобразованный)
@@ -77,6 +77,7 @@ begin
   Reset(f);
 
   for n := 2 to NUM_OF_HARMONICS do
+  begin
 
     for m := 0 to n do
     begin
@@ -90,7 +91,12 @@ begin
       ReadLn(f, temp_text);
       C[n, m] := StrToFloat(Copy(temp_text, 10, 19));
       S[n, m] := StrToFloat(Copy(temp_text, 30, 19));
+
+      P[n, m] := 0;
+      _P[n, m] := 0;
     end;
+
+  end;
 
   CloseFile(f);
 
@@ -116,7 +122,9 @@ var
 
   cos_m, sin_m,  // заранее посчитанные значения cos и sin на шаг
   ae_ro,         // заранее считаемые степени (ae / ro)^n+1
-  fM_ae          // заранее посчитанное значение ( fM / (ae * ro) )
+  fM_ae,          // заранее посчитанное значение ( fM / (ae * ro) )
+
+  div_ae_ro      // значение ae / ro
   	: MType;
 
   sum_inner, sum_outter: TVector; // сумма по каждой отдельной сферической координате
@@ -130,7 +138,10 @@ begin
   fi := SpherCoord[1];
   lambda := SpherCoord[2];
 
-  ae_ro := sqr(ae / ro);
+  div_ae_ro := ae / ro;
+  ae_ro := sqr(div_ae_ro);
+
+  fM_ae := fM / (ae * ro);
 
 	for n := 2 to NUM_OF_HARMONICS do
   begin
@@ -154,7 +165,7 @@ begin
 
     end;
 
-    ae_ro := ae_ro * (ae / ro); // степень n + 1
+    ae_ro := ae_ro * (div_ae_ro); // степень n + 1
 
     // "внешние" суммы - сложение по n
     sum_outter[0] := sum_outter[0] + (n + 1) * ae_ro * sum_inner[0];
@@ -164,8 +175,6 @@ begin
     sum_outter[2] := sum_outter[2] + ae_ro * sum_inner[2];
 
   end;
-
-  fM_ae := fM / ( ae * ro );
 
   _delta_g[0] := - fM_ae * sum_outter[0];   // g_ro
 
@@ -216,10 +225,12 @@ begin
 
       else
       if (n = m) AND (m <> 0) then
+      begin
       	P[n, m] := P[n - 1, m - 1] *
         					 cos(fi) *
         					 sqrt( (2 * n + 1) / (2 * n) *
                    			  1 / delta_m(m - 1) )
+			end
 
       else
       if n < m then
@@ -234,11 +245,11 @@ begin
     { можно оптимизировать:
     	изначально задавать delta_m = 0.5, менять на единицу после 1 итерации }
     for m := 0 to n do
+    begin
       _P[n, m] := -( m * Tan(fi) * P[n, m] -
-
       							 sqrt(delta_m(m) * (n - m) * (n + m + 1)) *
                      P[n, m + 1] )
-
+    end
   end;
 
 

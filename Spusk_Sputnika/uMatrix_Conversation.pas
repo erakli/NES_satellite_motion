@@ -5,8 +5,10 @@
 interface
 
 uses
+	System.Math,
   uMatrix_Operations, uConstants, uTypes, uPrecNut, uStarTime, uTime,
-  uEpheremides, uFunctions;
+  //uEpheremides,
+  uFunctions;
 
 function FromFixToTrueM(t: MType): TMatrix;
 function FromTrueToFixM(t: MType): TMatrix;
@@ -97,7 +99,7 @@ end;
 
 { ------------------------------------------------------------------------------ }
 
-{ Из земной связанной в сферическую (географическую)
+{ Из земной связанной в географическую
 
 	На выходе 1 - радиус вектор, 2-3 - углы в радианах }
 
@@ -129,37 +131,43 @@ begin
     y := FixCoord[1];
     z := FixCoord[2];
 
-    SqrSum := pow2(x) + pow2(y);
-
-    if SqrSum = 0 then
-    begin
-      Result := NullVec;
-      Exit;
-    end;
+//    SqrSum := pow2(x) + pow2(y);  // можно заменить на проверку ro = z
+//
+//    if SqrSum = 0 then
+//    begin
+//      Result[0] := z;
+//      Exit;
+//    end;
 
   end;
 
-  fi :=  ArcTan(
-                  z /
-                  Sqrt( SqrSum )
+  // Здесь ArcSin переводит нас в географическую СК (проверить, может всё-таки
+  // нужно в сферическую). Всё таки в сферическую
+
+  fi :=  ArcTan2(
+  								Sqrt( SqrSum ),
+                  z
                 );
 
-  lambda := ArcTan( y / x );
+  // В теории, функция ArcTan2 должна правильно обрабатывать угол, определяя
+  // квадрант. Непонятно, как обстоят дела с делением на ноль.
 
-  if (x > 0) AND (y >= 0) then
+  lambda := ArcTan2( y, x );
 
-  else
-  if x <= 0 then
-  	lambda := lambda + Pi
-
-  else
-  if (x >= 0) AND (y < 0) then
-  	lambda := lambda + PI2
-  else
-  begin
-      Result := NullVec;
-      Exit;
-  end;
+//  if (x > 0) AND (y >= 0) then
+//
+//  else
+//  if x <= 0 then
+//  	lambda := lambda + Pi
+//
+//  else
+//  if (x >= 0) AND (y < 0) then
+//  	lambda := lambda + PI2
+//  else
+//  begin
+//      Result := NullVec;
+//      Exit;
+//  end;
 
   Result[0] := ro;
   Result[1] := fi;

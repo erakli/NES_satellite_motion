@@ -1,4 +1,4 @@
-unit uTypes;
+﻿unit uTypes;
 
 { В данном модуле описаны используемые типы }
 
@@ -85,9 +85,6 @@ implementation
 uses
 	uTime, uFunctions;
 
-const
-	DegInDay: MType = 360 / 365; // кол-во градусов, которое в среднем проходит Земля в день (!костыль!)
-
 
 { TSun }
 
@@ -104,6 +101,8 @@ begin
 end;
 
 procedure TSun.SetParams(JD: MType);
+const
+	DegInDay: MType = 0.98630136986301369863013698630137; // кол-во градусов, которое в среднем проходит Земля в день (!костыль!)
 var
 	Days: word; // Дней с начала года
 begin
