@@ -1,4 +1,4 @@
-unit UI_unit;
+﻿unit UI_unit;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uConstants, uTime, uSputnik,
-  uControl, uTypes, Vcl.StdCtrls, Vcl.Mask;
+  uControl, uTypes, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls;
 
 type
   TForm1 = class(TForm)
@@ -28,12 +28,28 @@ type
     gbox_Aditional: TGroupBox;
     ed_Sb_coeff: TEdit;
     lab_Sb_coeff: TLabel;
+    RadGroup_CoordType: TRadioGroup;
+    Ed_Decart_Y: TEdit;
+    Ed_Decart_X: TEdit;
+    Ed_Decart_Z: TEdit;
+    GBox_Decart: TGroupBox;
+    lab_Decart_Y: TLabel;
+    lab_Decart_X: TLabel;
+    lab_Decart_Z: TLabel;
+    Ed_Decart_Vy: TEdit;
+    Ed_Decart_Vx: TEdit;
+    Ed_Decart_Vz: TEdit;
+    lab_Decart_Vy: TLabel;
+    lab_Decart_Vx: TLabel;
+    lab_Decart_Vz: TLabel;
     procedure btn_RunClick(Sender: TObject);
   private
     { Private declarations }
     t_start_, t_end_: TDate;
     TLE_: TLE_lines;
     mass_, space_, step_, Cb_coeff_, CrossSecArea_: MType;
+
+    Decart_Coord, Decart_Speed: TVector;
 
     procedure Proceed;
     procedure Run;
@@ -57,22 +73,28 @@ begin
 
 end;
 
+
 procedure TForm1.Proceed;
 var
   first_date, second_date: string;
   i: byte;
 
   function ReadValue(value: string): TDate;
+  var
+  	Hour, Minute: Byte;
+    second: MType;
   begin
     with Result do
     begin
       Day := StrToInt(Copy(value, 1, 2));
-      // добавить считывание части дня в виде часов/минут/сек сюда
       Month := StrToInt(Copy(value, 3, 2));
       Year := StrToInt(Copy(value, 5, 4));
-      // Hour := StrToInt(Copy(value, 9, 2));
-      // Minute := StrToInt(Copy(value, 11, 2));
-      // second := StrToFloat(Copy(value, 13, 2));
+
+      Hour := StrToInt(Copy(value, 9, 2));
+      Minute := StrToInt(Copy(value, 11, 2));
+      second := StrToFloat(Copy(value, 13, 2));
+
+      Day := Day + Hour / HoursPerDay + Minute / MinsPerHour + second / SecInDay;
     end;
   end;
 
@@ -84,8 +106,19 @@ begin
   second_date := maskEd_EndDate.Text + maskEd_EndTime.Text;
   t_end_ := ReadValue(second_date);
 
-  for i := 0 to 1 do
-    TLE_[i] := memo_TLE.Lines[i];
+  if RadGroup_CoordType.ItemIndex = 0 then
+    for i := 0 to 1 do
+      TLE_[i] := memo_TLE.Lines[i]
+  else
+  begin
+  	Decart_Coord[0] := StrToFloat(Ed_Decart_X.Text);
+    Decart_Coord[1] := StrToFloat(Ed_Decart_Y.Text);
+    Decart_Coord[2] := StrToFloat(Ed_Decart_Z.Text);
+
+    Decart_Speed[0] := StrToFloat(Ed_Decart_Vx.Text);
+    Decart_Speed[1] := StrToFloat(Ed_Decart_Vy.Text);
+    Decart_Speed[2] := StrToFloat(Ed_Decart_Vz.Text);
+  end;
 
   mass_ := StrToFloat(ed_Mass.Text);
   space_ := StrToFloat(ed_Space.Text);
@@ -98,7 +131,13 @@ end;
 procedure TForm1.Run;
 begin
 
-  Control.Prepare(t_start_, t_end_, step_, TLE_, mass_, space_, Cb_coeff_, CrossSecArea_);
+	if RadGroup_CoordType.ItemIndex = 0 then
+  	Control.Prepare(t_start_, t_end_, TLE_, NullVec, NullVec, mass_, space_, Cb_coeff_, CrossSecArea_)
+  else
+  begin
+  	Control.Prepare(t_start_, t_end_, TLE_, Decart_Coord, Decart_Speed, mass_, space_, Cb_coeff_, CrossSecArea_, false);
+  end;
+
   Control.Modeling;
 
 end;

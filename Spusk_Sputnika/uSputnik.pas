@@ -26,16 +26,16 @@ type
     destructor Destroy; override;
   end;
 
-function Perevod(Mas: TVector): TDVector;
+function VecToDVec(Mas: TVector): TDVector;
 
 var
   Sputnik: TSputnik;
 
 implementation // --------------------------------------------------------------
 
-uses SysUtils;
+uses SysUtils, uFunctions;
 
-function Perevod(Mas: TVector): TDVector;
+function VecToDVec(Mas: TVector): TDVector;
 var
   i: Integer;
   H: TDVector;
@@ -64,12 +64,20 @@ end;
 function TSputnik.getRight(X: PDVector; t: MType): TDVector;
 var
   _X, Y: TDVector;
-  coord, uskor: TVector;
   i: Integer;
-  res1, res2: TVector;
+
+  radius3: MType;
+
+  coord, uskor,
+  res1, res2
+  	: TVector;
+
   Mas1, Mas2, Mas3: coordinates;
   Summ1: TVector;
-  Summ2: TDVector;
+
+  Summ2, tempDVec,
+  standMotion
+  	: TDVector;
 begin
 
   Y := TDVector.Create(X.getsize);
@@ -82,8 +90,13 @@ begin
     uskor[i] := _X[i + 3]; // ускорение за пред. шаг
   end;
 
+  radius3 := pow3(module(coord));
+
+  // далее идут костыльные костыли по скрещиванию динамического и константного векторов
+	Mas2 := NullVec;
+
 //  Mas1 := SunPressure.RightPart(t, coord, uskor, _space);
-  Mas2 := GEO_Potential_new.RightPart(t, coord, uskor);
+//  Mas2 := GEO_Potential_new.RightPart(t, coord, uskor);
 //  Mas3 := AtmosphericDrag.RightPart(t, coord, uskor, Cb_coeff, CrossSecArea);
 
 //  res1 := ConstProduct(1 / mass, Mas1);
@@ -93,14 +106,27 @@ begin
 //  Summ2 := Perevod(VecSum(Mas2, Summ1)); // ускорение за этот шаг
 
 //	Summ2 := Perevod(Mas1);
-	Summ2 := Perevod(Mas2);
+	Summ2 := VecToDVec(Mas2);
 //	Summ2 := Perevod(Mas3);
 //	Summ2 := Perevod(VecSum(mas1, Mas3));
+
+	tempDVec := TDVector.Create(3);
+
+	// вычисление невозмущённого движения
+	for i := 0 to 2 do
+  begin
+  	tempDVec[i] := -fm * coord[i] / radius3;
+  end;
+
+  // получение возмущённого движения
+  standMotion := tempDVec.Add(Summ2);
+
+  tempDVec.Destroy;
 
   for i := 0 to 2 do
   begin
     Y[i] := uskor[i];
-    Y[i + 3] := Summ2[i];
+    Y[i + 3] := standMotion[i];
   end;
 
   result := Y; // заглушка

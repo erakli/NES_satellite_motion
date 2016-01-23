@@ -301,7 +301,7 @@ begin
   MainStep;
 
   // полное гравитационное ускорение (вычитание - из пособия Кружкова, с.39)
-  _delta_g[0] := _delta_g[0] - fM / sqr(SpherCoord[0]);
+ // _delta_g[0] := _delta_g[0] - fM / sqr(SpherCoord[0]);
 
   // переводим координаты обратно в декартовы, в земную СК
   FixCoord := MultMatrVec(OnFixProject(coord), _delta_g);
