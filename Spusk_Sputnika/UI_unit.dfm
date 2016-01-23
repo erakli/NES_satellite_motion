@@ -239,7 +239,7 @@ object Form1: TForm1
       Width = 58
       Height = 21
       TabOrder = 0
-      Text = '500000'
+      Text = '7000000'
     end
     object Ed_Decart_Y: TEdit
       Left = 31
@@ -263,7 +263,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 3
-      Text = '0'
+      Text = '9000'
     end
     object Ed_Decart_Vx: TEdit
       Left = 136
@@ -271,7 +271,7 @@ object Form1: TForm1
       Width = 58
       Height = 21
       TabOrder = 4
-      Text = '500000'
+      Text = '0'
     end
     object Ed_Decart_Vz: TEdit
       Left = 136

@@ -135,14 +135,21 @@ end;
 function TSputnik.Stop_Calculation(t: Double; Step: Double; PrevStep: PDVector;
   CurStep: PDVector): boolean;
 var
+  i: byte;
+  coord: TDVector;
   CurVisota: MType;
 begin
-  CurVisota := PrevStep.getLength;
+  coord := TDVector.Create(3);
+  for i := 0 to 2 do
+    coord[i] := PrevStep^[i];
+  CurVisota := coord.getLength;
 //	writeln(self.Result, 'h = ', FloatToStr(CurVisota - Earth.eq_rad));
   if CurVisota - Earth.eq_rad <= 0 then
     result := true
   else
   	result := false;
+
+  coord.Destroy;
 end;
 
 destructor TSputnik.Destroy;
