@@ -23,7 +23,7 @@ uses
   uEpheremides_new in 'uEpheremides_new.pas',
   uAtmospericDrag_Coeff in 'uAtmospericDrag_Coeff.pas',
   uGauss in 'uGauss.pas',
-  uGEO_Potential_new in 'uGEO_Potential_new.pas' {/  uModel in 'uModel.pas';},
+  uGEO_Potential_new in 'uGEO_Potential_new.pas',
   uMatrix in 'uMatrix.pas',
   uModel in 'uModel.pas',
   uDormanPrince in 'uDormanPrince.pas';
