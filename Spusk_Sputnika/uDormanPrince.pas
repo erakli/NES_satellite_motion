@@ -1,4 +1,4 @@
-unit uDormanPrince;
+﻿unit uDormanPrince;
 
 interface
 
@@ -49,8 +49,6 @@ type
 
     x_size: integer; // длина вектора начальных значений
 
-    _iter: word; // счётчик количества итераций
-
     procedure StepCorrection; // управление длиной шага интегрирования
     procedure getEps;
 
@@ -60,6 +58,7 @@ type
     function RoundingError: MType;
 
     procedure set_k(_size: integer);
+    procedure clear_k;
 
     function thick_extradition(Teta, Step: MType): TDVector; // плотная выдача
 
@@ -76,7 +75,6 @@ type
     property Eps: MType read _Eps write setEps;
     property Eps_Max: MType read _Eps_Max write setEps_Max;
     property Eps_Global: MType read _Eps_Global;
-    property iter: word read _iter;
 
     destructor Destroy; override;
 
@@ -124,17 +122,10 @@ begin
 	_Eps_Max := 1.0e-17;
 	_Eps_Global := 0;
 
-	_iter := 0; // количество итераций
-
 end;
 
 destructor TDormanPrince.Destroy;
-var
-  i: byte;
 begin
-
-  for i := 0 to SIZE - 1 do
-    k[i].Destroy;
 
   inherited;
 end;
@@ -151,10 +142,18 @@ var
   Teta
     : MType;
 
-  sum, sum_1,
+  sum, sum_1, tempSum, tempSum_1,
   Xout
     : TDVector;
+
+  consoleFlag, set_k_flag: boolean;
+
+  _iter: word; // счётчик количества итераций
+  _iterInAll: LongWord;
 begin
+
+	_iter := 0;
+  _iterInAll := 0;
 
 	CurModel := Model; // Храним адрес модели для внутренних нужд
 
@@ -168,8 +167,9 @@ begin
 	tout := t; // Для плотной выдачи
 //	PrevStep := 0; // храним знание о предыдущем шаге
 
+	set_k_flag := false;
 
-  AllocConsole;							// создаём консольное окно
+  consoleFlag := AllocConsole;							// создаём консольное окно
 	writeln('* * * Dorman Prince integration');
   writeln('t0 = ', FloatToStr(t));
   writeln('t1 = ', FloatToStr(CurModel.t1));
@@ -184,12 +184,17 @@ begin
 	while t < CurModel.t1 do
 	begin
 		// необходим контроль количества итераций
-		if _iter < 20000 then
+		if _iter < 30000 then
       _iter := _iter + 1
 		else
 			break;
 
+    if set_k_flag then clear_k;   // очищаем вектор векторов k
+
 		set_k(x_size);
+     // если флаг об заполнении k = false, то устанавливаем true (заполнили)
+    if NOT set_k_flag then set_k_flag := true;
+
 
     sum := TDVector.Create(x_size);
     sum_1 := TDVector.Create(x_size);
@@ -209,17 +214,32 @@ begin
 			вектор результатов интегрирования.
 			для 4 и 5 порядка
 		}
-		x1 := x0.Add(sum.ConstProduct(Step));
-		_x1 := x0.Add(sum_1.ConstProduct(Step));
+    tempSum := sum.ConstProduct(Step);
+    tempSum_1 := sum_1.ConstProduct(Step);
+		x1 := x0.Add(tempSum);
+		_x1 := x0.Add(tempSum_1);
+
+    tempSum.Destroy;          // промежуточные суммы
+    tempSum_1.Destroy;
+    sum.Destroy;
+    sum_1.Destroy;
 
 		PrevStep := Step; // Запомнили шаг до конца этой итерации
 		getEps();
 		StepCorrection();
 
 		// если мы не довольны ошибкой, уточняем шаг с текущим t
-		if Eps > Eps_Max then	continue; // ------------------- основной перевалочный пункт
+		if Eps > Eps_Max then   // ------------------- основной перевалочный пункт
+    begin
+    	x1.Destroy;
+    	_x1.Destroy;
+    	continue;
+    end;
 
 		_Eps_Global := Eps_Global + _Eps; // считаем глобальную погрешность как сумму локальных
+
+    _iterInAll := _iterInAll + _iter;  // считаем общее количество итераций интегратора
+    _iter := 0;
 
 		// если приращение координаты менее заданного условия прерываем процесс
 		if CurModel.Stop_Calculation(t, PrevStep, @x0, @x1) then
@@ -230,7 +250,7 @@ begin
 			результатов модели
 		}
     Xout := TDVector.Create(x_size); // сюда записываются значения с учётом коэф. плотной выдачи
-		while (tout < t + PrevStep) AND (tout < CurModel.t1) do
+		while (tout < t + PrevStep) AND (tout <= CurModel.t1) do
 		begin
 			Teta := (tout - t) / PrevStep;
 			Xout := thick_extradition(Teta, PrevStep);
@@ -244,17 +264,17 @@ begin
 
     writeln(FloatToStr(t), '	', FloatToStr(PrevStep));
 
-    sum.Destroy;
-    sum_1.Destroy;
     Xout.Destroy;
     _x1.Destroy;
 
 	end;
 
+//  CurModel.addResult(@x0, t);
   writeln;
-  writeln('Process has been finished. Result file is placed in C:\ directory.');
+  writeln('Process has been finished. Number of iterations = ', _iterInAll);
+  writeln('Result file is placed in C:\ directory.');
   Sleep(3000);
-  FreeConsole;  // убираем консоль
+  if consoleFlag then FreeConsole;  // убираем консоль
 end;
 
 {*
@@ -264,7 +284,7 @@ procedure TDormanPrince.set_k(_size: integer);
 var
   s, i, j: integer;
 
-  sum,
+  sum, tempSum,
   res_pointer: TDVector;
 begin
 
@@ -291,14 +311,26 @@ begin
 			end;
 		end;
 
-    res_pointer := x0.Add(sum.ConstProduct(Step));
+    tempSum := sum.ConstProduct(Step);
+    res_pointer := x0.Add(tempSum);
 
 		k[s] := CurModel.getRight(@res_pointer, t + c[s] * Step);
 
+    tempSum.Destroy;
+    res_pointer.Destroy;
     sum.Destroy;
 
 	end;
 
+end;
+
+// Очистка вектора векторов k
+procedure TDormanPrince.clear_k;
+var
+  i: byte;
+begin
+  for i := 0 to SIZE - 1 do
+    k[i].Destroy;
 end;
 
 {*
@@ -311,7 +343,7 @@ const
 var
   sqrTeta: MType;
 
-  b, sum: TDVector;
+  b, sum, tempSum: TDVector;
 
   i, j: integer;
 begin
@@ -346,8 +378,10 @@ begin
 		end;
 	end;
 
-	result := x0.Add(sum.ConstProduct(Step));
+  tempSum := sum.ConstProduct(Step);
+	result := x0.Add(tempSum);
 
+  tempSum.Destroy;
   sum.Destroy;
   b.Destroy;
 

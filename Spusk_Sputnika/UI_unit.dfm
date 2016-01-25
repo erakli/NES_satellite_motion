@@ -1,8 +1,8 @@
-object Form1: TForm1
+object Main_Window: TMain_Window
   Left = 0
   Top = 0
   Caption = #1052#1086#1076#1077#1083#1080#1088#1086#1074#1072#1085#1080#1077' '#1076#1074#1080#1078#1077#1085#1080#1103' '#1048#1057#1047
-  ClientHeight = 271
+  ClientHeight = 269
   ClientWidth = 693
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,28 +11,29 @@ object Form1: TForm1
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
+  object lab_TLE: TLabel
+    Left = 272
+    Top = 21
+    Width = 214
+    Height = 13
+    Caption = #1055#1086#1083#1077' '#1074#1074#1086#1076#1072' '#1076#1074#1091#1089#1090#1088#1086#1095#1085#1099#1093' '#1101#1083#1077#1084#1077#1085#1090#1086#1074' (TLE)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
   object gbox_Main: TGroupBox
-    Left = 8
+    Left = 11
     Top = 8
     Width = 674
     Height = 145
     Caption = #1054#1089#1085#1086#1074#1085#1099#1077' '#1076#1072#1085#1085#1099#1077
     TabOrder = 0
-    object lab_TLE: TLabel
-      Left = 272
-      Top = 21
-      Width = 214
-      Height = 13
-      Caption = #1055#1086#1083#1077' '#1074#1074#1086#1076#1072' '#1076#1074#1091#1089#1090#1088#1086#1095#1085#1099#1093' '#1101#1083#1077#1084#1077#1085#1090#1086#1074' (TLE)'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-    end
     object memo_TLE: TMemo
       Left = 272
       Top = 40
@@ -178,7 +179,7 @@ object Form1: TForm1
     Width = 179
     Height = 60
     Caption = #1058#1080#1087' '#1080#1089#1093#1086#1076#1085#1099#1093' '#1076#1072#1085#1085#1099#1093
-    ItemIndex = 0
+    ItemIndex = 1
     Items.Strings = (
       'TLE'
       #1044#1077#1082#1072#1088#1090#1086#1074#1099' '#1082#1086#1086#1088#1076#1080#1085#1072#1090#1099)
@@ -239,7 +240,7 @@ object Form1: TForm1
       Width = 58
       Height = 21
       TabOrder = 0
-      Text = '7000000'
+      Text = '6600000'
     end
     object Ed_Decart_Y: TEdit
       Left = 31
@@ -263,7 +264,7 @@ object Form1: TForm1
       Width = 57
       Height = 21
       TabOrder = 3
-      Text = '9000'
+      Text = '7800'
     end
     object Ed_Decart_Vx: TEdit
       Left = 136
@@ -281,5 +282,21 @@ object Form1: TForm1
       TabOrder = 5
       Text = '0'
     end
+  end
+  object ADOConnection1: TADOConnection
+    Connected = True
+    ConnectionString = 
+      'Provider=SQLOLEDB.1;Integrated Security=SSPI;Persist Security In' +
+      'fo=False;Initial Catalog=NES_motion;Data Source=MAIN-PC'
+    Provider = 'SQLOLEDB.1'
+    Left = 288
+    Top = 104
+  end
+  object ADOQuery1: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 360
+    Top = 104
   end
 end

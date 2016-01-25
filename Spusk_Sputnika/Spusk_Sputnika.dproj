@@ -107,6 +107,44 @@
         <DCCReference Include="uModel.pas"/>
         <DCCReference Include="uDormanPrince.pas"/>
         <None Include="Spusk_Sputnika.todo"/>
+        <None Include="ModelSupport_Spusk_Sputnika\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\UI_unit\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uGEO_Potential_new\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uSputnik\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uEpheremides_new\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uStarTime\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uFunctions\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uConstants\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uKepler_Conversation\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uTest_Module\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uControl\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uAtmospericDrag_Coeff\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uModel\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uTLE_conversation\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uMatrix_Conversation\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uAtmosphericDrag\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uCreate\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uDormanPrince\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uPrecNut_InitialParam\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uMatrix\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uTypes\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\Spusk_Sputnika\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uPrecNut\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uSunPressure\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uTime\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uGauss\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uMatrix_Operations\default.txvpck"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uControl\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uSputnik\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uMatrix_Operations\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uPrecNut_InitialParam\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\Spusk_Sputnika\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uAtmospericDrag_Coeff\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uAtmosphericDrag\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uConstants\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uCreate\default.txaPackage"/>
+        <None Include="ModelSupport_Spusk_Sputnika\uDormanPrince\default.txaPackage"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -177,7 +215,49 @@
                 </VersionInfoKeys>
             </Delphi.Personality>
             <Deployment>
-                <DeployFile LocalName="Spusk_Sputnika.todo" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\UI_unit\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uSputnik\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uCreate\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uStarTime\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uConstants\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uTime\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uAtmosphericDrag\default.txaPackage" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -186,6 +266,192 @@
                 <DeployFile LocalName="Win32\Debug\Spusk_Sputnika.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Spusk_Sputnika.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uDormanPrince\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uCreate\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Spusk_Sputnika.todo" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uFunctions\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\Spusk_Sputnika\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uControl\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uPrecNut\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uGEO_Potential_new\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uGauss\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uConstants\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uTLE_conversation\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uMatrix\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uEpheremides_new\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uPrecNut_InitialParam\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uModel\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uMatrix_Operations\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uTest_Module\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uTypes\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uAtmospericDrag_Coeff\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uPrecNut_InitialParam\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\Spusk_Sputnika\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uDormanPrince\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uKepler_Conversation\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uMatrix_Operations\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uAtmosphericDrag\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uSputnik\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uMatrix_Conversation\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uControl\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uSunPressure\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_Spusk_Sputnika\uAtmospericDrag_Coeff\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

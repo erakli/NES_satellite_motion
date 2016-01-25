@@ -1,4 +1,4 @@
-unit uCreate;
+﻿unit uCreate;
 
 interface
 
@@ -22,6 +22,8 @@ begin
   //Epheremides := TEpheremides.Create;
 	EphCreation(3); // создаём объект эферемид для получения координат Земли
   Control := TControl.Create;
+
+  Sputnik := TSputnik.Create;
 end;
 
 procedure DestroyObjects;
@@ -34,6 +36,8 @@ begin
   //Epheremides.Destroy;
   Earth_Moon.Destroy;
   Control.Destroy;
+
+  Sputnik.Destroy;
 end;
 
 initialization

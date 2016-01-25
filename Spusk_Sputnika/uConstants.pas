@@ -1,4 +1,4 @@
-unit uConstants;
+﻿unit uConstants;
 
 interface
 
@@ -16,6 +16,7 @@ const
   c: MType = 299792458; // [m/s] Скорость света
 
   SecInDay = 86400; // секунд в дне
+  SecInDay2 = 7464960000;  // количество сек в дне в квадрате (для преобр. ускор.)
 
   MJDCorrection: MType = 2400000.5; // вычитать из JD
   J2000_Day: MType = 2451545.0; // 2000 January 1.5 TT

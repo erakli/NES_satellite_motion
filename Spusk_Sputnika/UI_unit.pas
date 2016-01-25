@@ -6,10 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uConstants, uTime, uSputnik,
-  uControl, uTypes, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls;
+  uControl, uTypes, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, Data.Win.ADODB,
+  Data.DB;
 
 type
-  TForm1 = class(TForm)
+  TMain_Window = class(TForm)
     memo_TLE: TMemo;
     gbox_Main: TGroupBox;
     lab_TLE: TLabel;
@@ -42,6 +43,8 @@ type
     lab_Decart_Vy: TLabel;
     lab_Decart_Vx: TLabel;
     lab_Decart_Vz: TLabel;
+    ADOConnection1: TADOConnection;
+    ADOQuery1: TADOQuery;
     procedure btn_RunClick(Sender: TObject);
   private
     { Private declarations }
@@ -59,13 +62,15 @@ type
   end;
 
 var
-  Form1: TForm1;
+  Main_Window: TMain_Window;
 
 implementation
 
+//uses uGraph;
+
 {$R *.dfm}
 
-procedure TForm1.btn_RunClick(Sender: TObject);
+procedure TMain_Window.btn_RunClick(Sender: TObject);
 begin
 
   Proceed;
@@ -74,7 +79,7 @@ begin
 end;
 
 
-procedure TForm1.Proceed;
+procedure TMain_Window.Proceed;
 var
   first_date, second_date: string;
   i: byte;
@@ -128,7 +133,7 @@ begin
 
 end;
 
-procedure TForm1.Run;
+procedure TMain_Window.Run;
 begin
 
 	if RadGroup_CoordType.ItemIndex = 0 then
@@ -139,6 +144,9 @@ begin
   end;
 
   Control.Modeling;
+
+//  if NOT Assigned(FormGraph) then FormGraph := TFormGraph.Create(Self);
+//  FormGraph.Show;
 
 end;
 

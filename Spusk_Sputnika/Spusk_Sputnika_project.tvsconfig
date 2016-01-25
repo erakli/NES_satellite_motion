@@ -1,2 +1,12 @@
 <?xml version="1.0"?>
-<TgConfig Version="3" SubLevelDisabled="False" />
+<TgConfig Version="3" SubLevelDisabled="False">
+  <Option Name="namespaceFolder.uControl" Type="System.String" Value="uControl" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uSputnik" Type="System.String" Value="uSputnik" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uPrecNut_InitialParam" Type="System.String" Value="uPrecNut_InitialParam" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Spusk_Sputnika" Type="System.String" Value="Spusk_Sputnika" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uAtmospericDrag_Coeff" Type="System.String" Value="uAtmospericDrag_Coeff" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uAtmosphericDrag" Type="System.String" Value="uAtmosphericDrag" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uConstants" Type="System.String" Value="uConstants" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uCreate" Type="System.String" Value="uCreate" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uDormanPrince" Type="System.String" Value="uDormanPrince" Category="General" IsBrowsable="False" />
+</TgConfig>

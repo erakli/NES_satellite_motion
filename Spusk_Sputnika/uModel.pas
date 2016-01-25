@@ -1,4 +1,4 @@
-unit uModel;
+﻿unit uModel;
 
 interface
 
@@ -36,7 +36,9 @@ type
 
     function getRight(X: PDVector; t: MType): TDVector; virtual; abstract;
 
-    procedure addResult(X: PDVector; t: MType);
+    procedure addResult(X: PDVector; t: MType); virtual;
+    procedure CreateResult;
+    procedure CloseResult;
 
     // инкапсуляция в чистом виде
     procedure setStart(arg: PDVector);
@@ -76,8 +78,6 @@ implementation
 {* * * * * * * * * * TModel * * * * * * * * * *}
 
 constructor TModel.Create;
-const
-  output_file = 'output.txt';
 begin
 	Interval := 0.1; // перенести на ручной ввод
 	t0 := 0;
@@ -86,15 +86,10 @@ begin
 	stop_count := 0;
 	stop_count_max := 5;
 	stop_flag := false;
-
-  AssignFile(Result, 'C:\' + output_file);
-  ReWrite(Result);
 end;
 
 destructor TModel.Destroy;
 begin
-
-  CloseFile(Result);
 //  StartValues.Destroy;
 
   inherited;
@@ -107,10 +102,12 @@ var
 
   i: byte;
 begin
-  write(Result, FloatToStr(t), '  ');
+  write(Result, FloatToStr(t), '	');
 
   for i := 0 to X.getSize - 1 do
-    write(Result, X^[i], ' ');
+    write(Result, X^[i], '	');
+
+  write(Result, X.getLength);
 
   writeln(Result);
 
@@ -134,6 +131,19 @@ begin
 end;
 
 // ----- свойства
+procedure TModel.CreateResult;
+const
+  output_file = 'output.txt';
+begin
+  AssignFile(Result, 'C:\' + output_file);
+  ReWrite(Result);
+end;
+
+procedure TModel.CloseResult;
+begin
+	CloseFile(Result);
+end;
+
 function TModel.getStart: TDVector;
 begin
   result := StartValues;

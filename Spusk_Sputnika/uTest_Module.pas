@@ -76,6 +76,7 @@ function test_uAtmosphericDrag: boolean;
 function test_uGEO_Potential: boolean;
 function test_uSunPressure: boolean;
 
+procedure TestInit;
 //var
 //  i: byte;
 //  a: MType;
@@ -516,7 +517,7 @@ end;
 
 function test_uEpheremides_new: boolean;
 const
-  EphType = 3; // Earth_Moon
+  EphType = 4; // 4	Mars
 var
   planet_coord: TVector;
   Date: TDate;
@@ -540,7 +541,7 @@ begin
   writeln;
   writeln;
 
-	Earth_Moon.Destroy;
+	Mars.Destroy;
   result := true;
 
 end;
@@ -760,16 +761,18 @@ begin
   Model := TArenstorfModel.Create(0);
   Integrator := TDormanPrince.Create;
 
+  Model.CreateResult;
+
   Model.t1 := Model.Period * 5;
 
   Integrator.Run(Model);
 
+  Model.CloseResult;
+
   Model.Destroy;
   Integrator.Destroy;
 
-  writeln('result file is placed in C:\ directory');
   writeln;
-
   writeln(' * * * * * * * * done');
   writeln;
   writeln;
@@ -777,84 +780,85 @@ begin
   result := true;
 end;
 
+// Основная процедура тестирования
+procedure TestInit;
+begin
+
+	AllocConsole;							// создаём консольное окно
+  //SetConsoleCP(1251);				// устанавливаем принятие кириллицы
+  //SetConsoleOutputCP(1251);
+
+  { Вызов тестов модулей }
+  test_uFunctions;
+  test_uMatrix;
+  test_uMatrix_Operations;
+  test_uTime;
+  test_uTypes;
+  test_uTLE_conversation;
+  test_uKepler_Conversation;
+  test_uEpheremides_new;
+  test_uPrecNut;
+  test_uMatrix_Conversation;
+  test_uAtmosphericDrag;
+  test_uGEO_Potential;
+  test_uSunPressure;
+
+  test_uDormanPrince;
+
+
+  //JD := 2415284.191;
+
+  // MJD := 57258;
+
+  //interval := 0;
+  // интервал, на который считаются координаты. необходимо для JDEquinox
+
+  //TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
+  //TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
+
+  //TLE_output := ReadTLE(TLE);
+  //MJD := TLE_output.time;
+  //JD := TLE_output.time;
+
+  { a, s_e, i, b_Omega, s_omega, M, n - Кеплеровские элементы орбиты (7) }
+  //with Elements do
+  //begin
+  //  a := TLE_output.Elements[0];
+  //  e := TLE_output.Elements[1];
+  //  i := TLE_output.Elements[2];
+  //  omega := TLE_output.Elements[3];
+  //  w := TLE_output.Elements[4];
+  //  JDEquinox := JD + interval; // как я понял, на этот момент получаем координаты
+  //  T := JDEquinox - TLE_output.Elements[5] / TLE_output.Elements[6];
+    // уточнить справедливость вычитания
+  //end;
+
+  //Details := EllipticalCalculate(Elliptical, JD, Elements);
+
+  //Kepler_Elements := TLE_output.Elements;
+  // метод из Дубошина
+  //coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
+  //v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
+
+  //coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
+
+  //coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
+
+  //dist1 := module(v) - 6378.1366;
+  //dist2 := module(coord) - 6378.1366;
+
+
+  writeln('Press any key to finish tests...');
+  readln;
+  FreeConsole;  // убираем консоль
+
+end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 initialization
 
-AllocConsole;							// создаём консольное окно
-//SetConsoleCP(1251);				// устанавливаем принятие кириллицы
-//SetConsoleOutputCP(1251);
-
-{ Вызов тестов модулей }
-//test_uFunctions;
-//test_uMatrix;
-//test_uMatrix_Operations;
-//test_uTime;
-//test_uTypes;
-//test_uTLE_conversation;
-//test_uKepler_Conversation;
-//test_uEpheremides_new;
-//test_uPrecNut;
-test_uMatrix_Conversation;
-//test_uAtmosphericDrag;
-//test_uGEO_Potential;
-//test_uSunPressure;
-//
-//test_uDormanPrince;
-
-
-
-
-
-//JD := 2415284.191;
-
-// MJD := 57258;
-
-//interval := 0;
-// интервал, на который считаются координаты. необходимо для JDEquinox
-
-//TLE[0] := '1 25544U 98067A   04070.88065972  .00013484  00000-0  13089-3 0  3477';
-//TLE[1] := '2 25544  51.6279 106.4208 0010791 261.4810  91.7966 15.66622191302881';
-
-//TLE_output := ReadTLE(TLE);
-//MJD := TLE_output.time;
-//JD := TLE_output.time;
-
-{ a, s_e, i, b_Omega, s_omega, M, n - Кеплеровские элементы орбиты (7) }
-//with Elements do
-//begin
-//  a := TLE_output.Elements[0];
-//  e := TLE_output.Elements[1];
-//  i := TLE_output.Elements[2];
-//  omega := TLE_output.Elements[3];
-//  w := TLE_output.Elements[4];
-//  JDEquinox := JD + interval; // как я понял, на этот момент получаем координаты
-//  T := JDEquinox - TLE_output.Elements[5] / TLE_output.Elements[6];
-  // уточнить справедливость вычитания
-//end;
-
-//Details := EllipticalCalculate(Elliptical, JD, Elements);
-
-//Kepler_Elements := TLE_output.Elements;
-// метод из Дубошина
-//coord := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).coord;
-//v := Kepler_to_Decart(Kepler_Elements, 0, Dubosh).speed;
-
-//coord := Kepler_to_Decart(Kepler_Elements, 0).coord; // метод из comalg.pdf
-
-//coord := MultMatrVec(ITRS2GCRS(TT_time(JD)), coord);
-
-//dist1 := module(v) - 6378.1366;
-//dist2 := module(coord) - 6378.1366;
-
-
-
-
-writeln('Press any key to finish tests...');
-readln;
-FreeConsole;  // убираем консоль
-
-
+//TestInit;  // здесь мы запускаем весь написанный выше код
 
 { //---------------------------------------- для случая из учебника AA (с. 232)
   JD := 2448170.5;
@@ -888,15 +892,5 @@ FreeConsole;  // убираем консоль
   dist2 := sqrt(dist2);
   end;
 }
-
-// for i := 0 to 5 do Elements[i] := ElemInit[i];
-//
-// coord := Kepler_to_Decart(Elements, 0).coord;
-
-
-// AtmosphericDrag.RightPart(MJD, coord, v, Sb_coeff);  // Необходимы параметры
-
-// a := 2457198.5;
-// not_load := 0;
 
 end.
