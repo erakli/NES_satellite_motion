@@ -9,4 +9,7 @@
   <Option Name="namespaceFolder.uConstants" Type="System.String" Value="uConstants" Category="General" IsBrowsable="False" />
   <Option Name="namespaceFolder.uCreate" Type="System.String" Value="uCreate" Category="General" IsBrowsable="False" />
   <Option Name="namespaceFolder.uDormanPrince" Type="System.String" Value="uDormanPrince" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uModel" Type="System.String" Value="uModel" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uFunctions" Type="System.String" Value="uFunctions" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uGEO_Potential_new" Type="System.String" Value="uGEO_Potential_new" Category="General" IsBrowsable="False" />
 </TgConfig>

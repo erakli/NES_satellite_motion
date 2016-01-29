@@ -178,13 +178,15 @@ begin
   if E < 14 then
     m := E - 1
   else if (E = 14) OR (E = 15) then
-    m := E - 13;
+    m := E - 13
+    else m := 1;
 
   // year
   if m > 2 then
     Year := C - 4716
   else if (m = 1) OR (m = 2) then
-    Year := C - 4715;
+    Year := C - 4715
+    else Year := 0;
 
   Result.Month := m;
   Result.Year := Year;

@@ -7,6 +7,7 @@ interface
 const
 
   m_size = 2; // Размер матриц
+  ForcesNum = 2; // максимальный индекс возмущающих сил
 
 type
 
@@ -14,6 +15,7 @@ type
 
   TMatrix = array [0 .. m_size, 0 .. m_size] of MType;
   TVector = array [0 .. m_size] of MType;
+  TBoolVec = array[0..ForcesNum] of Boolean;
 
   TMassive = record
     x, y, z: TMatrix;
@@ -75,6 +77,15 @@ type
   TTLE_output = record // специально для TLE модуля - вывод функции ReadTLE
     time: MType; // в JD
     Elements: TElements;
+  end;
+
+  TControlInitRec = record
+    TLE: TLE_lines;
+    coord, speed: TVector;
+  	Forces: TBoolVec;
+    Interval: MType;
+    Precision: byte;
+    mass, s, Сb_coeff, CrossSecArea: MType;
   end;
 
 var

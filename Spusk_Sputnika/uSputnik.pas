@@ -10,6 +10,8 @@ uses
 type
   TSputnik = class(TModel)
   private
+  	ForcesResult: TextFile;
+  	GEO_force: coordinates;
   public
 //    position: coordinates;
     mass, Cb_coeff, // баллистический коэффициент
@@ -18,12 +20,17 @@ type
     _space // s - площадь эффективного/поперечного сечения
       : MType;
 
-    modellingNum, initParam: string; // для SQL
+//    modellingNum, initParam: string; // для SQL
+
+		Forces: TBoolVec;  // вектор флагов о наличии возмущений
 
     function getRight(X: PDVector; t: MType): TDVector; override;
     function Stop_Calculation(t, Step: MType; PrevStep, CurStep: PDVector)
       : boolean; override;
     procedure addResult(X: PDVector; t: MType); override;
+
+    procedure CreateResult; override;
+    procedure CloseResult; override;
 
     constructor Create; overload;
     constructor Create(newmass, newCb_coeff, newCrossSecArea, new_space: MType); overload;
@@ -37,7 +44,7 @@ var
 
 implementation // --------------------------------------------------------------
 
-uses SysUtils, uFunctions, UI_unit;
+uses SysUtils, uFunctions;
 
 function VecToDVec(Mas: TVector): TDVector;
 var
@@ -53,25 +60,37 @@ end;
 { TSputnik }
 
 constructor TSputnik.Create;
+var
+	i: byte;
 begin
   inherited Create;
 
   Interval := 1;
 
-  StartValues := TDVector.Create(6);
+  for i := 0 to ForcesNum do
+  	Forces[i] := false;
+
+//  StartValues := TDVector.Create(6);
 
   mass := 417289;
   Cb_coeff := 2.2;
   CrossSecArea := 3;
   _space := 3;
+
+  GEO_force := NullVec;
 end;
 
 constructor TSputnik.Create(newmass, newCb_coeff, newCrossSecArea,
   new_space: MType);
+var
+	i: byte;
 begin
   inherited Create;
 
   Interval := 1;
+
+  for i := 0 to ForcesNum do
+  	Forces[i] := false;
 
   StartValues := TDVector.Create(6);
 
@@ -79,6 +98,8 @@ begin
   Cb_coeff := newCb_coeff;
   CrossSecArea := newCrossSecArea;
   _space := new_space;
+
+  GEO_force := NullVec;
 end;
 
 function TSputnik.getRight(X: PDVector; t: MType): TDVector;
@@ -88,8 +109,8 @@ var
 
   radius3: MType;
 
-  coord, speed,
-  res1, res2
+  coord, speed
+//  , res1, res2
   	: TVector;
 
   Mas1, Mas2, Mas3: coordinates;
@@ -105,17 +126,26 @@ begin
   for i := 0 to 2 do
   begin
     coord[i] := X^[i];
-    speed[i] := X^[i + 3] / SecInDay; // ускорение за пред. шаг
+    speed[i] := X^[i + 3]; // ускорение за пред. шаг
   end;
 
   radius3 := pow3(module(coord));
 
   // далее идут костыльные костыли по скрещиванию динамического и константного векторов
+//  Mas1 := NullVec;
 	Mas2 := NullVec;
+//  Mas3 := NullVec;
 
-//  Mas1 := SunPressure.RightPart(t, coord, uskor, _space);
-  Mas2 := GEO_Potential_new.RightPart(t, coord, speed);
-//  Mas3 := AtmosphericDrag.RightPart(t, coord, uskor, Cb_coeff, CrossSecArea);
+	if Forces[0] then
+  	Mas1 := SunPressure.RightPart(t / SecsPerDay, coord, speed, _space);
+
+  if Forces[1] then
+  	Mas2 := GEO_Potential_new.RightPart(t / SecsPerDay, coord, speed);
+
+  GEO_force := Mas2;
+
+  if Forces[2] then
+  	Mas3 := AtmosphericDrag.RightPart(t / SecsPerDay, coord, speed, Cb_coeff, CrossSecArea);
 
 //  res1 := ConstProduct(1 / mass, Mas1);
 //  res2 := ConstProduct(1 / mass, Mas3);
@@ -140,8 +170,8 @@ begin
 
   for i := 0 to 2 do
   begin
-    Y[i] := speed[i] * SecInDay;
-    Y[i + 3] := standMotion[i] * SecInDay2;
+    Y[i] := speed[i];
+    Y[i + 3] := standMotion[i];
   end;
 
   standMotion.Destroy;
@@ -173,50 +203,70 @@ procedure TSputnik.addResult(X: PDVector; t: MType);
 var
   i: byte;
 
-  ADDcoordAndSpeed, coordAndSpeed, ADDresult: string;
+//  ADDcoordAndSpeed, coordAndSpeed, ADDresult: string;
 begin
-  write(Result, FloatToStr(t), '	');
+  write(Result, FloatToStr(t - t0), '	');
+  write(ForcesResult, FloatToStr(t - t0), '	');
 
   for i := 0 to 2 do
+  begin
     write(Result, X^[i], '	');
+    write(ForcesResult, GEO_force[i], '	');
+  end;
 
   for i := 3 to 5 do
-    write(Result, X^[i] / SecInDay, '	');
+    write(Result, X^[i], '	');
 
   write(Result, sqrt(sqr(X^[0]) + sqr(X^[1]) + sqr(X^[2])) );
 
   writeln(Result);
+  writeln(ForcesResult);
 
   // дополнительно пишем в БД
-  with Main_Window.ADOQuery1 do
-  begin
-    SQL.Clear;
-    ADDcoordAndSpeed :=
-    			'INSERT into [Coordinates and Speed](X, Y, Z, Vx, Vy, Vz) values('
-            + FloatToStr(X^[0]) + ' , ' + FloatToStr(X^[1]) + ', ' + FloatToStr(X^[2]) + ', '
-            + FloatToStr(X^[3]) + ', ' + FloatToStr(X^[4]) + ', ' + FloatToStr(X^[5])  + ') ';
+//  with Main_Window.ADOQuery1 do
+//  begin
+//    SQL.Clear;
+//    ADDcoordAndSpeed :=
+//    			'INSERT into [Coordinates and Speed](X, Y, Z, Vx, Vy, Vz) values('
+//            + FloatToStr(X^[0]) + ' , ' + FloatToStr(X^[1]) + ', ' + FloatToStr(X^[2]) + ', '
+//            + FloatToStr(X^[3]) + ', ' + FloatToStr(X^[4]) + ', ' + FloatToStr(X^[5])  + ') ';
+//
+//    SQL.Add(ADDcoordAndSpeed);
+//    SQL.Add('SELECT scope_identity() from [Coordinates and Speed]');
+//    Open;
+//    coordAndSpeed := Fields[0].AsString;
+//
+//    SQL.Clear;
+//    ADDresult :=
+//    			'INSERT into Result(Modelling, CoordinatesAndSpeed) values('
+//            + modellingNum + ' , ' + coordAndSpeed + ') ';
+//
+//    SQL.Add(ADDresult);
+//    ExecSQL;
+//  end;
 
-    SQL.Add(ADDcoordAndSpeed);
-    SQL.Add('SELECT scope_identity() from [Coordinates and Speed]');
-    Open;
-    coordAndSpeed := Fields[0].AsString;
+end;
 
-    SQL.Clear;
-    ADDresult :=
-    			'INSERT into Result(Modelling, CoordinatesAndSpeed) values('
-            + modellingNum + ' , ' + coordAndSpeed + ') ';
+procedure TSputnik.CreateResult;
+const
+  output_forces = 'output_forces.txt';
+begin
+  inherited;
+  AssignFile(ForcesResult, 'C:\' + output_forces);
+  ReWrite(ForcesResult);
+end;
 
-    SQL.Add(ADDresult);
-    ExecSQL;
-  end;
-
+procedure TSputnik.CloseResult;
+begin
+	inherited;
+  CloseFile(ForcesResult);
 end;
 
 destructor TSputnik.Destroy;
 begin
 
-	// проверить очистку данного вектора
-  StartValues.Destroy;
+//	// проверить очистку данного вектора
+//  StartValues.Destroy;
 
   inherited;
 end;

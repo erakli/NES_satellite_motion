@@ -119,7 +119,8 @@ begin
 
 	_Step := 1.0e-3;
 	_Eps := 1.0e-5;
-	_Eps_Max := 1.0e-17;
+	//_Eps_Max := 1.0e-17;
+  _Eps_Max := 1.0e-12;
 	_Eps_Global := 0;
 
 end;
@@ -444,6 +445,7 @@ var
   v, u: MType;
 begin
 	v := 1;
+	u := v;
 
 	while 1 + v > 1 do
 	begin

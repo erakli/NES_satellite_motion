@@ -1,4 +1,4 @@
-unit uSunPressure;
+﻿unit uSunPressure;
 
 { Модуль рассчёта давления, вызываемого светом.
 

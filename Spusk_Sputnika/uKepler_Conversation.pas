@@ -31,6 +31,7 @@ begin
   // E := E - ((E - s_e * sin(DegToRad(E)) - M) / (1 - s_e * cos(DegToRad(E))));
   // result := E;
 
+  E := 0;
   cur := M + s_e * Sin(M); // в радианах
   dif := 1;
   iter := 0;

@@ -131,13 +131,14 @@ begin
     y := FixCoord[1];
     z := FixCoord[2];
 
-//    SqrSum := pow2(x) + pow2(y);  // можно заменить на проверку ro = z
-//
-//    if SqrSum = 0 then
-//    begin
-//      Result[0] := z;
-//      Exit;
-//    end;
+    SqrSum := pow2(x) + pow2(y);  // можно заменить на проверку ro = z
+
+    if SqrSum = 0 then
+    begin
+    	Result := NullVec;
+      Result[0] := z;
+      Exit;
+    end;
 
   end;
 

@@ -275,6 +275,8 @@ begin
 
 	r_xy := sqrt( sqr(x) + sqr(y) );
 
+  if r_xy = 0 then r_xy := 0.00001;  // костыльный костыль
+
   Msf[0, 0] := x / ro;		Msf[0, 1] := - x * z / (ro * r_xy);		Msf[0, 2] := - y / r_xy;
 
   Msf[1, 0] := y / ro;		Msf[1, 1] := - y * z / (ro * r_xy);		Msf[1, 2] := x / r_xy;
@@ -292,11 +294,16 @@ function TGEO_Potential_new.RightPart(t: MType;
 																	coord, veloc: coordinates): coordinates;
 var
 	FixCoord: TVector;
+  ITtoGC: TMatrix;
 
 begin
 
-	SpherCoord := Fix2Spher(coord);
-  SpherCoord[0] := SpherCoord[0]; // привели к метрам
+	ITtoGC := ITRS2GCRS(t);
+
+  FixCoord := MultMatrVec(TranspMatr(ITtoGC), coord); // перевели к связанной
+
+	SpherCoord := Fix2Spher(FixCoord);
+ // SpherCoord[0] := SpherCoord[0]; // привели к метрам
   Prepare_P(SpherCoord[1]);
   MainStep;
 
@@ -304,10 +311,10 @@ begin
  // _delta_g[0] := _delta_g[0] - fM / sqr(SpherCoord[0]);
 
   // переводим координаты обратно в декартовы, в земную СК
-  FixCoord := MultMatrVec(OnFixProject(coord), _delta_g);
+  FixCoord := MultMatrVec(OnFixProject(FixCoord), _delta_g);
 
   // сразу перешли в небесную инерциальную
-  Result := MultMatrVec(ITRS2GCRS(t), FixCoord);
+  Result := MultMatrVec(ITtoGC, FixCoord);
 
 end;
 

@@ -1,4 +1,4 @@
-unit uFunctions;
+﻿unit uFunctions;
 
 { Служебные функции }
 
@@ -19,6 +19,9 @@ function pow2(arg: MType): MType;
 function pow3(arg: MType): MType;
 function pow4(arg: MType): MType;
 function pow5(arg: MType): MType;
+
+function getSign(const arg: double): integer; overload;
+function getSign(const arg: integer): integer; overload;
 
 implementation
 
@@ -87,6 +90,21 @@ end;
 function pow5(arg: MType): MType;
 begin
   result := arg * arg * arg * arg * arg;
+end;
+
+{ Определение знака числа }
+function getSign(const arg: double): integer;
+begin
+	Result := 1;
+	if arg < 0 then
+  	Result := -1;
+end;
+
+function getSign(const arg: integer): integer;
+begin
+	Result := 1;
+	if arg < 0 then
+  	Result := -1;
 end;
 
 end.

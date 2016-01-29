@@ -37,8 +37,8 @@ type
     function getRight(X: PDVector; t: MType): TDVector; virtual; abstract;
 
     procedure addResult(X: PDVector; t: MType); virtual;
-    procedure CreateResult;
-    procedure CloseResult;
+    procedure CreateResult; virtual;
+    procedure CloseResult; virtual;
 
     // инкапсуляция в чистом виде
     procedure setStart(arg: PDVector);
@@ -142,6 +142,7 @@ end;
 procedure TModel.CloseResult;
 begin
 	CloseFile(Result);
+  StartValues.Destroy;
 end;
 
 function TModel.getStart: TDVector;
